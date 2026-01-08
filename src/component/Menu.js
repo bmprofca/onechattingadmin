@@ -328,27 +328,6 @@ export const Header = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsMi
 
           {/* Right */}
           <div className="flex items-center gap-3 md:gap-5">
-            <button
-              onClick={() => setSwitchProjectModalOpen(true)}
-              className="hidden md:flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-sm transition-all duration-200 group"
-            >
-              <FiBriefcase size={16} className="text-slate-400 group-hover:text-indigo-500 transition-colors" />
-              <span className="max-w-[120px] truncate">{selectedProjectName || selectedCompany?.name || 'Select Project'}</span>
-              <FiChevronDown size={14} className="text-slate-400" />
-            </button>
-
-            <div className="hidden sm:flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pr-3 shadow-sm hover:border-indigo-200 transition-colors cursor-default">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
-                <FiCreditCard size={14} />
-              </div>
-              <div className="flex flex-col leading-none">
-                {/* <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Balance</span> */}
-                <span className="text-sm font-bold text-slate-700 font-mono">₹{Number(walletBalance).toFixed(2)}</span>
-              </div>
-              <button onClick={() => navigate('/wallet-recharge')} className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-105 transition-all shadow-md shadow-indigo-200">
-                <FiPlus size={12} />
-              </button>
-            </div>
 
             <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
 

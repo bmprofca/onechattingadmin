@@ -5,9 +5,11 @@ import {
     FiSearch,
     FiBriefcase,
     FiActivity,
-    FiToggleRight
+    FiToggleRight,
+    FiDollarSign
 } from 'react-icons/fi';
 import axios from 'axios';
+import ProjectChargesModal from '../component/Modals/ProjectChargesModal';
 
 const Projects = () => {
     const navigate = useNavigate();
@@ -22,6 +24,8 @@ const Projects = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [tokens, setTokens] = useState(null);
     const [error, setError] = useState('');
+    const [chargesModalOpen, setChargesModalOpen] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
 
     // Sync Sidebar State
     useEffect(() => {
@@ -83,6 +87,23 @@ const Projects = () => {
     const wabaConnected = projects.filter(
         p => p.is_waba_connected === 1 || p.is_waba_connected === '1' || p.is_waba_connected === true
     ).length;
+
+    const handleOpenCharges = (project, e) => {
+        if (e) {
+            e.stopPropagation();
+        }
+        setSelectedProject(project);
+        setChargesModalOpen(true);
+    };
+
+    const handleChargesUpdated = (updatedProject) => {
+        if (!updatedProject) return;
+        setProjects(prev =>
+            prev.map(p =>
+                p.project_id === updatedProject.project_id ? { ...p, ...updatedProject } : p
+            )
+        );
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -187,6 +208,9 @@ const Projects = () => {
                                         <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             WABA
                                         </th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            Charges
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -212,7 +236,8 @@ const Projects = () => {
                                             return (
                                                 <tr
                                                     key={project.id || project.project_id}
-                                                    className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors"
+                                                    className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors cursor-pointer"
+                                                    onClick={() => navigate(`/admin/projects/${project.project_id}`)}
                                                 >
                                                     <td className="px-6 py-4">
                                                         <div className="flex items-center">
@@ -271,6 +296,16 @@ const Projects = () => {
                                                             {isConnected ? 'Connected' : 'Not Connected'}
                                                         </span>
                                                     </td>
+                                                    <td className="px-6 py-4">
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => handleOpenCharges(project, e)}
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/20 transition-colors"
+                                                        >
+                                                            <FiDollarSign className="text-emerald-500" size={12} />
+                                                            View Charges
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             );
                                         })
@@ -288,6 +323,14 @@ const Projects = () => {
                             </table>
                         </div>
                     </div>
+
+                    <ProjectChargesModal
+                        isOpen={chargesModalOpen}
+                        onClose={() => setChargesModalOpen(false)}
+                        project={selectedProject}
+                        tokens={tokens}
+                        onUpdated={handleChargesUpdated}
+                    />
                 </div>
             </div>
         </div>

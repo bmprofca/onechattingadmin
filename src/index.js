@@ -3,6 +3,7 @@ import './index.css';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
 import Projects from './pages/Projects';
+import ProjectDetails from './pages/ProjectDetails';
 import Login from './pages/Login';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -23,6 +24,7 @@ root.render(
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/projects" element={<Projects />} />
+          <Route path="/admin/projects/:project_id" element={<ProjectDetails />} />
           {/* Fallback to dashboard for any unknown route */}
           <Route path="*" element={<Dashboard />} />
         </Routes>
