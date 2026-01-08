@@ -1,37 +1,13 @@
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import Error_404 from './pages/error/Error_404';
 import Dashboard from './pages/Dashboard';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Users from './pages/Users';
+import Projects from './pages/Projects';
 import Login from './pages/Login';
-import Register from './pages/Register';
-import LiveChat from './pages/LiveChat';
-import Template from './pages/Template';
-import TemplateAdd from './pages/TemplateAdd';
-import TemplateEdit from './pages/TemplateEdit';
-import Contact from './pages/Contact';
-import ContactGroup from './pages/ContactGroup';
-import ContactGroupList from './pages/ContactGroupList';
-import AgentManagement from './pages/AgentManagement';
-import MyPlan from './pages/MyPlan';
-import Blank from './pages/Blank';
-import PermissionsList from './pages/PermissionsList';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Provider } from 'react-redux';
 import store from './store';
-import CreateCampaign from './pages/Campaign/CreateCampaign';
-import Transactions from './pages/Transactions';
-import Projects from './pages/Projects';
-import CampaignList from './pages/Campaign/CampaignList';
-import CampaignDetails from './pages/Campaign/CampaignDetails.js';
-import AutoReply from './pages/Automation/AutoReply';
-import Flow from './pages/Automation/Flow';
-import MyProfile from './pages/MyProfile.js';
-import WalletRecharge from './pages/WalletRecharge.js';
-import PaymentStatus from './pages/PaymentStatus.js';
-import ProjectDetails from './pages/ProjectDetails';
-import Support from './pages/Support';
-import ProtectedRoute from './component/ProtectedRoute';
 const GOOGLE_CLIENT_ID = "124604231994-dtnflivbu049428d1cg9ngfuhgq38efs.apps.googleusercontent.com";
 
 
@@ -42,71 +18,13 @@ root.render(
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/dasboard" element={<Dashboard />} />
-          {/* Protected routes that require project */}
-          <Route path="/live-chat" element={
-            <ProtectedRoute requiresProject={true}>
-              <LiveChat />
-            </ProtectedRoute>
-          } />
-          <Route path="/live-chat/:phone" element={
-            <ProtectedRoute requiresProject={true}>
-              <LiveChat />
-            </ProtectedRoute>
-          } />
-          <Route path="/template" element={
-            <ProtectedRoute requiresProject={true}>
-              <Template />
-            </ProtectedRoute>
-          } />
-          <Route path="/template-add" element={
-            <ProtectedRoute requiresProject={true}>
-              <TemplateAdd />
-            </ProtectedRoute>
-          } />
-          <Route path="/template-edit/:templateId" element={
-            <ProtectedRoute requiresProject={true}>
-              <TemplateEdit />
-            </ProtectedRoute>
-          } />
-          <Route path="/campaigns" element={
-            <ProtectedRoute requiresProject={true}>
-              <CampaignList />
-            </ProtectedRoute>
-          } />
-          <Route path="/campaign/:campaignId" element={
-            <ProtectedRoute requiresProject={true}>
-              <CampaignDetails />
-            </ProtectedRoute>
-          } />
-          <Route path="/create-campaign" element={
-            <ProtectedRoute requiresProject={true}>
-              <CreateCampaign />
-            </ProtectedRoute>
-          } />
-          {/* Regular protected routes */}
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/contact-group" element={<ContactGroup />} />
-          <Route path="/contact-group-list" element={<ContactGroupList />} />
-          <Route path="/agent-management" element={<AgentManagement />} />
-          <Route path="/my-plan" element={<MyPlan />} />
-          <Route path="/permission-list" element={<PermissionsList />} />
-          <Route path="/blank" element={<Blank />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/project-details/:projectId" element={<ProjectDetails />} />
-          {/* Login related page */}
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/auto-reply" element={<AutoReply />} />
-          <Route path="/flow" element={<Flow />} />
-          <Route path="/my-profile" element={<MyProfile />} />
-          <Route path="/wallet-recharge" element={<WalletRecharge />} />
-          <Route path="/payment-status" element={<PaymentStatus />} />
-          <Route path="/support" element={<Support />} />
-          {/* Add more routes as needed */}
-          <Route path="*" element={<Error_404 />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/projects" element={<Projects />} />
+          {/* Fallback to dashboard for any unknown route */}
+          <Route path="*" element={<Dashboard />} />
         </Routes>
       </BrowserRouter>
     </GoogleOAuthProvider>

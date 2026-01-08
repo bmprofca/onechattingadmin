@@ -493,38 +493,8 @@ export const Sidebar = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsM
 
   const menuItems = [
     { key: 'dashboard', title: 'Dashboard', icon: <FiPieChart size={18} />, path: '/' },
-    { key: 'live-chat', title: 'Live Chat', icon: <FiMessageSquare size={18} />, path: '/live-chat' },
-    { 
-      key: 'contact', title: 'Audience', icon: <FiUsers size={18} />, 
-      submenus: [
-        { title: 'All Contacts', path: '/contact' },
-        { title: 'Groups', path: '/contact-group' },
-      ]
-    },
-    { key: 'templates', title: 'Templates', icon: <FiMail size={18} />, path: '/template' },
-    { key: 'campaigns', title: 'Campaigns', icon: <FiZap size={18} />, path: '/campaigns' },
-    { 
-      key: 'automation', title: 'Automation', icon: <FiCpu size={18} />, 
-      submenus: [
-        { title: 'Auto Reply', path: '/auto-reply' },
-        { title: 'Flow Builder', path: '/flow' }
-      ]
-    },
-    { key: 'projects', title: 'Projects', icon: <FiBriefcase size={18} />, path: '/projects' },
-    { 
-      key: 'management', title: 'Management', icon: <FiSettings size={18} />, 
-      submenus: [
-        { title: 'Agents', path: '/agent-management' },
-        { title: 'Permissions', path: '/permission-list' }
-      ]
-    },
-    { 
-      key: 'billing', title: 'Billing', icon: <FiCreditCard size={18} />, 
-      submenus: [
-        { title: 'My Plan', path: '/my-plan' },
-        { title: 'Transactions', path: '/transactions' }
-      ]
-    }
+    { key: 'users', title: 'Users', icon: <FiUsers size={18} />, path: '/admin/users' },
+    { key: 'projects', title: 'Projects', icon: <FiBriefcase size={18} />, path: '/admin/projects' }
   ];
 
   return (
@@ -588,18 +558,6 @@ export const Sidebar = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsM
             ))}
           </nav>
         </div>
-        
-        <AnimatePresence>
-          {(!isMinimized || isHovered) && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={{ delay: 0.1 }} className="p-4 border-t border-indigo-100">
-              <div className="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-4 text-xs border border-indigo-100 shadow-sm">
-                <p className="font-semibold text-indigo-900 mb-1">Need help?</p>
-                <p className="text-slate-600 mb-3 leading-relaxed">Check our docs or contact support for assistance.</p>
-                <a href="/support" className="block w-full py-1.5 bg-white border border-indigo-200 text-indigo-600 font-medium rounded-md shadow-sm hover:bg-indigo-50 transition-colors text-center">Contact Support</a>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.div>
     </>
   );

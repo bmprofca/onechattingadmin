@@ -1,650 +1,299 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header, Sidebar } from '../component/Menu';
-import { 
-  FiPlus, 
-  FiSearch, 
-  FiBriefcase, 
-  FiEdit2, 
-  FiTrash2, 
-  FiX, 
-  FiUsers,
-  FiCalendar,
-  FiMoreVertical,
-  FiCheck,
-  FiEye
+import {
+    FiSearch,
+    FiBriefcase,
+    FiActivity,
+    FiToggleRight
 } from 'react-icons/fi';
-import { motion, AnimatePresence } from 'framer-motion';
-import moment from 'moment';
-import { useDispatch } from 'react-redux';
-import { setSelectedProjectId } from '../store/authSlice';
-import toast from 'react-hot-toast';
-import { fetchUserProfile, createProject } from '../api/auth';
+import axios from 'axios';
 
 const Projects = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(() => {
-    const saved = localStorage.getItem('sidebarMinimized');
-    return saved ? JSON.parse(saved) : false;
-  });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
-  const [showActionsMenu, setShowActionsMenu] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState(null);
-  const [projects, setProjects] = useState([]);
-
-  const userProjects = Array.isArray(userData?.projects?.list) ? userData.projects.list : [];
-  const hasUserProjects = userData && userProjects.length > 0;
-
-  const [selectedUserProjectId, setSelectedUserProjectId] = useState(
-    userData?.selected_project_id || (userProjects[0]?.project_id || '')
-  );
-
-  const [formData, setFormData] = useState({
-    company_name: '',
-    name: ''
-  });
-
-  // Fetch user profile data on component mount
-  useEffect(() => {
-    const loadUserProfile = async () => {
-      try {
-        setLoading(true);
-        const response = await fetchUserProfile();
-        
-        if (response && !response.error) {
-          const profileData = response;
-          setUserData(profileData);
-          
-          
-          // Update localStorage with fresh data
-          // localStorage.setItem('userData', JSON.stringify(profileData));
-          
-          // Set projects from API response
-          if (Array.isArray(profileData.projects?.list)) {
-            setProjects(profileData.projects.list.map(project => ({
-              id: project.project_id,
-              name: project.name,
-              description: project.description || 'No description',
-              status: project.status || 'Active',
-              members: project.members || 0,
-              createdAt: project.created_at || new Date().toISOString(),
-              updatedAt: project.updated_at || new Date().toISOString()
-            })));
-          }
-          
-          // Set selected project
-          if (profileData.selected_project_id) {
-            setSelectedUserProjectId(profileData.selected_project_id);
-          } else if (profileData.projects?.list && profileData.projects.list.length > 0) {
-            setSelectedUserProjectId(profileData.projects.list[0].project_id);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-        toast.error('Failed to load projects');
-        
-        // Fallback to localStorage if API fails
-        try {
-          const localData = localStorage.getItem('userData');
-          if (localData) {
-            const parsedData = JSON.parse(localData);
-            setUserData(parsedData);
-            if (Array.isArray(parsedData.projects)) {
-              setProjects(parsedData.projects.map(project => ({
-                id: project.project_id,
-                name: project.name,
-                description: project.description || 'No description',
-                status: project.status || 'Active',
-                members: project.members || 0,
-                createdAt: project.created_at || new Date().toISOString(),
-                updatedAt: project.updated_at || new Date().toISOString()
-              })));
-            }
-          }
-        } catch (localError) {
-          console.error('Error loading from localStorage:', localError);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUserProfile();
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('sidebarMinimized', JSON.stringify(isMinimized));
-  }, [isMinimized]);
-
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, [mobileMenuOpen]);
-
-  // Filter projects based on search
-  const filteredProjects = projects.filter(project =>
-    project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleCreateProject = () => {
-    setEditingProject(null);
-    setFormData({
-      company_name: '',
-      name: ''
+    const navigate = useNavigate();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(() => {
+        const saved = localStorage.getItem('sidebarMinimized');
+        return saved ? JSON.parse(saved) : false;
     });
-    setShowCreateModal(true);
-  };
 
-  const handleEditProject = (project) => {
-    setEditingProject(project);
-    setFormData({
-      company_name: project.company_name || '',
-      name: project.name
-    });
-    setShowActionsMenu(null);
-    setShowCreateModal(true);
-  };
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [tokens, setTokens] = useState(null);
+    const [error, setError] = useState('');
 
-  const handleDeleteProject = (projectId) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      // TODO: Implement API call to delete project
-      setProjects(projects.filter(p => p.id !== projectId));
-      setShowActionsMenu(null);
-      toast.success('Project deleted successfully');
-    }
-  };
+    // Sync Sidebar State
+    useEffect(() => {
+        localStorage.setItem('sidebarMinimized', JSON.stringify(isMinimized));
+    }, [isMinimized]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (editingProject) {
-      // TODO: Implement API call for update project
-      setProjects(projects.map(p => 
-        p.id === editingProject.id 
-          ? { 
-              ...p, 
-              ...formData, 
-              updatedAt: new Date().toISOString() 
-            }
-          : p
-      ));
-      toast.success('Project updated successfully');
-      setShowCreateModal(false);
-      setFormData({ company_name: '', name: '' });
-      setEditingProject(null);
-    } else {
-      // Create new project via API
-      try {
-        setLoading(true);
-        const response = await createProject({
-          company_name: formData.company_name,
-          project_name: formData.name
-        });
-        
-        if (response && !response.error) {
-          toast.success('Project created successfully');
-          
-          // Refresh the projects list by fetching user profile again
-          const profileResponse = await fetchUserProfile();
-          if (profileResponse && !profileResponse.error) {
-            const profileData = profileResponse;
-            setUserData(profileData);
-            
-            if (Array.isArray(profileData.projects?.list)) {
-              setProjects(profileData.projects.list.map(project => ({
-                id: project.project_id,
-                name: project.name,
-                description: project.description || 'No description',
-                status: project.status || 'Active',
-                members: project.members || 0,
-                createdAt: project.created_at || new Date().toISOString(),
-                updatedAt: project.updated_at || new Date().toISOString()
-              })));
-            }
-          }
-          
-          setShowCreateModal(false);
-          setFormData({ company_name: '', name: '' });
-          setEditingProject(null);
+    // Load tokens
+    useEffect(() => {
+        const data = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+        if (data) {
+            setTokens(JSON.parse(data));
         } else {
-          toast.error(response?.message || 'Failed to create project');
+            navigate('/login');
         }
-      } catch (error) {
-        console.error('Error creating project:', error);
-        toast.error(error?.message || 'Failed to create project');
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
+    }, [navigate]);
 
-  const getStatusColor = (status) => {
-    return status === 'Active' 
-      ? 'bg-green-100 text-green-800 border-green-200' 
-      : 'bg-gray-100 text-gray-800 border-gray-200';
-  };
+    // Fetch Projects
+    const fetchProjects = useCallback(async () => {
+        if (!tokens?.token) return;
+        setLoading(true);
+        setError('');
+        try {
+            const response = await axios.get('https://api.w1chat.com/admin/projects', {
+                headers: {
+                    'x-token': tokens.token,
+                    'username': tokens.username
+                }
+            });
 
-  // Prevent background scrolling when modal is open
-  useEffect(() => {
-    if (showCreateModal) {
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-      document.body.style.overflow = 'hidden';
+            if (!response.data.error) {
+                setProjects(response.data.data || []);
+            } else {
+                setError(response.data.message || 'Failed to fetch projects');
+            }
+        } catch (err) {
+            setError('Authorization failed or server error');
+        } finally {
+            setLoading(false);
+        }
+    }, [tokens]);
 
-      return () => {
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        document.body.style.overflow = '';
-        window.scrollTo(0, scrollY);
-      };
-    }
-  }, [showCreateModal]);
+    useEffect(() => {
+        fetchProjects();
+    }, [fetchProjects]);
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Header
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        isMinimized={isMinimized}
-        setIsMinimized={setIsMinimized}
-      />
-      <Sidebar
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        isMinimized={isMinimized}
-        setIsMinimized={setIsMinimized}
-      />
+    const filteredProjects = projects.filter(project => {
+        const term = searchTerm.toLowerCase();
+        return (
+            project.project_name?.toLowerCase().includes(term) ||
+            project.project_id?.toString().toLowerCase().includes(term) ||
+            project.business_id?.toString().toLowerCase().includes(term)
+        );
+    });
 
-      {/* Main content */}
-      <div className={`pt-16 transition-all duration-300 ease-in-out ${isMinimized ? 'md:pl-20' : 'md:pl-72'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
-          {/* Header Section */}
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Projects</h1>
-              <p className="text-gray-600">Manage your projects and teams</p>
-            </div>
-            <button
-              onClick={handleCreateProject}
-              className="flex items-center justify-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            >
-              <FiPlus size={20} />
-              <span>Create Project</span>
-            </button>
-          </div>
+    const totalProjects = projects.length;
+    const activeProjects = projects.filter(
+        p => p.status === '1' || p.status === 1 || p.status === 'active'
+    ).length;
+    const wabaConnected = projects.filter(
+        p => p.is_waba_connected === 1 || p.is_waba_connected === '1' || p.is_waba_connected === true
+    ).length;
 
-          {/* Loading State */}
-          {loading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-            </div>
-          )}
+    return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            <Header
+                mobileMenuOpen={mobileMenuOpen}
+                setMobileMenuOpen={setMobileMenuOpen}
+                isMinimized={isMinimized}
+                setIsMinimized={setIsMinimized}
+            />
+            <Sidebar
+                mobileMenuOpen={mobileMenuOpen}
+                setMobileMenuOpen={setMobileMenuOpen}
+                isMinimized={isMinimized}
+                setIsMinimized={setIsMinimized}
+            />
 
-          {!loading && (
-            <>
-
-          {/* No Projects Warning */}
-          {!hasUserProjects && (
-            <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <FiBriefcase className="h-5 w-5 text-amber-400" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-amber-800">
-                    No Projects Found
-                  </h3>
-                  <div className="mt-2 text-sm text-amber-700">
-                    <p>
-                      You need to create at least one project to access Live Chat, Templates, and Campaigns features. 
-                      Create your first project to unlock these features.
-                    </p>
-                  </div>
-                  <div className="mt-4">
-                    <button
-                      onClick={handleCreateProject}
-                      className="bg-amber-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-amber-700 transition-colors"
-                    >
-                      Create Your First Project
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Search Bar */}
-          <div className="mb-6">
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search projects..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-                    {/* Stats Summary */}
-          {filteredProjects.length > 0 && (
-            <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white rounded-xl shadow p-4">
-                <p className="text-sm text-gray-600 mb-1">Total Projects</p>
-                <p className="text-2xl font-bold text-gray-900">{filteredProjects.length}</p>
-              </div>
-              <div className="bg-white rounded-xl shadow p-4">
-                <p className="text-sm text-gray-600 mb-1">Active Projects</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {filteredProjects.filter(p => p.status === 'Active').length}
-                </p>
-              </div>
-              <div className="bg-white rounded-xl shadow p-4">
-                <p className="text-sm text-gray-600 mb-1">Total Members</p>
-                <p className="text-2xl font-bold text-indigo-600">
-                  {filteredProjects.reduce((sum, p) => sum + p.members, 0)}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Project selection for logged-in user (from API) */}
-          {/* {userProjects.length > 0 && (
-            <div className="mb-6 bg-white rounded-xl shadow p-4 border border-indigo-100">
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                Select Active Project
-              </h2>
-              {userProjects.length === 1 ? (
-                <p className="text-sm text-gray-700">
-                  You are currently using project{' '}
-                  <span className="font-medium">{userProjects[0].name}</span>.
-                </p>
-              ) : (
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <select
-                    value={selectedUserProjectId}
-                    onChange={(e) => setSelectedUserProjectId(e.target.value)}
-                    className="w-full sm:w-72 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    {userProjects.map((project) => (
-                      <option key={project.project_id} value={project.project_id}>
-                        {project.name}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!selectedUserProjectId) return;
-
-                      // Persist in Redux
-                      dispatch(setSelectedProjectId(selectedUserProjectId));
-
-                      // Persist in localStorage for non-Redux code
-                      try {
-                        const updated = {
-                          ...userData,
-                          selected_project_id: selectedUserProjectId
-                        };
-                        localStorage.setItem('userData', JSON.stringify(updated));
-                        setUserData(updated);
-                      } catch (error) {
-                        console.error('Failed to update selected project in localStorage', error);
-                      }
-
-                      toast.success('Active project updated');
-                    }}
-                    className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
-                  >
-                    Set as Active
-                  </button>
-                </div>
-              )}
-            </div>
-          )} */}
-
-          {/* Projects Grid */}
-          {filteredProjects.length === 0 ? (
-            <div className="bg-white rounded-xl shadow p-12 text-center">
-              <FiBriefcase className="mx-auto text-gray-400 mb-4" size={48} />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {searchTerm ? 'No projects found' : 'No projects yet'}
-              </h3>
-              <p className="text-gray-600 mb-4">
-                {searchTerm 
-                  ? 'Try adjusting your search terms' 
-                  : 'Get started by creating your first project'}
-              </p>
-              {!searchTerm && (
-                <button
-                  onClick={handleCreateProject}
-                  className="inline-flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  <FiPlus size={18} />
-                  <span>Create Project</span>
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProjects.map((project) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-xl shadow hover:shadow-lg transition-shadow duration-200 p-6 relative cursor-pointer"
-                  onClick={() => navigate(`/project-details/${project.id}`)}
-                >
-                  {/* Actions Menu */}
-                  <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      onClick={() => setShowActionsMenu(showActionsMenu === project.id ? null : project.id)}
-                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <FiMoreVertical size={18} />
-                    </button>
-                    {showActionsMenu === project.id && (
-                      <>
-                        <div 
-                          className="fixed inset-0 z-10" 
-                          onClick={() => setShowActionsMenu(null)}
-                        />
-                        <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
-                          <button
-                            onClick={() => {
-                              handleEditProject(project);
-                              setShowActionsMenu(null);
-                            }}
-                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-                          >
-                            <FiEdit2 size={16} />
-                            <span>Edit</span>
-                          </button>
-                          <button
-                            onClick={() => {
-                              navigate(`/project-details/${project.id}`);
-                              setShowActionsMenu(null);
-                            }}
-                            className="w-full text-left px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 flex items-center space-x-2"
-                          >
-                            <FiEye size={16} />
-                            <span>View Details</span>
-                          </button>
-                          <button
-                            onClick={() => {
-                              handleDeleteProject(project.id);
-                              setShowActionsMenu(null);
-                            }}
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
-                          >
-                            <FiTrash2 size={16} />
-                            <span>Delete</span>
-                          </button>
+            <div className={`pt-16 transition-all duration-300 ease-in-out ${isMinimized ? 'md:pl-20' : 'md:pl-72'}`}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8">
+                    {/* Page Header */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Projects</h1>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                List of all client projects configured in the system.
+                            </p>
                         </div>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Project Icon */}
-                  <div className="mb-4">
-                    <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                      <FiBriefcase className="text-indigo-600" size={24} />
                     </div>
-                  </div>
 
-                  {/* Project Info */}
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{project.name}</h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{project.description}</p>
-
-                  {/* Project Stats */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-1 text-gray-600">
-                      <FiUsers size={16} />
-                      <span className="text-sm">{project.members} members</span>
+                    {/* Stats Overview */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Projects</p>
+                                    <h3 className="text-2xl font-bold dark:text-white">{totalProjects}</h3>
+                                </div>
+                                <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
+                                    <FiBriefcase size={24} />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Active Projects</p>
+                                    <h3 className="text-2xl font-bold dark:text-white">{activeProjects}</h3>
+                                </div>
+                                <div className="p-3 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg">
+                                    <FiActivity size={24} />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">WABA Connected</p>
+                                    <h3 className="text-2xl font-bold dark:text-white">{wabaConnected}</h3>
+                                </div>
+                                <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                                    <FiToggleRight size={24} />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(project.status)}`}>
-                      {project.status}
-                    </span>
-                  </div>
 
-                  {/* Project Dates */}
-                  <div className="pt-4 border-t border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-1 text-xs text-gray-500">
-                        <FiCalendar size={14} />
-                        <span>Updated {moment(project.updatedAt).fromNow()}</span>
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/project-details/${project.id}`);
-                        }}
-                        className="flex items-center space-x-1 text-xs text-indigo-600 hover:text-indigo-700 font-medium"
-                      >
-                        <FiEye size={14} />
-                        <span>View Details</span>
-                      </button>
+                    {/* Search Bar */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mb-6">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="relative flex-1">
+                                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search by project name, project ID or business ID..."
+                                    className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+
+                    {/* Table */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        {error && (
+                            <div className="px-6 py-3 bg-red-50 dark:bg-red-900/30 text-sm text-red-700 dark:text-red-300 border-b border-red-100 dark:border-red-800">
+                                {error}
+                            </div>
+                        )}
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+                                    <tr>
+                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            Project
+                                        </th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            IDs
+                                        </th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            WABA
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                    {loading ? (
+                                        [...Array(5)].map((_, i) => (
+                                            <tr key={i} className="animate-pulse">
+                                                <td colSpan="4" className="px-6 py-8">
+                                                    <div className="h-8 bg-gray-100 dark:bg-gray-700 rounded w-full" />
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : filteredProjects.length > 0 ? (
+                                        filteredProjects.map((project) => {
+                                            const isActive =
+                                                project.status === '1' ||
+                                                project.status === 1 ||
+                                                project.status === 'active';
+                                            const isConnected =
+                                                project.is_waba_connected === 1 ||
+                                                project.is_waba_connected === '1' ||
+                                                project.is_waba_connected === true;
+
+                                            return (
+                                                <tr
+                                                    key={project.id || project.project_id}
+                                                    className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors"
+                                                >
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center">
+                                                            <div className="h-10 w-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-sm">
+                                                                {project.project_name?.charAt(0) || 'P'}
+                                                            </div>
+                                                            <div className="ml-4">
+                                                                <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                                                                    {project.project_name}
+                                                                </div>
+                                                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                                    {project.business_id && `Business ID: ${project.business_id}`}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                                        <div className="space-y-1">
+                                                            <div>
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                                    Project ID:
+                                                                </span>{' '}
+                                                                <span className="font-mono text-xs">
+                                                                    {project.project_id}
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                                    Internal ID:
+                                                                </span>{' '}
+                                                                <span className="font-mono text-xs">
+                                                                    {project.id}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        {isActive ? (
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
+                                                                Active
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400">
+                                                                Inactive
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <span
+                                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                                isConnected
+                                                                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400'
+                                                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
+                                                            }`}
+                                                        >
+                                                            {isConnected ? 'Connected' : 'Not Connected'}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    ) : (
+                                        <tr>
+                                            <td
+                                                colSpan="4"
+                                                className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+                                            >
+                                                No projects found matching your search.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-          )}
-
-
-          </>
-          )}
         </div>
-      </div>
-
-      {/* Create/Edit Project Modal */}
-      <AnimatePresence>
-        {showCreateModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto"
-            onClick={() => setShowCreateModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", duration: 0.3 }}
-              className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 my-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0">
-                    <FiBriefcase className="w-6 h-6 text-indigo-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {editingProject ? 'Edit Project' : 'Create New Project'}
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setShowCreateModal(false)}
-                  className="text-gray-400 hover:text-gray-500 focus:outline-none transition-colors"
-                >
-                  <FiX className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Modal Body */}
-              <form onSubmit={handleSubmit} className="p-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Company Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.company_name}
-                      onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      placeholder="Enter company name"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Project Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      placeholder="Enter project name"
-                    />
-                  </div>
-                </div>
-
-                {/* Modal Footer */}
-                <div className="mt-6 flex items-center justify-end space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowCreateModal(false)}
-                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 flex items-center space-x-2"
-                  >
-                    <FiCheck size={18} />
-                    <span>{editingProject ? 'Update' : 'Create'} Project</span>
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+    );
 };
 
 export default Projects;
+
+

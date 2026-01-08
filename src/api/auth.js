@@ -15,7 +15,7 @@ export const loginUser = async ({ email, password }) => {
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/account/login',
+    url: 'https://api.w1chat.com/admin/login',
     headers: {
       'Content-Type': 'application/json'
     },

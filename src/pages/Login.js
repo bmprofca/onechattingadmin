@@ -1,544 +1,86 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom'
-import { Encrypt } from './encryption/payload-encryption';
-import axios from 'axios';
-import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
-import { useDispatch } from 'react-redux';
-import { setAuthData, setSelectedProjectId } from '../store/authSlice';
 import { loginUser } from '../api/auth';
 
-const Login = () => {
+function Login() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-  });
-  const [errors, setErrors] = useState({
-    username: '',
-    password: '',
-    global: '',
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [showGlobalError, setShowGlobalError] = useState(false);
-
-  // Project selection modal state
-  const [showProjectModal, setShowProjectModal] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [selectedProjectIdLocal, setSelectedProjectIdLocal] = useState('');
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear error when user types
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = { username: '', password: '' };
-
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
-      valid = false;
-    } else if (formData.username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters';
-      valid = false;
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-      valid = false;
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    setError('');
+    setLoading(true);
 
-    setIsLoading(true);
     try {
-      const data = await loginUser({
-        email: formData.username,
-        password: formData.password
-      });
+      const res = await loginUser({ email, password });
 
-      if (data.error === false) {
-        // Persist full user payload (including projects) for backward compatibility
-        const projects = Array.isArray(data.projects) ? data.projects : [];
-
-        // Base object to store (without selected project for now)
-        let userDataToStore = {
-          ...data,
-          selected_project_id: null
+      if (!res.error && res.token) {
+        // Admin route: just store auth and go to dashboard, no project selection
+        const userData = {
+          token: res.token,
+          username: res.username,
+          profile: res.profile || {},
         };
-
-        // If no projects at all, just store and redirect to projects page
-        if (projects.length === 0) {
-          localStorage.setItem('userData', JSON.stringify(userDataToStore));
-          dispatch(setAuthData(userDataToStore));
-          toast.success('Login successful, but no projects found.');
-          setTimeout(() => {
-            navigate('/projects');
-          }, 800);
-          return;
-        }
-
-        // If there is exactly one project, auto-select it and redirect
-        if (projects.length === 1) {
-          const onlyProjectId = projects[0]?.project_id || null;
-          userDataToStore = {
-            ...userDataToStore,
-            selected_project_id: onlyProjectId
-          };
-
-          localStorage.setItem('userData', JSON.stringify(userDataToStore));
-          dispatch(setAuthData(userDataToStore));
-          if (onlyProjectId) {
-            dispatch(setSelectedProjectId(onlyProjectId));
-          }
-
-          toast.loading('Redirecting...');
-          setTimeout(() => {
-            navigate('/'); // Navigate to Home directly
-          }, 1500);
-          return;
-        }
-
-        // More than one project → open in-page modal for selection
-        localStorage.setItem('userData', JSON.stringify(userDataToStore));
-        dispatch(setAuthData(userDataToStore));
-        setProjects(projects);
-        setSelectedProjectIdLocal(projects[0]?.project_id || '');
-        setShowProjectModal(true);
-        toast.success('Login successful. Please choose a project.');
+        localStorage.setItem('userData', JSON.stringify(userData));
+        navigate('/');
       } else {
-        throw new Error(data.error || 'Something went wrong');
+        setError(res.message || 'Invalid credentials');
       }
-    } catch (error) {
-      setErrors((prev) => ({
-        ...prev,
-        global: error.message || 'An error occurred during login'
-      }));
-      setShowGlobalError(true);
+    } catch (err) {
+      setError('Login failed. Please try again.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
-
-  const handleProjectConfirm = () => {
-    if (!selectedProjectIdLocal) return;
-
-    try {
-      const stored = localStorage.getItem('userData');
-      const parsed = stored ? JSON.parse(stored) : {};
-      const updated = {
-        ...parsed,
-        selected_project_id: selectedProjectIdLocal
-      };
-
-      localStorage.setItem('userData', JSON.stringify(updated));
-
-      // Keep Redux auth state in sync
-      dispatch(setSelectedProjectId(selectedProjectIdLocal));
-      dispatch(setAuthData(updated));
-    } catch (error) {
-      console.error('Failed to set selected project', error);
-    }
-
-    setShowProjectModal(false);
-    toast.loading('Redirecting...');
-    setTimeout(() => {
-      navigate('/');
-    }, 800);
-  };
-
-  // Handle Google Login Success
-  const handleGoogleSuccess = async (credentialResponse) => {
-    setIsGoogleLoading(true);
-
-    try {
-      // Decode the JWT token to get user info
-      const decoded = jwtDecode(credentialResponse.credential);
-
-      // Prepare payload for your backend
-      const payload = {
-        google_token: credentialResponse.credential,
-        email: decoded.email,
-        name: decoded.name,
-        picture: decoded.picture
-      };
-
-      // Encrypt and send to your backend
-      const { data, key } = Encrypt(payload);
-
-      let data_pass = JSON.stringify({
-        "data": data,
-        "key": key
-      });
-
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: 'https://api.w1chat.com/account/google-login', // You'll need to create this endpoint
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: data_pass
-      };
-
-      const response = await axios.request(config);
-      const responseData = response.data;
-
-
-      if (responseData.error) {
-        throw new Error(responseData.error || "Google login failed");
-      } else {
-        localStorage.setItem("userData", JSON.stringify(responseData));
-        toast.success('Google login successful!');
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
-      }
-    } catch (error) {
-      console.error('Google login error:', error);
-      setErrors((prev) => ({
-        ...prev,
-        global: error.message || "Google login failed"
-      }));
-      setShowGlobalError(true);
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  };
-
-  // Handle Google Login Failure
-  const handleGoogleError = () => {
-    setErrors((prev) => ({
-      ...prev,
-      global: "Google login failed. Please try again."
-    }));
-    setShowGlobalError(true);
-  };
-
-  const dismissGlobalError = () => {
-    setShowGlobalError(false);
-    // Clear the error message after animation completes
-    setTimeout(() => {
-      setErrors(prev => ({ ...prev, global: '' }));
-    }, 300);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row"
-      >
-        {/* Animated Image Side - Hidden on mobile */}
-        <div className="hidden md:block md:w-1/2 bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden">
-          <motion.div
-            animate={{
-              scale: [1, 1.05, 1],
-              rotate: [0, 2, -2, 0],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              repeatType: 'reverse',
-              ease: 'easeInOut',
-            }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <svg
-              viewBox="0 0 200 200"
-              className="w-full h-full opacity-20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill="#FFFFFF"
-                d="M45.1,-65.6C58.2,-58.4,68.5,-45.8,73.9,-31.4C79.3,-17,79.7,-0.8,75.9,13.2C72.1,27.1,64.1,38.9,53.1,49.2C42.1,59.5,28.1,68.3,12.5,73.8C-3.1,79.3,-20.3,81.6,-34.9,74.9C-49.5,68.2,-61.5,52.6,-68.2,35.2C-74.9,17.8,-76.3,-1.4,-70.9,-17.8C-65.5,-34.2,-53.3,-47.8,-39.1,-54.7C-24.9,-61.6,-8.7,-61.8,6.3,-69.5C21.3,-77.2,42.6,-92.4,45.1,-65.6Z"
-                transform="translate(100 100)"
-              />
-            </svg>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="relative z-10 p-10 flex flex-col justify-center h-full"
-          >
-            <h2 className="text-4xl font-bold text-white mb-4">Welcome Back</h2>
-            <p className="text-indigo-100 text-lg">
-              Sign in to access your account and continue your journey with us.
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Form Side */}
-        <div className="w-full md:w-1/2 p-8 md:p-10">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800">Sign In</h1>
-            <p className="text-gray-600 mt-2">Enter your credentials to continue</p>
-          </div>
-
-          <AnimatePresence>
-            {showGlobalError && errors.global && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25 }}
-                className="mb-4 flex items-center justify-between rounded-lg border border-red-400 bg-red-100 px-4 py-2 text-red-700 shadow"
-                role="alert"
-              >
-                <span>{errors.global}</span>
-                <button
-                  onClick={dismissGlobalError}
-                  className="ml-3 text-red-800 hover:text-red-600"
-                >
-                  <svg
-                    className="h-5 w-5 fill-current"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
-                  </svg>
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Google Login Button */}
-          <div className="mb-6">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              shape="rectangular"
-              size="large"
-              width="100%"
-              text="continue_with"
-              locale="en"
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md bg-white shadow-md rounded-xl p-8">
+        <h1 className="text-2xl font-bold mb-6 text-gray-900">Admin Login</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email / Username
+            </label>
+            <input
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
-            {isGoogleLoading && (
-              <div className="text-center mt-2">
-                <div className="inline-flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Signing in with Google...
-                </div>
-              </div>
-            )}
           </div>
-
-          {/* Divider */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-lg border ${errors.username ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
-                placeholder="Enter your username"
-              />
-              <AnimatePresence>
-                {errors.username && (
-                  <motion.p
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="text-red-500 text-sm mt-1"
-                  >
-                    {errors.username}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-lg border ${errors.password ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
-                placeholder="Enter your password"
-              />
-              <AnimatePresence>
-                {errors.password && (
-                  <motion.p
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="text-red-500 text-sm mt-1"
-                  >
-                    {errors.password}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                  Forgot password?
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <motion.button
-                type="submit"
-                disabled={isLoading}
-                whileHover={{ scale: isLoading ? 1 : 1.02 }}
-                whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors ${isLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
-              >
-                {isLoading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Signing in...
-                  </>
-                ) : 'Sign in'}
-              </motion.button>
-            </div>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link to='../register' className="font-medium text-indigo-600 hover:text-indigo-500">
-                Sign up
-              </Link>
+          {error && (
+            <p className="text-sm text-red-600">
+              {error}
             </p>
-          </div>
-        </div>
-      </motion.div>
-      <Toaster />
-
-      {/* Project selection modal after successful login */}
-      <AnimatePresence>
-        {showProjectModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-4"
+          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-60"
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: 'spring', duration: 0.35 }}
-              className="w-full max-w-md bg-white rounded-xl shadow-2xl p-6"
-            >
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                Choose your project
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                You have access to multiple projects. Please select one to continue.
-              </p>
-
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project
-                </label>
-                <select
-                  value={selectedProjectIdLocal}
-                  onChange={(e) => setSelectedProjectIdLocal(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  {projects.map((project) => (
-                    <option key={project.project_id} value={project.project_id}>
-                      {project.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowProjectModal(false)}
-                  className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleProjectConfirm}
-                  disabled={!selectedProjectIdLocal}
-                  className={`px-4 py-2 text-sm rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    !selectedProjectIdLocal ? 'opacity-70 cursor-not-allowed' : ''
-                  }`}
-                >
-                  Continue
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+      </div>
     </div>
   );
-};
+}
 
 export default Login;
