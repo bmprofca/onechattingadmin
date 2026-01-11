@@ -6,7 +6,8 @@ import {
   FiMenu, FiBriefcase, FiChevronDown, FiCreditCard, 
   FiPlus, FiBell, FiUser, FiSettings, FiHelpCircle, 
   FiLogOut, FiPieChart, FiMessageSquare, FiUsers, 
-  FiMail, FiZap, FiCpu, FiLock, FiChevronRight, FiX 
+  FiMail, FiZap, FiCpu, FiLock, FiChevronRight, FiX,
+  FiPackage, FiDollarSign, FiList
 } from 'react-icons/fi';
 
 // Adjust these import paths if necessary
@@ -473,7 +474,18 @@ export const Sidebar = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsM
   const menuItems = [
     { key: 'dashboard', title: 'Dashboard', icon: <FiPieChart size={18} />, path: '/' },
     { key: 'users', title: 'Users', icon: <FiUsers size={18} />, path: '/admin/users' },
-    { key: 'projects', title: 'Projects', icon: <FiBriefcase size={18} />, path: '/admin/projects' }
+    { key: 'projects', title: 'Projects', icon: <FiBriefcase size={18} />, path: '/admin/projects' },
+    { 
+      key: 'subscriptions', 
+      title: 'Subscriptions', 
+      icon: <FiPackage size={18} />, 
+      path: '#',
+      submenus: [
+        { title: 'All Subscriptions', path: '/admin/subscriptions' },
+        { title: 'Subscription Packs', path: '/admin/subscription-packs' },
+        { title: 'Custom Pricing', path: '/admin/custom-pricing' }
+      ]
+    }
   ];
 
   return (

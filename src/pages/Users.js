@@ -14,9 +14,11 @@ import {
     FiDownload,
     FiUsers,
     FiActivity,
-    FiLogIn
+    FiLogIn,
+    FiCreditCard
 } from 'react-icons/fi';
 import axios from 'axios';
+import UserBillingModal from '../component/Modals/UserBillingModal';
 
 const Users = () => {
     const navigate = useNavigate();
@@ -31,6 +33,8 @@ const Users = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
     const [tokens, setTokens] = useState(null);
+    const [billingModalOpen, setBillingModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     // Sync Sidebar State
     useEffect(() => {
@@ -89,6 +93,16 @@ const Users = () => {
         });
         const url = `${baseUrl}?${params.toString()}`;
         window.open(url, '_blank', 'noopener,noreferrer');
+    };
+
+    const handleOpenBilling = (user) => {
+        setSelectedUser(user);
+        setBillingModalOpen(true);
+    };
+
+    const handleCloseBilling = () => {
+        setBillingModalOpen(false);
+        setSelectedUser(null);
     };
 
     return (
@@ -169,16 +183,16 @@ const Users = () => {
                     </div>
 
                     {/* Table Container */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div className="overflow-x-auto">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 32rem)' }}>
+                        <div className="overflow-x-auto overflow-y-auto flex-1">
                             <table className="w-full text-left">
-                                <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+                                <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
                                     <tr>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">S.No.</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">S.No.</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">Contact</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">Status</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">Role</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right bg-gray-50 dark:bg-gray-900/50">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -219,11 +233,18 @@ const Users = () => {
                                                 <td className="px-6 py-4 text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <button 
-                                                            onClick={() => navigate(`/admin/users/${user.id}`)}
+                                                            onClick={() => navigate(`/admin/users/${user.username}`)}
                                                             className="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
                                                             title="View Profile"
                                                         >
                                                             <FiEye size={18} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleOpenBilling(user)}
+                                                            className="p-2 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-all"
+                                                            title="View Billing & Plans"
+                                                        >
+                                                            <FiCreditCard size={18} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleLoginAsUser(user)}
@@ -273,6 +294,17 @@ const Users = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Billing Modal */}
+            <UserBillingModal
+                isOpen={billingModalOpen}
+                onClose={handleCloseBilling}
+                user={selectedUser}
+                tokens={tokens}
+                onUpdated={() => {
+                    // Optionally refresh users list if needed
+                }}
+            />
         </div>
     );
 };
