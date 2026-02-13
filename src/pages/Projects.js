@@ -6,7 +6,13 @@ import {
     FiBriefcase,
     FiActivity,
     FiToggleRight,
-    FiDollarSign
+    FiDollarSign,
+    FiChevronRight,
+    FiDatabase,
+    FiCheckCircle,
+    FiXCircle,
+    FiWifi,
+    FiWifiOff
 } from 'react-icons/fi';
 import axios from 'axios';
 import ProjectChargesModal from '../component/Modals/ProjectChargesModal';
@@ -106,7 +112,7 @@ const Projects = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
             <Header
                 mobileMenuOpen={mobileMenuOpen}
                 setMobileMenuOpen={setMobileMenuOpen}
@@ -125,59 +131,78 @@ const Projects = () => {
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Projects</h1>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                List of all client projects configured in the system.
-                            </p>
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20">
+                                    <FiDatabase className="text-white" size={24} />
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                                        Projects
+                                    </h1>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        List of all client projects configured in the system
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                <span className="text-sm text-gray-600 dark:text-gray-300">
+                                    Last updated: {new Date().toLocaleDateString()}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     {/* Stats Overview */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Projects</p>
-                                    <h3 className="text-2xl font-bold dark:text-white">{totalProjects}</h3>
+                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Projects</p>
+                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{totalProjects}</h3>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">All time</p>
                                 </div>
-                                <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
-                                    <FiBriefcase size={24} />
+                                <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/20">
+                                    <FiBriefcase className="text-white" size={24} />
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Active Projects</p>
-                                    <h3 className="text-2xl font-bold dark:text-white">{activeProjects}</h3>
+                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Projects</p>
+                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{activeProjects}</h3>
+                                    <p className="text-xs text-green-500 dark:text-green-400 mt-1">{((activeProjects/totalProjects)*100 || 0).toFixed(1)}% of total</p>
                                 </div>
-                                <div className="p-3 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg">
-                                    <FiActivity size={24} />
+                                <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg shadow-green-500/20">
+                                    <FiActivity className="text-white" size={24} />
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">WABA Connected</p>
-                                    <h3 className="text-2xl font-bold dark:text-white">{wabaConnected}</h3>
+                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">WABA Connected</p>
+                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{wabaConnected}</h3>
+                                    <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">{((wabaConnected/totalProjects)*100 || 0).toFixed(1)}% connected</p>
                                 </div>
-                                <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg">
-                                    <FiToggleRight size={24} />
+                                <div className="p-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg shadow-emerald-500/20">
+                                    <FiToggleRight className="text-white" size={24} />
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Search Bar */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mb-6">
+                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6">
                         <div className="flex flex-col md:flex-row gap-4">
                             <div className="relative flex-1">
-                                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                 <input
                                     type="text"
                                     placeholder="Search by project name, project ID or business ID..."
-                                    className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
+                                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -185,143 +210,190 @@ const Projects = () => {
                         </div>
                     </div>
 
-                    {/* Table */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 32rem)' }}>
-                        {error && (
-                            <div className="px-6 py-3 bg-red-50 dark:bg-red-900/30 text-sm text-red-700 dark:text-red-300 border-b border-red-100 dark:border-red-800">
-                                {error}
+                    {/* Error Message */}
+                    {error && (
+                        <div className="mb-6 px-6 py-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                            <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-300">
+                                <FiXCircle className="flex-shrink-0" size={16} />
+                                <span>{error}</span>
                             </div>
-                        )}
-                        <div className="overflow-x-auto overflow-y-auto flex-1">
-                            <table className="w-full text-left">
-                                <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
-                                    <tr>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">
-                                            Project
-                                        </th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">
-                                            IDs
-                                        </th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">
-                                            Status
-                                        </th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">
-                                            WABA
-                                        </th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">
-                                            Charges
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                    {loading ? (
-                                        [...Array(5)].map((_, i) => (
-                                            <tr key={i} className="animate-pulse">
-                                                <td colSpan="4" className="px-6 py-8">
-                                                    <div className="h-8 bg-gray-100 dark:bg-gray-700 rounded w-full" />
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : filteredProjects.length > 0 ? (
-                                        filteredProjects.map((project) => {
-                                            const isActive =
-                                                project.status === '1' ||
-                                                project.status === 1 ||
-                                                project.status === 'active';
-                                            const isConnected =
-                                                project.is_waba_connected === 1 ||
-                                                project.is_waba_connected === '1' ||
-                                                project.is_waba_connected === true;
+                        </div>
+                    )}
+                    
+                    {/* Professional Table - No Card, No Horizontal Scroll */}
+                    <div className="w-full overflow-x-visible">
+                        <table className="w-full text-center border-separate border-spacing-0">
+                            <thead className="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900">
+                                <tr>
+                                    <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700 rounded-tl-2xl">
+                                        Project Details
+                                    </th>
+                                    <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700">
+                                        IDs & References
+                                    </th>
+                                    <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700">
+                                        Status
+                                    </th>
+                                    <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700">
+                                        WABA Connection
+                                    </th>
+                                    <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700 rounded-tr-2xl">
+                                        Charges
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white dark:bg-gray-800">
+                                {loading ? (
+                                    [...Array(8)].map((_, i) => (
+                                        <tr key={i} className="animate-pulse hover:bg-gray-50/50 dark:hover:bg-gray-700/30 border-b border-gray-100 dark:border-gray-700">
+                                            <td className="px-6 py-5" colSpan="5">
+                                                <div className="flex items-center justify-center space-x-4">
+                                                    <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+                                                    <div className="flex-1 space-y-3">
+                                                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto"></div>
+                                                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : filteredProjects.length > 0 ? (
+                                    filteredProjects.map((project, index) => {
+                                        const isActive =
+                                            project.status === '1' ||
+                                            project.status === 1 ||
+                                            project.status === 'active';
+                                        const isConnected =
+                                            project.is_waba_connected === 1 ||
+                                            project.is_waba_connected === '1' ||
+                                            project.is_waba_connected === true;
+                                        
+                                        const isLast = index === filteredProjects.length - 1;
 
-                                            return (
-                                                <tr
-                                                    key={project.id || project.project_id}
-                                                    className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors cursor-pointer"
-                                                    onClick={() => navigate(`/admin/projects/${project.project_id}`)}
-                                                >
-                                                    <td className="px-6 py-4">
+                                        return (
+                                            <tr
+                                                key={project.id || project.project_id}
+                                                className={`hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-blue-50/50 dark:hover:from-indigo-900/20 dark:hover:to-blue-900/20 transition-all duration-200 cursor-pointer group border-b border-gray-100 dark:border-gray-700 ${
+                                                    isLast ? 'border-b-0' : ''
+                                                }`}
+                                                onClick={() => navigate(`/admin/projects/${project.project_id}`)}
+                                            >
+                                                <td className="px-6 py-5">
+                                                    <div className="flex items-center justify-center">
                                                         <div className="flex items-center">
-                                                            <div className="h-10 w-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-sm">
+                                                            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
                                                                 {project.project_name?.charAt(0) || 'P'}
                                                             </div>
-                                                            <div className="ml-4">
-                                                                <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                                                            <div className="ml-4 text-left">
+                                                                <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                                                     {project.project_name}
                                                                 </div>
                                                                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                                    {project.business_id && `Business ID: ${project.business_id}`}
+                                                                    {project.business_id ? `Business ID: ${project.business_id}` : 'No Business ID'}
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                                                        <div className="space-y-1">
-                                                            <div>
-                                                                <span className="text-xs text-gray-500 dark:text-gray-400">
-                                                                    Project ID:
-                                                                </span>{' '}
-                                                                <span className="font-mono text-xs">
-                                                                    {project.project_id}
-                                                                </span>
-                                                            </div>
-                                                            <div>
-                                                                <span className="text-xs text-gray-500 dark:text-gray-400">
-                                                                    Internal ID:
-                                                                </span>{' '}
-                                                                <span className="font-mono text-xs">
-                                                                    {project.id}
-                                                                </span>
-                                                            </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5">
+                                                    <div className="flex flex-col items-center space-y-2">
+                                                        <div className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <span className="text-xs text-gray-500 dark:text-gray-400 block">Project ID</span>
+                                                            <span className="text-sm font-mono font-medium text-gray-900 dark:text-white">
+                                                                {project.project_id}
+                                                            </span>
                                                         </div>
-                                                    </td>
-                                                    <td className="px-6 py-4">
+                                                        <div className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                            <span className="text-xs text-gray-500 dark:text-gray-400 block">Internal ID</span>
+                                                            <span className="text-sm font-mono font-medium text-gray-900 dark:text-white">
+                                                                {project.id}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5">
+                                                    <div className="flex items-center justify-center">
                                                         {isActive ? (
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                                                                Active
-                                                            </span>
+                                                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-200 dark:border-green-800">
+                                                                <FiCheckCircle className="text-green-500 dark:text-green-400" size={14} />
+                                                                <span className="text-xs font-semibold text-green-700 dark:text-green-400">Active</span>
+                                                            </div>
                                                         ) : (
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400">
-                                                                Inactive
-                                                            </span>
+                                                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-red-200 dark:border-red-800">
+                                                                <FiXCircle className="text-red-500 dark:text-red-400" size={14} />
+                                                                <span className="text-xs font-semibold text-red-700 dark:text-red-400">Inactive</span>
+                                                            </div>
                                                         )}
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <span
-                                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                                isConnected
-                                                                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400'
-                                                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
-                                                            }`}
-                                                        >
-                                                            {isConnected ? 'Connected' : 'Not Connected'}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4">
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5">
+                                                    <div className="flex items-center justify-center">
+                                                        {isConnected ? (
+                                                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-200 dark:border-emerald-800">
+                                                                <FiWifi className="text-emerald-500 dark:text-emerald-400" size={14} />
+                                                                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Connected</span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-gray-500/10 to-gray-600/10 border border-gray-200 dark:border-gray-700">
+                                                                <FiWifiOff className="text-gray-500 dark:text-gray-400" size={14} />
+                                                                <span className="text-xs font-semibold text-gray-700 dark:text-gray-400">Not Connected</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5">
+                                                    <div className="flex items-center justify-center">
                                                         <button
                                                             type="button"
                                                             onClick={(e) => handleOpenCharges(project, e)}
-                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/20 transition-colors"
+                                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-medium shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-105 transition-all duration-200"
                                                         >
-                                                            <FiDollarSign className="text-emerald-500" size={12} />
+                                                            <FiDollarSign size={14} />
                                                             View Charges
+                                                            <FiChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                                                         </button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })
-                                    ) : (
-                                        <tr>
-                                            <td
-                                                colSpan="4"
-                                                className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
-                                            >
-                                                No projects found matching your search.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" className="px-6 py-20 text-center border-b border-gray-100 dark:border-gray-700">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
+                                                    <FiDatabase className="text-gray-400 dark:text-gray-500" size={32} />
+                                                </div>
+                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No projects found</h3>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                    No projects match your search criteria. Try adjusting your search.
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                            
+                            {/* Table Footer */}
+                            {filteredProjects.length > 0 && (
+                                <tfoot>
+                                    <tr>
+                                        <td colSpan="5" className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-t-2 border-gray-200 dark:border-gray-700 rounded-b-2xl">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs text-gray-600 dark:text-gray-400">
+                                                    Showing <span className="font-semibold">{filteredProjects.length}</span> of <span className="font-semibold">{totalProjects}</span> projects
+                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                        {activeProjects} active, {wabaConnected} WABA connected
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            )}
+                        </table>
                     </div>
 
                     <ProjectChargesModal
@@ -338,5 +410,3 @@ const Projects = () => {
 };
 
 export default Projects;
-
-

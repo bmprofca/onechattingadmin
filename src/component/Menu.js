@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
   FiMenu, FiBriefcase, FiChevronDown, FiCreditCard, 
@@ -64,9 +64,10 @@ const isSubmenuItemActive = (submenuPath, currentPath) => {
 };
 
 // ==========================================
-// 3. NavItem Component (MOVED OUTSIDE)
+// 3. NavItem Component
 // ==========================================
 const NavItem = ({ item, isMobile, isMinimized, isHovered, currentPath, openSubmenus, toggleSubmenu, setHoveredMenu, hoveredMenu, setMobileMenuOpen, hasProjects, unreadCount }) => {
+  const navigate = useNavigate();
   const isActive = isItemActive(item, currentPath);
   const isDisabled = requiresProject(item) && !hasProjects;
   const hasSubmenu = item.submenus && item.submenus.length > 0;
@@ -119,9 +120,16 @@ const NavItem = ({ item, isMobile, isMinimized, isHovered, currentPath, openSubm
                 {item.submenus.map((sub, idx) => {
                     const isSubActive = isSubmenuItemActive(sub.path, currentPath);
                     return (
-                    <a key={idx} href={sub.path} className={`block px-3 py-2 rounded-md text-sm transition-all duration-200 ${isSubActive ? 'text-indigo-700 font-semibold bg-indigo-50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50'}`}>
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        navigate(sub.path);
+                        if (isMobile) setMobileMenuOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 ${isSubActive ? 'text-indigo-700 font-semibold bg-indigo-50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50'}`}
+                    >
                       {sub.title}
-                    </a>
+                    </button>
                     )
                 })}
               </div>
@@ -135,12 +143,19 @@ const NavItem = ({ item, isMobile, isMinimized, isHovered, currentPath, openSubm
   // Render Single Link Item
   return (
     <div className="mb-1 relative">
-      <a href={isDisabled ? '#' : item.path} onClick={(e) => { if(isDisabled) e.preventDefault(); else if(isMobile) setMobileMenuOpen(false); }}
-        className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group border
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          if (isDisabled) return;
+          navigate(item.path);
+          if (isMobile) setMobileMenuOpen(false);
+        }}
+        className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group border
           ${isDisabled ? THEME.locked : isActive ? THEME.active : THEME.inactive}
           ${isMini ? 'justify-center px-2' : ''}`}
         onMouseEnter={() => isMini && setHoveredMenu(item.key)}
         onMouseLeave={() => isMini && setHoveredMenu(null)}
+        disabled={isDisabled}
       >
         <span className={`${isMini ? '' : 'mr-3'} ${isDisabled ? 'text-slate-300' : isActive ? THEME.iconActive : THEME.iconInactive} transition-colors relative`}>
           {item.icon}
@@ -168,7 +183,7 @@ const NavItem = ({ item, isMobile, isMinimized, isHovered, currentPath, openSubm
               {item.title} {isDisabled && '(Locked)'}
             </div>
         )}
-      </a>
+      </button>
     </div>
   );
 };
@@ -332,7 +347,10 @@ export const Header = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsMi
 
             <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
 
-            <button className="relative p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all">
+            <button 
+              className="relative p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all"
+              onClick={() => navigate('/notifications')}
+            >
               <FiBell size={20} />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500 border-2 border-white"></span>
             </button>
@@ -350,13 +368,28 @@ export const Header = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsMi
                       <p className="text-sm font-semibold text-slate-900">{userProfile.name || 'User'}</p>
                       <p className="text-xs text-slate-500 truncate">{userProfile.email || ''}</p>
                     </div>
-                    <button className="md:hidden flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors" onClick={() => { setProfileDropdownOpen(false); setSwitchProjectModalOpen(true); }}>
+                    <button 
+                      className="md:hidden flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                      onClick={() => { 
+                        setProfileDropdownOpen(false); 
+                        setSwitchProjectModalOpen(true); 
+                      }}
+                    >
                       <FiBriefcase size={16} /> Switch Project
                     </button>
                     {profileItems.map((item, index) => (
-                      <a key={index} href={item.path} className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors" onClick={() => setProfileDropdownOpen(false)}>
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          if (item.path !== '#') {
+                            navigate(item.path);
+                          }
+                        }}
+                        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                      >
                         {item.icon} {item.title}
-                      </a>
+                      </button>
                     ))}
                     <div className="my-1 h-px bg-slate-100"></div>
                     <button onClick={handleLogout} className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
@@ -386,19 +419,14 @@ export const Sidebar = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsM
   const [openSubmenus, setOpenSubmenus] = useState({});
   const [hoveredMenu, setHoveredMenu] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
-  const [currentPath, setCurrentPath] = useState('');
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
+  
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   const userData = getUserData();
   const projectList = userData?.projects?.list || (Array.isArray(userData?.projects) ? userData.projects : []);
   const hasProjects = projectList.length > 0 || (userData?.projects?.project_count > 0);
-
-  useEffect(() => {
-    setCurrentPath(window.location.pathname);
-    const handleLocationChange = () => setCurrentPath(window.location.pathname);
-    window.addEventListener('popstate', handleLocationChange);
-    return () => window.removeEventListener('popstate', handleLocationChange);
-  }, []);
 
   // Fetch and calculate total unread count
   useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Header, Sidebar } from '../component/Menu'; // Adjust path if necessary
+import { Header, Sidebar } from '../component/Menu';
 import { useNavigate } from 'react-router-dom';
 import {
     FiSearch,
@@ -15,10 +15,16 @@ import {
     FiUsers,
     FiActivity,
     FiLogIn,
-    FiCreditCard
+    FiCreditCard,
+    FiCalendar,
+    FiShield,
+    FiRefreshCw,
+    FiXCircle,
+    FiDollarSign
 } from 'react-icons/fi';
 import axios from 'axios';
 import UserBillingModal from '../component/Modals/UserBillingModal';
+import UserTransactionHistoryModal from '../component/Modals/UserTransactionHistoryModal'; // Import the new modal
 
 const Users = () => {
     const navigate = useNavigate();
@@ -30,11 +36,15 @@ const Users = () => {
 
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [exportLoading, setExportLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
     const [tokens, setTokens] = useState(null);
     const [billingModalOpen, setBillingModalOpen] = useState(false);
+    const [transactionModalOpen, setTransactionModalOpen] = useState(false); // State for transaction modal
     const [selectedUser, setSelectedUser] = useState(null);
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [showFilters, setShowFilters] = useState(false);
 
     // Sync Sidebar State
     useEffect(() => {
@@ -75,20 +85,59 @@ const Users = () => {
         fetchUsers(pagination.page);
     }, [fetchUsers, pagination.page]);
 
+    // Fetch ALL Users for Export
+    const fetchAllUsersForExport = async () => {
+        if (!tokens?.token) return [];
+        try {
+            // First get total count
+            const firstPage = await axios.get(`https://api.w1chat.com/admin/users?page=1&limit=1`, {
+                headers: { 'x-token': tokens.token }
+            });
+            
+            const totalUsers = firstPage.data.pagination.total;
+            const totalPages = Math.ceil(totalUsers / 100); // Fetch 100 per page for export
+            
+            let allUsers = [];
+            
+            // Fetch all pages
+            for (let page = 1; page <= totalPages; page++) {
+                const response = await axios.get(`https://api.w1chat.com/admin/users?page=${page}&limit=100`, {
+                    headers: { 'x-token': tokens.token }
+                });
+                
+                if (!response.data.error) {
+                    allUsers = [...allUsers, ...response.data.data];
+                }
+            }
+            
+            return allUsers;
+        } catch (err) {
+            console.error("Failed to fetch all users for export", err);
+            return [];
+        }
+    };
+
     // Derived filtering for current page
-    const filteredUsers = users.filter(user => 
-        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.username?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = 
+            user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.mobile?.includes(searchTerm);
+        
+        const matchesStatus = 
+            filterStatus === 'all' || 
+            (filterStatus === 'active' && user.status === '1') ||
+            (filterStatus === 'inactive' && user.status !== '1');
+        
+        return matchesSearch && matchesStatus;
+    });
 
     const handleLoginAsUser = (user) => {
         if (!user?.email) return;
         const baseUrl = 'https://wichat-sigma.vercel.app/login';
         const params = new URLSearchParams({
             username: user.email,
-            // If backend sends a password field for the user, it will be used here.
-            // Otherwise this will be empty and the target app can handle it.
             password: user.password || ''
         });
         const url = `${baseUrl}?${params.toString()}`;
@@ -103,6 +152,116 @@ const Users = () => {
     const handleCloseBilling = () => {
         setBillingModalOpen(false);
         setSelectedUser(null);
+    };
+
+    // Handle balance click - opens transaction history modal with POST /admin/user/transaction-history
+    const handleBalanceClick = (user) => {
+        setSelectedUser(user);
+        setTransactionModalOpen(true);
+    };
+
+    const handleCloseTransactionModal = () => {
+        setTransactionModalOpen(false);
+        setSelectedUser(null);
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        try {
+            const date = new Date(dateString);
+            return new Intl.DateTimeFormat('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }).format(date);
+        } catch {
+            return dateString;
+        }
+    };
+
+    const formatBalance = (balance) => {
+        if (balance === undefined || balance === null) return '0.00';
+        const num = parseFloat(balance);
+        return num.toFixed(2);
+    };
+
+    const getInitials = (name) => {
+        if (!name) return 'U';
+        return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    };
+
+    // Export ALL Data to CSV
+    const exportAllToCSV = async () => {
+        setExportLoading(true);
+        try {
+            // Fetch ALL users from all pages
+            const allUsers = await fetchAllUsersForExport();
+            
+            if (allUsers.length === 0) {
+                alert('No users to export');
+                return;
+            }
+
+            // Define CSV headers
+            const headers = [
+                'S.No.',
+                'Name',
+                'Username',
+                'Email',
+                'Mobile',
+                'Country Code',
+                'Status',
+                'Balance',
+                'Role',
+                'Created Date',
+                'Last Login'
+            ];
+
+            // Prepare data rows for ALL users
+            const rows = allUsers.map((user, index) => [
+                index + 1,
+                user.name || 'N/A',
+                user.username || 'N/A',
+                user.email || 'N/A',
+                user.mobile || 'N/A',
+                user.country_code || 'N/A',
+                user.status === '1' ? 'Active' : 'Inactive',
+                formatBalance(user.balance),
+                user.role?.toUpperCase() || 'USER',
+                formatDate(user.created_at),
+                formatDate(user.last_login)
+            ]);
+
+            // Combine headers and rows
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => {
+                    // Escape commas and quotes in CSV
+                    if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
+                        return `"${cell.replace(/"/g, '""')}"`;
+                    }
+                    return cell;
+                }).join(','))
+            ].join('\n');
+
+            // Create blob and download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `all_users_export_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert(`Successfully exported ${allUsers.length} users`);
+        } catch (error) {
+            console.error('Export failed:', error);
+            alert('Failed to export users. Please try again.');
+        } finally {
+            setExportLoading(false);
+        }
     };
 
     return (
@@ -122,8 +281,7 @@ const Users = () => {
 
             {/* Main content */}
             <div className={`pt-16 transition-all duration-300 ease-in-out ${isMinimized ? 'md:pl-20' : 'md:pl-72'}`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8">
-                    
+                <div className="w-full px-4 sm:px-6 py-8">
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div>
@@ -131,8 +289,26 @@ const Users = () => {
                             <p className="text-sm text-gray-500 dark:text-gray-400">Manage, monitor and verify system users across all projects.</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <button className="flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm">
-                                <FiDownload className="mr-2" /> Export CSV
+                            <button 
+                                onClick={() => fetchUsers(pagination.page)}
+                                className="flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm"
+                            >
+                                <FiRefreshCw className="mr-2" /> Refresh
+                            </button>
+                            <button 
+                                onClick={exportAllToCSV}
+                                disabled={exportLoading}
+                                className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {exportLoading ? (
+                                    <>
+                                        <FiRefreshCw className="mr-2 animate-spin" /> Exporting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <FiDownload className="mr-2" /> Export All Users
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
@@ -154,10 +330,26 @@ const Users = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Active Now</p>
-                                    <h3 className="text-2xl font-bold dark:text-white">{users.filter(u => u.status === '1').length} <span className="text-sm font-normal text-gray-400">on this page</span></h3>
+                                    <h3 className="text-2xl font-bold dark:text-white">
+                                        {users.filter(u => u.status === '1').length}
+                                        <span className="text-sm font-normal text-gray-400 ml-2">on this page</span>
+                                    </h3>
                                 </div>
                                 <div className="p-3 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg">
                                     <FiActivity size={24} />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Inactive Users</p>
+                                    <h3 className="text-2xl font-bold dark:text-white">
+                                        {users.filter(u => u.status !== '1').length}
+                                    </h3>
+                                </div>
+                                <div className="p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg">
+                                    <FiUserX size={24} />
                                 </div>
                             </div>
                         </div>
@@ -170,87 +362,175 @@ const Users = () => {
                                 <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                 <input 
                                     type="text"
-                                    placeholder="Search by name, email or username..."
-                                    className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
+                                    placeholder="Search by name, email, username or mobile..."
+                                    className="w-full pl-10 pr-10 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
-                            </div>                            <button className="flex items-center justify-center px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <FiFilter className="mr-2" /> Filters
-                            </button>
+                                {searchTerm && (
+                                    <button 
+                                        onClick={() => setSearchTerm('')}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    >
+                                        <FiXCircle size={16} />
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="relative">
+                                    <button 
+                                        onClick={() => setShowFilters(!showFilters)}
+                                        className={`flex items-center justify-center px-4 py-2.5 border rounded-lg text-sm font-medium transition-all ${
+                                            filterStatus !== 'all'
+                                                ? 'border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' 
+                                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                        }`}
+                                    >
+                                        <FiFilter className="mr-2" /> 
+                                        Status
+                                        {filterStatus !== 'all' && (
+                                            <span className="ml-2 w-5 h-5 rounded-full bg-indigo-200 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs flex items-center justify-center">
+                                                1
+                                            </span>
+                                        )}
+                                    </button>
+                                    
+                                    {showFilters && (
+                                        <>
+                                            <div className="fixed inset-0 z-40" onClick={() => setShowFilters(false)}></div>
+                                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 p-1 z-50">
+                                                <button 
+                                                    onClick={() => { setFilterStatus('all'); setShowFilters(false); }}
+                                                    className={`w-full text-left px-3 py-2 rounded-md text-sm ${filterStatus === 'all' ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                                                >
+                                                    All Users
+                                                </button>
+                                                <button 
+                                                    onClick={() => { setFilterStatus('active'); setShowFilters(false); }}
+                                                    className={`w-full text-left px-3 py-2 rounded-md text-sm ${filterStatus === 'active' ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                                                >
+                                                    Active Only
+                                                </button>
+                                                <button 
+                                                    onClick={() => { setFilterStatus('inactive'); setShowFilters(false); }}
+                                                    className={`w-full text-left px-3 py-2 rounded-md text-sm ${filterStatus === 'inactive' ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                                                >
+                                                    Inactive Only
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Table Container */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 32rem)' }}>
-                        <div className="overflow-x-auto overflow-y-auto flex-1">
-                            <table className="w-full text-left">
-                                <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
+                    {/* Table Container - NO HORIZONTAL SCROLL */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden w-full">
+                        {/* Table - Responsive with no horizontal scroll */}
+                        <div className="w-full">
+                            <table className="w-full table-fixed">
+                                <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
                                     <tr>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">S.No.</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">Contact</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">Status</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-900/50">Role</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right bg-gray-50 dark:bg-gray-900/50">Actions</th>
+                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[5%] text-center">#</th>
+                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[20%] text-center">Contact</th>
+                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[10%] text-center">Status</th>
+                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[10%] text-center">Balance</th>
+                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[15%] text-center">Joined</th>
+                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[15%] text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                     {loading ? (
                                         [...Array(5)].map((_, i) => (
                                             <tr key={i} className="animate-pulse">
-                                                <td colSpan="5" className="px-6 py-8"><div className="h-8 bg-gray-100 dark:bg-gray-700 rounded w-full"></div></td>
+                                                <td className="px-3 py-4 text-center"><div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded mx-auto"></div></td>
+                                                <td className="px-3 py-4">
+                                                    <div className="space-y-2">
+                                                        <div className="h-4 w-full max-w-[140px] bg-gray-200 dark:bg-gray-700 rounded mx-auto"></div>
+                                                        <div className="h-3 w-full max-w-[100px] bg-gray-200 dark:bg-gray-700 rounded mx-auto"></div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-3 py-4 text-center"><div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto"></div></td>
+                                                <td className="px-3 py-4 text-center"><div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded mx-auto"></div></td>
+                                                <td className="px-3 py-4 text-center"><div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded mx-auto"></div></td>
+                                                <td className="px-3 py-4 text-center"><div className="flex justify-center gap-1"><div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div><div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div><div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div></div></td>
                                             </tr>
                                         ))
                                     ) : filteredUsers.length > 0 ? (
                                         filteredUsers.map((user, index) => (
-                                            <tr key={user.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
-                                                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                            <tr 
+                                                key={user.id} 
+                                                className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors"
+                                            >
+                                                <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap text-center">
                                                     {(pagination.page - 1) * pagination.limit + index + 1}
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="space-y-1">
-                                                        <div className="flex items-center text-xs text-gray-600 dark:text-gray-400"><FiMail className="mr-2" size={12}/> {user.email}</div>
-                                                        <div className="flex items-center text-xs text-gray-600 dark:text-gray-400"><FiPhone className="mr-2" size={12}/> {user.country_code} {user.mobile}</div>
+                                                <td className="px-3 py-4">
+                                                    <div className="space-y-1 min-w-0 text-center">
+                                                        <div className="flex items-center justify-center text-xs text-gray-600 dark:text-gray-300">
+                                                            <FiMail className="mr-1.5 flex-shrink-0" size={11} />
+                                                            <span className="truncate">{user.email}</span>
+                                                        </div>
+                                                        <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400">
+                                                            <FiPhone className="mr-1.5 flex-shrink-0" size={11} />
+                                                            <span className="truncate">
+                                                                {user.country_code ? `${user.country_code} ${user.mobile || ''}` : user.mobile || 'No phone'}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className="px-3 py-4 whitespace-nowrap text-center">
                                                     {user.status === '1' ? (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                                                            <FiUserCheck className="mr-1" /> Active
+                                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">
+                                                            <FiUserCheck className="mr-1" size={10} />
+                                                            Active
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400">
-                                                            <FiUserX className="mr-1" /> Inactive
+                                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
+                                                            <FiUserX className="mr-1" size={10} />
+                                                            Inactive
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <span className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                                                        {user.role?.toUpperCase()}
-                                                    </span>
+                                                <td className="px-3 py-4 whitespace-nowrap text-center">
+                                                    <button
+                                                        onClick={() => handleBalanceClick(user)}
+                                                        className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-purple-100 dark:hover:bg-purple-900/30 hover:text-purple-700 dark:hover:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800 transition-all cursor-pointer"
+                                                        title="View Transaction History"
+                                                    >
+                                                        <FiDollarSign className="mr-1" size={10} />
+                                                        {formatBalance(user.balance)}
+                                                    </button>
                                                 </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
+                                                <td className="px-3 py-4 whitespace-nowrap text-center">
+                                                    <div className="flex items-center justify-center text-xs text-gray-600 dark:text-gray-400">
+                                                        <FiCalendar className="mr-1.5 flex-shrink-0" size={11} />
+                                                        <span className="truncate">{formatDate(user.created_at)}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-3 py-4 whitespace-nowrap text-center">
+                                                    <div className="flex items-center justify-center gap-1">
                                                         <button 
                                                             onClick={() => navigate(`/admin/users/${user.username}`)}
-                                                            className="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                                            className="p-1.5 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
                                                             title="View Profile"
                                                         >
-                                                            <FiEye size={18} />
+                                                            <FiEye size={15} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleOpenBilling(user)}
-                                                            className="p-2 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-all"
-                                                            title="View Billing & Plans"
+                                                            className="p-1.5 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-all"
+                                                            title="View Billing"
                                                         >
-                                                            <FiCreditCard size={18} />
+                                                            <FiCreditCard size={15} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleLoginAsUser(user)}
-                                                            className="p-2 text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-all"
-                                                            title="Login as this user"
+                                                            className="p-1.5 text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-all"
+                                                            title="Login as User"
                                                         >
-                                                            <FiLogIn size={18} />
+                                                            <FiLogIn size={15} />
                                                         </button>
                                                     </div>
                                                 </td>
@@ -258,8 +538,27 @@ const Users = () => {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                                                No users found matching your search.
+                                            <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                                <div className="flex flex-col items-center justify-center">
+                                                    <FiUsers size={40} className="text-gray-300 dark:text-gray-600 mb-3" />
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">No users found</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm">
+                                                        {searchTerm || filterStatus !== 'all' 
+                                                            ? 'Try adjusting your search or filter criteria'
+                                                            : 'No users have been created yet'}
+                                                    </p>
+                                                    {(searchTerm || filterStatus !== 'all') && (
+                                                        <button 
+                                                            onClick={() => {
+                                                                setSearchTerm('');
+                                                                setFilterStatus('all');
+                                                            }}
+                                                            className="mt-4 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-md text-xs font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50"
+                                                        >
+                                                            Clear Filters
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     )}
@@ -268,41 +567,55 @@ const Users = () => {
                         </div>
 
                         {/* Pagination Bar */}
-                        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
-                                Showing <span className="font-medium text-gray-900 dark:text-white">{(pagination.page - 1) * pagination.limit + 1}</span> to <span className="font-medium text-gray-900 dark:text-white">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of <span className="font-medium text-gray-900 dark:text-white">{pagination.total}</span> users
+                        {filteredUsers.length > 0 && (
+                            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div className="text-sm text-gray-500 dark:text-gray-400">
+                                    Showing <span className="font-medium text-gray-900 dark:text-white">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
+                                    <span className="font-medium text-gray-900 dark:text-white">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of{' '}
+                                    <span className="font-medium text-gray-900 dark:text-white">{pagination.total}</span> users
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button 
+                                        disabled={pagination.page === 1}
+                                        onClick={() => setPagination(prev => ({...prev, page: prev.page - 1}))}
+                                        className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    >
+                                        <FiChevronLeft size={16} />
+                                    </button>
+                                    <div className="text-sm font-medium px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg">
+                                        {pagination.page}
+                                    </div>
+                                    <button 
+                                        disabled={pagination.page * pagination.limit >= pagination.total}
+                                        onClick={() => setPagination(prev => ({...prev, page: prev.page + 1}))}
+                                        className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    >
+                                        <FiChevronRight size={16} />
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <button 
-                                    disabled={pagination.page === 1}
-                                    onClick={() => setPagination(prev => ({...prev, page: prev.page - 1}))}
-                                    className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all dark:text-white"
-                                >
-                                    <FiChevronLeft />
-                                </button>
-                                <div className="text-sm font-medium px-4 dark:text-white">Page {pagination.page}</div>
-                                <button 
-                                    disabled={pagination.page * pagination.limit >= pagination.total}
-                                    onClick={() => setPagination(prev => ({...prev, page: prev.page + 1}))}
-                                    className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all dark:text-white"
-                                >
-                                    <FiChevronRight />
-                                </button>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* Billing Modal */}
+            {/* Billing Modal - For payments and invoices */}
             <UserBillingModal
                 isOpen={billingModalOpen}
                 onClose={handleCloseBilling}
                 user={selectedUser}
                 tokens={tokens}
                 onUpdated={() => {
-                    // Optionally refresh users list if needed
+                    fetchUsers(pagination.page);
                 }}
+            />
+
+            {/* Transaction History Modal - For balance/transaction history - Uses POST /admin/user/transaction-history */}
+            <UserTransactionHistoryModal
+                isOpen={transactionModalOpen}
+                onClose={handleCloseTransactionModal}
+                user={selectedUser}
+                tokens={tokens}
             />
         </div>
     );
