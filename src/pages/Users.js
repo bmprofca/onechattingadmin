@@ -24,7 +24,6 @@ import {
 } from 'react-icons/fi';
 import axios from 'axios';
 import UserBillingModal from '../component/Modals/UserBillingModal';
-import UserTransactionHistoryModal from '../component/Modals/UserTransactionHistoryModal'; // Import the new modal
 
 const Users = () => {
     const navigate = useNavigate();
@@ -41,7 +40,6 @@ const Users = () => {
     const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
     const [tokens, setTokens] = useState(null);
     const [billingModalOpen, setBillingModalOpen] = useState(false);
-    const [transactionModalOpen, setTransactionModalOpen] = useState(false); // State for transaction modal
     const [selectedUser, setSelectedUser] = useState(null);
     const [filterStatus, setFilterStatus] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
@@ -154,15 +152,10 @@ const Users = () => {
         setSelectedUser(null);
     };
 
-    // Handle balance click - opens transaction history modal with POST /admin/user/transaction-history
+    // Handle balance click – navigates to transaction history page
     const handleBalanceClick = (user) => {
-        setSelectedUser(user);
-        setTransactionModalOpen(true);
-    };
-
-    const handleCloseTransactionModal = () => {
-        setTransactionModalOpen(false);
-        setSelectedUser(null);
+        // Navigate to the transaction history page, passing user and tokens via state
+        navigate(`/admin/users/${user.username}/transactions`, { state: { user, tokens } });
     };
 
     const formatDate = (dateString) => {
@@ -466,20 +459,23 @@ const Users = () => {
                                                 <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap text-center">
                                                     {(pagination.page - 1) * pagination.limit + index + 1}
                                                 </td>
-                                                <td className="px-3 py-4">
-                                                    <div className="space-y-1 min-w-0 text-center">
-                                                        <div className="flex items-center justify-center text-xs text-gray-600 dark:text-gray-300">
-                                                            <FiMail className="mr-1.5 flex-shrink-0" size={11} />
-                                                            <span className="truncate">{user.email}</span>
-                                                        </div>
-                                                        <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400">
-                                                            <FiPhone className="mr-1.5 flex-shrink-0" size={11} />
-                                                            <span className="truncate">
-                                                                {user.country_code ? `${user.country_code} ${user.mobile || ''}` : user.mobile || 'No phone'}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </td>
+                                               <td className="px-3 py-4">
+    <div className="space-y-1 min-w-0 text-left">
+        <div className="flex items-center justify-start text-xs text-gray-600 dark:text-gray-300">
+            <FiMail className="mr-1.5 flex-shrink-0" size={11} />
+            <span className="truncate">{user.email}</span>
+        </div>
+
+        <div className="flex items-center justify-start text-xs text-gray-500 dark:text-gray-400">
+            <FiPhone className="mr-1.5 flex-shrink-0" size={11} />
+            <span className="truncate">
+                {user.country_code
+                    ? `${user.country_code} ${user.mobile || ''}`
+                    : user.mobile || 'No phone'}
+            </span>
+        </div>
+    </div>
+</td>
                                                 <td className="px-3 py-4 whitespace-nowrap text-center">
                                                     {user.status === '1' ? (
                                                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">
@@ -610,13 +606,7 @@ const Users = () => {
                 }}
             />
 
-            {/* Transaction History Modal - For balance/transaction history - Uses POST /admin/user/transaction-history */}
-            <UserTransactionHistoryModal
-                isOpen={transactionModalOpen}
-                onClose={handleCloseTransactionModal}
-                user={selectedUser}
-                tokens={tokens}
-            />
+            {/* Transaction history modal removed – now using dedicated page */}
         </div>
     );
 };

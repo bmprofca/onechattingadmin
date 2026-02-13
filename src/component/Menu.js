@@ -504,13 +504,13 @@ export const Sidebar = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsM
     { key: 'users', title: 'Users', icon: <FiUsers size={18} />, path: '/admin/users' },
     { key: 'projects', title: 'Projects', icon: <FiBriefcase size={18} />, path: '/admin/projects' },
     { 
-      key: 'subscriptions', 
-      title: 'Subscriptions', 
+      key: 'Plans', 
+      title: 'Plans', 
       icon: <FiPackage size={18} />, 
       path: '#',
       submenus: [
-        { title: 'All Subscriptions', path: '/admin/subscriptions' },
-        { title: 'Subscription Packs', path: '/admin/subscription-packs' },
+        { title: 'Pricing', path: '/admin/subscriptions' },
+        // { title: 'Subscription Packs', path: '/admin/subscription-packs' },
         { title: 'Custom Pricing', path: '/admin/custom-pricing' }
       ]
     }

@@ -12,7 +12,8 @@ import {
     FiCheckCircle,
     FiXCircle,
     FiWifi,
-    FiWifiOff
+    FiWifiOff,
+    FiFilter
 } from 'react-icons/fi';
 import axios from 'axios';
 import ProjectChargesModal from '../component/Modals/ProjectChargesModal';
@@ -28,6 +29,8 @@ const Projects = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [wabaFilter, setWabaFilter] = useState('all');
     const [tokens, setTokens] = useState(null);
     const [error, setError] = useState('');
     const [chargesModalOpen, setChargesModalOpen] = useState(false);
@@ -77,13 +80,36 @@ const Projects = () => {
         fetchProjects();
     }, [fetchProjects]);
 
+    // Apply filters
     const filteredProjects = projects.filter(project => {
         const term = searchTerm.toLowerCase();
-        return (
+        
+        // Search filter
+        const matchesSearch = 
             project.project_name?.toLowerCase().includes(term) ||
             project.project_id?.toString().toLowerCase().includes(term) ||
-            project.business_id?.toString().toLowerCase().includes(term)
-        );
+            project.business_id?.toString().toLowerCase().includes(term) ||
+            project.id?.toString().toLowerCase().includes(term);
+        
+        if (!matchesSearch) return false;
+
+        // Status filter
+        const isActive = project.status === '1' || project.status === 1 || project.status === 'active';
+        if (statusFilter !== 'all') {
+            if (statusFilter === 'active' && !isActive) return false;
+            if (statusFilter === 'inactive' && isActive) return false;
+        }
+
+        // WABA Connection filter
+        const isConnected = project.is_waba_connected === 1 || 
+                           project.is_waba_connected === '1' || 
+                           project.is_waba_connected === true;
+        if (wabaFilter !== 'all') {
+            if (wabaFilter === 'connected' && !isConnected) return false;
+            if (wabaFilter === 'not_connected' && isConnected) return false;
+        }
+
+        return true;
     });
 
     const totalProjects = projects.length;
@@ -109,6 +135,12 @@ const Projects = () => {
                 p.project_id === updatedProject.project_id ? { ...p, ...updatedProject } : p
             )
         );
+    };
+
+    const clearFilters = () => {
+        setSearchTerm('');
+        setStatusFilter('all');
+        setWabaFilter('all');
     };
 
     return (
@@ -194,9 +226,10 @@ const Projects = () => {
                         </div>
                     </div>
 
-                    {/* Search Bar */}
+                    {/* Search and Filters */}
                     <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6">
-                        <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex flex-col gap-4">
+                            {/* Search Bar */}
                             <div className="relative flex-1">
                                 <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                 <input
@@ -207,6 +240,68 @@ const Projects = () => {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
+                            
+                            {/* Filter Row */}
+                            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                    <FiFilter size={16} />
+                                    <span>Filters:</span>
+                                </div>
+                                
+                                {/* Status Filter */}
+                                <select
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white text-sm"
+                                >
+                                    <option value="all">All Status</option>
+                                    <option value="active">Active Only</option>
+                                    <option value="inactive">Inactive Only</option>
+                                </select>
+
+                                {/* WABA Connection Filter */}
+                                <select
+                                    value={wabaFilter}
+                                    onChange={(e) => setWabaFilter(e.target.value)}
+                                    className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white text-sm"
+                                >
+                                    <option value="all">All Connections</option>
+                                    <option value="connected">WABA Connected</option>
+                                    <option value="not_connected">WABA Not Connected</option>
+                                </select>
+
+                                {/* Active Filters Count */}
+                                {(statusFilter !== 'all' || wabaFilter !== 'all' || searchTerm) && (
+                                    <button
+                                        onClick={clearFilters}
+                                        className="px-4 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors"
+                                    >
+                                        Clear Filters
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Active Filter Indicators */}
+                            {(statusFilter !== 'all' || wabaFilter !== 'all') && (
+                                <div className="flex flex-wrap gap-2 pt-2">
+                                    {statusFilter !== 'all' && (
+                                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-xs">
+                                            <span>Status: {statusFilter === 'active' ? 'Active' : 'Inactive'}</span>
+                                            <button onClick={() => setStatusFilter('all')} className="ml-1 hover:text-indigo-900 dark:hover:text-indigo-100">
+                                                ×
+                                            </button>
+                                        </span>
+                                    )}
+                                    {wabaFilter !== 'all' && (
+                                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full text-xs">
+                                            <span>WABA: {wabaFilter === 'connected' ? 'Connected' : 'Not Connected'}</span>
+                                            <button onClick={() => setWabaFilter('all')} className="ml-1 hover:text-emerald-900 dark:hover:text-emerald-100">
+                                                ×
+                                            </button>
+                                        </span>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -365,9 +460,15 @@ const Projects = () => {
                                                     <FiDatabase className="text-gray-400 dark:text-gray-500" size={32} />
                                                 </div>
                                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No projects found</h3>
-                                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                    No projects match your search criteria. Try adjusting your search.
+                                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                                    No projects match your search criteria. Try adjusting your filters.
                                                 </p>
+                                                <button
+                                                    onClick={clearFilters}
+                                                    className="px-4 py-2 bg-indigo-500 text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors"
+                                                >
+                                                    Clear All Filters
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

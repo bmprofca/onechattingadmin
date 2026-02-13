@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import SubscriptionPacks from './pages/SubscriptionPacks';
 import CustomPricing from './pages/CustomPricing';
 import AllSubscriptions from './pages/AllSubscriptions';
+import UserTransactionHistory from "./component/Modals/UserTransactionHistory";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Provider } from 'react-redux';
@@ -28,6 +29,7 @@ root.render(
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/users/:username" element={<UserDetails />} />
+          <Route path="/admin/users/:username/transactions" element={<UserTransactionHistory />} />
           <Route path="/admin/projects" element={<Projects />} />
           <Route path="/admin/projects/:project_id" element={<ProjectDetails />} />
           <Route path="/admin/subscriptions" element={<AllSubscriptions />} />
