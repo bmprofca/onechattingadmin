@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Header, Sidebar } from '../component/Menu';
 import { useNavigate } from 'react-router-dom';
 import {
+    FiUser,
     FiSearch,
     FiEye,
     FiUserCheck,
@@ -461,6 +462,10 @@ const Users = () => {
                                                 </td>
                                                <td className="px-3 py-4">
     <div className="space-y-1 min-w-0 text-left">
+         <div className="flex items-center justify-start text-xs text-gray-600 dark:text-gray-300">
+            <FiUser className="mr-1.5 flex-shrink-0" size={11} />
+            <span className="truncate">{user.name}</span>
+        </div>
         <div className="flex items-center justify-start text-xs text-gray-600 dark:text-gray-300">
             <FiMail className="mr-1.5 flex-shrink-0" size={11} />
             <span className="truncate">{user.email}</span>
