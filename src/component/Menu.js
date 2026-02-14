@@ -501,17 +501,17 @@ export const Sidebar = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsM
 
   const menuItems = [
     { key: 'dashboard', title: 'Dashboard', icon: <FiPieChart size={18} />, path: '/' },
-    { key: 'users', title: 'Users', icon: <FiUsers size={18} />, path: '/admin/users' },
-    { key: 'projects', title: 'Projects', icon: <FiBriefcase size={18} />, path: '/admin/projects' },
+    { key: 'users', title: 'Users', icon: <FiUsers size={18} />, path: '/users' },
+    { key: 'projects', title: 'Projects', icon: <FiBriefcase size={18} />, path: '/projects' },
     { 
       key: 'Plans', 
       title: 'Plans', 
       icon: <FiPackage size={18} />, 
       path: '#',
       submenus: [
-        { title: 'Pricing', path: '/admin/subscriptions' },
-        // { title: 'Subscription Packs', path: '/admin/subscription-packs' },
-        { title: 'Custom Pricing', path: '/admin/custom-pricing' }
+        { title: 'Pricing', path: '/subscriptions' },
+        // { title: 'Subscription Packs', path: '/subscription-packs' },
+        { title: 'Custom Pricing', path: '/custom-pricing' }
       ]
     }
   ];

@@ -371,7 +371,7 @@ const Projects = () => {
                                                 className={`hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-blue-50/50 dark:hover:from-indigo-900/20 dark:hover:to-blue-900/20 transition-all duration-200 cursor-pointer group border-b border-gray-100 dark:border-gray-700 ${
                                                     isLast ? 'border-b-0' : ''
                                                 }`}
-                                                onClick={() => navigate(`/admin/projects/${project.project_id}`)}
+                                                onClick={() => navigate(`/projects/${project.project_id}`)}
                                             >
                                                 <td className="px-6 py-5">
                                                     <div className="flex items-center justify-center">

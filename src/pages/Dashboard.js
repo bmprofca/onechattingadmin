@@ -402,7 +402,7 @@ function AdminDashboard() {
                                                 </div>
                                                 
                                                 <button 
-                                                    onClick={() => navigate('/admin/users')}
+                                                    onClick={() => navigate('/users')}
                                                     className="w-full mt-4 bg-white text-indigo-700 py-3 rounded-xl font-semibold hover:bg-indigo-50 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center group"
                                                 >
                                                     Manage Users

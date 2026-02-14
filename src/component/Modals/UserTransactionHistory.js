@@ -280,7 +280,7 @@ const UserTransactionHistoryPage = ({ user: propUser, tokens: propTokens }) => {
                     localStorage.removeItem('token');
                     localStorage.removeItem('x-auth-token');
                     setTimeout(() => {
-                        window.location.href = '/admin/login';
+                        window.location.href = '/login';
                     }, 2000);
                 } else if (error.response.status === 404) {
                     setError('User not found or has no transactions.');

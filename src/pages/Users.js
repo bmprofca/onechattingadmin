@@ -11,6 +11,8 @@ import {
     FiPhone,
     FiChevronLeft,
     FiChevronRight,
+    FiChevronsLeft,
+    FiChevronsRight,
     FiFilter,
     FiDownload,
     FiUsers,
@@ -44,6 +46,7 @@ const Users = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [filterStatus, setFilterStatus] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
+    const [pageJumpInput, setPageJumpInput] = useState('');
 
     // Sync Sidebar State
     useEffect(() => {
@@ -65,7 +68,8 @@ const Users = () => {
         if (!tokens?.token) return;
         setLoading(true);
         try {
-            const response = await axios.get(`https://api.w1chat.com/admin/users?page=${page}&limit=${pagination.limit}`, {
+            const limit = Math.min(Math.max(pagination.limit || 10, 1), 100);
+            const response = await axios.get(`https://api.w1chat.com/admin/users?page=${page}&limit=${limit}`, {
                 headers: { 'x-token': tokens.token }
             });
 
@@ -156,7 +160,7 @@ const Users = () => {
     // Handle balance click – navigates to transaction history page
     const handleBalanceClick = (user) => {
         // Navigate to the transaction history page, passing user and tokens via state
-        navigate(`/admin/users/${user.username}/transactions`, { state: { user, tokens } });
+        navigate(`/users/${user.username}/transactions`, { state: { user, tokens } });
     };
 
     const formatDate = (dateString) => {
@@ -513,7 +517,7 @@ const Users = () => {
                                                 <td className="px-3 py-4 whitespace-nowrap text-center">
                                                     <div className="flex items-center justify-center gap-1">
                                                         <button 
-                                                            onClick={() => navigate(`/admin/users/${user.username}`)}
+                                                            onClick={() => navigate(`/users/${user.username}`)}
                                                             className="p-1.5 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
                                                             title="View Profile"
                                                         >
@@ -568,34 +572,91 @@ const Users = () => {
                         </div>
 
                         {/* Pagination Bar */}
-                        {filteredUsers.length > 0 && (
-                            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <div className="text-sm text-gray-500 dark:text-gray-400">
-                                    Showing <span className="font-medium text-gray-900 dark:text-white">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
-                                    <span className="font-medium text-gray-900 dark:text-white">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of{' '}
-                                    <span className="font-medium text-gray-900 dark:text-white">{pagination.total}</span> users
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button 
-                                        disabled={pagination.page === 1}
-                                        onClick={() => setPagination(prev => ({...prev, page: prev.page - 1}))}
-                                        className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                                    >
-                                        <FiChevronLeft size={16} />
-                                    </button>
-                                    <div className="text-sm font-medium px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg">
-                                        {pagination.page}
+                        {filteredUsers.length > 0 && (() => {
+                            const totalPages = Math.ceil(pagination.total / pagination.limit) || 1;
+                            const start = (pagination.page - 1) * pagination.limit + 1;
+                            const end = Math.min(pagination.page * pagination.limit, pagination.total);
+                            return (
+                                <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                                            Showing <span className="font-medium text-gray-900 dark:text-white">{start}</span> to{' '}
+                                            <span className="font-medium text-gray-900 dark:text-white">{end}</span> of{' '}
+                                            <span className="font-medium text-gray-900 dark:text-white">{pagination.total}</span> users
+                                        </div>
+                                        <div className="flex items-center gap-0.5">
+                                            <button
+                                                type="button"
+                                                disabled={pagination.page <= 1}
+                                                onClick={() => setPagination(prev => ({...prev, page: 1}))}
+                                                className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                                title="First"
+                                            >
+                                                <FiChevronsLeft size={16} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                disabled={pagination.page <= 1}
+                                                onClick={() => setPagination(prev => ({...prev, page: prev.page - 1}))}
+                                                className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                                title="Previous"
+                                            >
+                                                <FiChevronLeft size={16} />
+                                            </button>
+                                            <span className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg min-w-[80px] text-center">
+                                                {pagination.page}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                disabled={pagination.page >= totalPages}
+                                                onClick={() => setPagination(prev => ({...prev, page: prev.page + 1}))}
+                                                className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                                title="Next"
+                                            >
+                                                <FiChevronRight size={16} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                disabled={pagination.page >= totalPages}
+                                                onClick={() => setPagination(prev => ({...prev, page: totalPages}))}
+                                                className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                                title="Last"
+                                            >
+                                                <FiChevronsRight size={16} />
+                                            </button>
+                                        </div>
                                     </div>
-                                    <button 
-                                        disabled={pagination.page * pagination.limit >= pagination.total}
-                                        onClick={() => setPagination(prev => ({...prev, page: prev.page + 1}))}
-                                        className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                                    >
-                                        <FiChevronRight size={16} />
-                                    </button>
+                                    {totalPages > 1 && (
+                                        <form
+                                            onSubmit={(e) => {
+                                                e.preventDefault();
+                                                const val = parseInt(pageJumpInput || String(pagination.page), 10);
+                                                if (val >= 1 && val <= totalPages) setPagination(prev => ({...prev, page: val}));
+                                                setPageJumpInput('');
+                                            }}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <span className="text-sm text-gray-500 dark:text-gray-400">Go to</span>
+                                            <input
+                                                type="number"
+                                                min={1}
+                                                max={totalPages}
+                                                value={pageJumpInput !== '' ? pageJumpInput : String(pagination.page)}
+                                                onChange={(e) => setPageJumpInput(e.target.value)}
+                                                placeholder={`${start}-${end}`}
+                                                className="w-14 px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
+                                            />
+                                            <button
+                                                type="submit"
+                                                className="px-2 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                                            >
+                                                Go
+                                            </button>
+                                        </form>
+                                    )}
                                 </div>
-                            </div>
-                        )}
+                            );
+                        })()}
                     </div>
                 </div>
             </div>

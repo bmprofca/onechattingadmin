@@ -116,7 +116,7 @@ const ProjectDetails = () => {
 
                     {/* Breadcrumb & Navigation */}
                     <button 
-                        onClick={() => navigate('/admin/projects')}
+                        onClick={() => navigate('/projects')}
                         className="group mb-6 flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-all duration-200"
                     >
                         <div className="p-1.5 rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 mr-3 group-hover:border-indigo-200 dark:group-hover:border-indigo-800 group-hover:-translate-x-1 transition-all">

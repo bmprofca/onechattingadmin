@@ -27,14 +27,14 @@ root.render(
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin/users" element={<Users />} />
-          <Route path="/admin/users/:username" element={<UserDetails />} />
-          <Route path="/admin/users/:username/transactions" element={<UserTransactionHistory />} />
-          <Route path="/admin/projects" element={<Projects />} />
-          <Route path="/admin/projects/:project_id" element={<ProjectDetails />} />
-          <Route path="/admin/subscriptions" element={<AllSubscriptions />} />
-          <Route path="/admin/subscription-packs" element={<SubscriptionPacks />} />
-          <Route path="/admin/custom-pricing" element={<CustomPricing />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/users/:username" element={<UserDetails />} />
+          <Route path="/users/:username/transactions" element={<UserTransactionHistory />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:project_id" element={<ProjectDetails />} />
+          <Route path="/subscriptions" element={<AllSubscriptions />} />
+          <Route path="/subscription-packs" element={<SubscriptionPacks />} />
+          <Route path="/custom-pricing" element={<CustomPricing />} />
           {/* Fallback to dashboard for any unknown route */}
           <Route path="*" element={<Dashboard />} />
         </Routes>
