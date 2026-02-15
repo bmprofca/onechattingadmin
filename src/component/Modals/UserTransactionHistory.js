@@ -23,20 +23,24 @@ import {
     FiTrendingDown,
     FiHash,
     FiTag,
-    FiArrowLeft
+    FiArrowLeft,
+    FiPlusCircle,
+    FiMinusCircle
 } from 'react-icons/fi';
 import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Header, Sidebar } from '../Menu';
+import { Encrypt } from "../../pages/encryption/payload-encryption";
 
 // API Base URL
 const API_BASE_URL = 'https://api.w1chat.com';
 
 const UserTransactionHistoryPage = ({ user: propUser, tokens: propTokens }) => {
-    const { username } = useParams();
     const navigate = useNavigate();
-    const location = useLocation();
-    const state = location.state || {};
+   const { username: urlUsername } = useParams();
+const location = useLocation();
+const state = location.state || {};
+const username = state.username || urlUsername;
 
     // Sidebar state
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -81,6 +85,15 @@ const UserTransactionHistoryPage = ({ user: propUser, tokens: propTokens }) => {
     });
     const [showFilters, setShowFilters] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Wallet modal states
+    const [showWalletModal, setShowWalletModal] = useState(false);
+    const [walletAction, setWalletAction] = useState(''); // 'credit' or 'debit'
+    const [walletAmount, setWalletAmount] = useState('');
+    const [walletRemark, setWalletRemark] = useState('');
+    const [walletLoading, setWalletLoading] = useState(false);
+    const [walletError, setWalletError] = useState('');
+    const [walletSuccess, setWalletSuccess] = useState('');
 
     // Transaction types options
     const transactionTypes = [
@@ -193,6 +206,118 @@ const UserTransactionHistoryPage = ({ user: propUser, tokens: propTokens }) => {
             }
         }
     }, [user, filters.from_date, filters.to_date, filters.transaction_type, filters.type]);
+
+    // Handle wallet credit/debit
+   // Handle wallet credit/debit
+const handleWalletAction = async () => {
+    if (!user?.username) {
+        setWalletError('User not found');
+        return;
+    }
+
+    if (!walletAmount || parseFloat(walletAmount) <= 0) {
+        setWalletError('Please enter a valid amount');
+        return;
+    }
+
+    const token = getAuthToken();
+    if (!token) {
+        setWalletError('Authentication token missing');
+        return;
+    }
+
+    setWalletLoading(true);
+    setWalletError('');
+    setWalletSuccess('');
+
+    try {
+        // Get admin username from token or localStorage
+        let adminUsername = '';
+        
+        // Try to get from propTokens
+        if (propTokens?.username) {
+            adminUsername = propTokens.username;
+        } else if (tokens?.username) {
+            adminUsername = tokens.username;
+        } else {
+            // Try to get from localStorage
+            adminUsername = localStorage.getItem('adminUsername') || 
+                           localStorage.getItem('username') || 
+                           'SYSTEM';
+        }
+
+        // Prepare data for encryption with admin username included
+        const payload = {
+            amount: parseFloat(walletAmount),
+            remark: walletRemark || `${walletAction} by admin`,
+            admin: adminUsername // Include admin username in payload
+        };
+
+        // Encrypt the data using the Encrypt function
+        const encrypted = Encrypt(payload);
+
+        const payloadData = {
+            data: encrypted.data,
+            key: encrypted.key
+        };
+
+        // Determine which endpoint to use
+        const endpoint = walletAction === 'credit' 
+            ? `${API_BASE_URL}/admin/credit-wallet/${user.username}`
+            : `${API_BASE_URL}/admin/debit-wallet/${user.username}`;
+
+        const response = await axios.post(endpoint, payloadData, {
+            headers: { 
+                'x-auth-token': token,
+                'x-token': token,
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.data && response.data.error === false) {
+            setWalletSuccess(`Wallet ${walletAction}ed successfully!`);
+            
+            // Reset form
+            setWalletAmount('');
+            setWalletRemark('');
+            
+            // Refresh transactions and summary
+            fetchTransactions(1);
+            
+            // Close modal after 2 seconds
+            setTimeout(() => {
+                setShowWalletModal(false);
+                setWalletSuccess('');
+            }, 2000);
+        } else {
+            setWalletError(response.data?.error || `Failed to ${walletAction} wallet`);
+        }
+    } catch (error) {
+        console.error(`Failed to ${walletAction} wallet:`, error);
+        
+        if (error.code === 'ERR_NETWORK') {
+            setWalletError('Cannot connect to server. Please check if the API server is running.');
+        } else if (error.response) {
+            if (error.response.status === 401) {
+                setWalletError('Unauthorized: Your session has expired. Please login again.');
+            } else if (error.response.status === 404) {
+                setWalletError('User not found');
+            } else if (error.response.status === 500) {
+                setWalletError('Server error. Please try again later.');
+                console.error('Server error details:', error.response.data);
+            } else {
+                setWalletError(error.response.data?.error || `Server error: ${error.response.status}`);
+            }
+        } else if (error.request) {
+            setWalletError('No response from server. Please check your network connection.');
+        } else {
+            setWalletError(`Request failed: ${error.message}`);
+        }
+    } finally {
+        setWalletLoading(false);
+    }
+};
 
     // Copy to clipboard function
     const copyToClipboard = (text, id) => {
@@ -548,6 +673,129 @@ const UserTransactionHistoryPage = ({ user: propUser, tokens: propTokens }) => {
                 setIsMinimized={setIsMinimized}
             />
 
+            {/* Wallet Action Modal */}
+            {showWalletModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full">
+                        <div className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    {walletAction === 'credit' ? 'Credit Wallet' : 'Debit Wallet'}
+                                </h3>
+                                <button
+                                    onClick={() => {
+                                        setShowWalletModal(false);
+                                        setWalletError('');
+                                        setWalletSuccess('');
+                                        setWalletAmount('');
+                                        setWalletRemark('');
+                                    }}
+                                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                >
+                                    <FiX size={20} />
+                                </button>
+                            </div>
+
+                            <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    User: <span className="font-medium text-gray-900 dark:text-white">@{user.username}</span>
+                                </p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    Current Balance: <span className="font-medium text-indigo-600 dark:text-indigo-400">₹{parseFloat(summary.current_balance).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                                </p>
+                            </div>
+
+                            {walletError && (
+                                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg">
+                                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center">
+                                        <FiXCircle className="mr-2 flex-shrink-0" size={16} />
+                                        {walletError}
+                                    </p>
+                                </div>
+                            )}
+
+                            {walletSuccess && (
+                                <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-lg">
+                                    <p className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center">
+                                        <FiCheckCircle className="mr-2 flex-shrink-0" size={16} />
+                                        {walletSuccess}
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Amount (₹)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="0.01"
+                                        step="0.01"
+                                        value={walletAmount}
+                                        onChange={(e) => setWalletAmount(e.target.value)}
+                                        placeholder="Enter amount"
+                                        className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white"
+                                        disabled={walletLoading || walletSuccess}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Remark (Optional)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={walletRemark}
+                                        onChange={(e) => setWalletRemark(e.target.value)}
+                                        placeholder={`Enter remark for ${walletAction}`}
+                                        className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white"
+                                        disabled={walletLoading || walletSuccess}
+                                    />
+                                </div>
+
+                                <div className="flex gap-3 mt-6">
+                                    <button
+                                        onClick={handleWalletAction}
+                                        disabled={walletLoading || !walletAmount || parseFloat(walletAmount) <= 0 || walletSuccess}
+                                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition-all ${
+                                            walletAction === 'credit'
+                                                ? 'bg-emerald-600 hover:bg-emerald-700'
+                                                : 'bg-rose-600 hover:bg-rose-700'
+                                        } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
+                                    >
+                                        {walletLoading ? (
+                                            <>
+                                                <FiRefreshCw className="animate-spin mr-2" size={14} />
+                                                Processing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                {walletAction === 'credit' ? <FiPlusCircle className="mr-2" size={14} /> : <FiMinusCircle className="mr-2" size={14} />}
+                                                Confirm {walletAction === 'credit' ? 'Credit' : 'Debit'}
+                                            </>
+                                        )}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowWalletModal(false);
+                                            setWalletError('');
+                                            setWalletSuccess('');
+                                            setWalletAmount('');
+                                            setWalletRemark('');
+                                        }}
+                                        disabled={walletLoading}
+                                        className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all disabled:opacity-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Main content */}
             <div className={`pt-16 transition-all duration-300 ease-in-out ${isMinimized ? 'md:pl-20' : 'md:pl-72'}`}>
                 <div className="w-full px-4 sm:px-6 py-8">
@@ -576,6 +824,26 @@ const UserTransactionHistoryPage = ({ user: propUser, tokens: propTokens }) => {
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => {
+                                    setWalletAction('credit');
+                                    setShowWalletModal(true);
+                                }}
+                                className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-all shadow-sm"
+                            >
+                                <FiPlusCircle className="mr-2" size={14} />
+                                Credit Wallet
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setWalletAction('debit');
+                                    setShowWalletModal(true);
+                                }}
+                                className="inline-flex items-center px-4 py-2 bg-rose-600 text-white rounded-lg text-sm font-medium hover:bg-rose-700 transition-all shadow-sm"
+                            >
+                                <FiMinusCircle className="mr-2" size={14} />
+                                Debit Wallet
+                            </button>
                             <button
                                 onClick={() => navigate(-1)}
                                 className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm"

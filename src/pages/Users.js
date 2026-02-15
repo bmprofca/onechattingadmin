@@ -514,7 +514,7 @@ const Users = () => {
                                                         <span className="truncate">{formatDate(user.created_at)}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-3 py-4 whitespace-nowrap text-center">
+                                                {/* <td className="px-3 py-4 whitespace-nowrap text-center">
                                                     <div className="flex items-center justify-center gap-1">
                                                         <button 
                                                             onClick={() => navigate(`/users/${user.username}`)}
@@ -538,7 +538,7 @@ const Users = () => {
                                                             <FiLogIn size={15} />
                                                         </button>
                                                     </div>
-                                                </td>
+                                                </td> */}
                                             </tr>
                                         ))
                                     ) : (
