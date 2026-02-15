@@ -545,21 +545,21 @@ const Users = () => {
                                                             className="p-1.5 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
                                                             title="View Profile"
                                                         >
-                                                            <FiEye size={15} />
+                                                            <FiEye size={20} />
                                                         </button>
-                                                        <button
+                                                        {/* <button
                                                             onClick={() => handleOpenBilling(user)}
                                                             className="p-1.5 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-all"
                                                             title="View Billing"
                                                         >
                                                             <FiCreditCard size={15} />
-                                                        </button>
+                                                        </button> */}
                                                         <button
                                                             onClick={() => handleLoginAsUser(user)}
                                                             className="p-1.5 text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-all"
                                                             title="Login as User"
                                                         >
-                                                            <FiLogIn size={15} />
+                                                            <FiLogIn size={20} />
                                                         </button>
                                                     </div>
                                                 </td>
