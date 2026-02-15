@@ -184,13 +184,10 @@ const AllSubscriptions = () => {
 
     const { savings, savingsPercent } = calculateSavings();
 
-    const handleEditChange = (e) => {
-        const { name, value } = e.target;
-        // Only allow numbers
-        if (value === '' || /^\d+$/.test(value)) {
-            setEditPrices(prev => ({ ...prev, [name]: value }));
-        }
-    };
+   const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditPrices(prev => ({ ...prev, [name]: value }));
+};
 
     const cancelEdit = () => {
         setEditPrices({
