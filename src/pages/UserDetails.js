@@ -560,6 +560,8 @@ const UserDetails = () => {
 
     const displayCols = items.length > 0 ? Object.keys(items[0] || {}) : [];
     const hasActions = typeof actionsColumn === 'function';
+    const showSerialNo = tableType === 'projects' || tableType === 'tokens';
+    const { page: pagPage = 1, limit: pagLimit = 10 } = pagination || {};
 
     const renderCell = (col, row, idx) => {
       const value = row[col];
@@ -658,6 +660,11 @@ const UserDetails = () => {
               <table className="min-w-full text-xs sm:text-[13px]">
                 <thead className="bg-gray-50 dark:bg-gray-900/60 border-y border-gray-100 dark:border-gray-700">
                   <tr>
+                    {showSerialNo && (
+                      <th className="px-3 py-2 text-left font-semibold text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap w-12">
+                        #
+                      </th>
+                    )}
                     {displayCols.map((col) => (
                       <th key={col} className="px-3 py-2 text-left font-semibold text-[11px] uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap">
                         {formatLabel(col)}
@@ -673,6 +680,11 @@ const UserDetails = () => {
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                   {items.map((row, idx) => (
                     <tr key={idx} className="hover:bg-gray-50/70 dark:hover:bg-gray-800/60">
+                      {showSerialNo && (
+                        <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 text-[11px] font-medium">
+                          {(pagPage - 1) * pagLimit + idx + 1}
+                        </td>
+                      )}
                       {displayCols.map((col) => (
                         <td key={col} className="px-3 py-2.5 text-gray-800 dark:text-gray-100 align-top max-w-xs break-words">
                           {renderCell(col, row, idx)}
@@ -751,10 +763,10 @@ const UserDetails = () => {
                       type="number"
                       min={1}
                       max={total_pages}
-                      value={pageJumpValue !== '' ? pageJumpValue : String(page)}
+                      value={pageJumpValue}
                       onChange={(e) => onPageJumpChange?.(e.target.value)}
                       placeholder={`${start}-${end}`}
-                      className="w-14 px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
+                      className="w-20 min-w-[5rem] px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
                     />
                     <button
                       type="submit"

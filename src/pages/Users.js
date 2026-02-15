@@ -20,9 +20,10 @@ import {
     FiLogIn,
     FiCreditCard,
     FiCalendar,
-    FiShield,
-    FiRefreshCw,
+    FiBriefcase,
+    FiX,
     FiXCircle,
+    FiRefreshCw,
     FiDollarSign
 } from 'react-icons/fi';
 import axios from 'axios';
@@ -47,6 +48,8 @@ const Users = () => {
     const [filterStatus, setFilterStatus] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
     const [pageJumpInput, setPageJumpInput] = useState('');
+    const [projectsModalOpen, setProjectsModalOpen] = useState(false);
+    const [selectedUserForProjects, setSelectedUserForProjects] = useState(null);
 
     // Sync Sidebar State
     useEffect(() => {
@@ -96,23 +99,23 @@ const Users = () => {
             const firstPage = await axios.get(`https://api.w1chat.com/admin/users?page=1&limit=1`, {
                 headers: { 'x-token': tokens.token }
             });
-            
+
             const totalUsers = firstPage.data.pagination.total;
             const totalPages = Math.ceil(totalUsers / 100); // Fetch 100 per page for export
-            
+
             let allUsers = [];
-            
+
             // Fetch all pages
             for (let page = 1; page <= totalPages; page++) {
                 const response = await axios.get(`https://api.w1chat.com/admin/users?page=${page}&limit=100`, {
                     headers: { 'x-token': tokens.token }
                 });
-                
+
                 if (!response.data.error) {
                     allUsers = [...allUsers, ...response.data.data];
                 }
             }
-            
+
             return allUsers;
         } catch (err) {
             console.error("Failed to fetch all users for export", err);
@@ -122,17 +125,17 @@ const Users = () => {
 
     // Derived filtering for current page
     const filteredUsers = users.filter(user => {
-        const matchesSearch = 
-            user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        const matchesSearch =
+            user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.mobile?.includes(searchTerm);
-        
-        const matchesStatus = 
-            filterStatus === 'all' || 
+
+        const matchesStatus =
+            filterStatus === 'all' ||
             (filterStatus === 'active' && user.status === '1') ||
             (filterStatus === 'inactive' && user.status !== '1');
-        
+
         return matchesSearch && matchesStatus;
     });
 
@@ -155,6 +158,16 @@ const Users = () => {
     const handleCloseBilling = () => {
         setBillingModalOpen(false);
         setSelectedUser(null);
+    };
+
+    const handleOpenProjectsModal = (user) => {
+        setSelectedUserForProjects(user);
+        setProjectsModalOpen(true);
+    };
+
+    const handleCloseProjectsModal = () => {
+        setProjectsModalOpen(false);
+        setSelectedUserForProjects(null);
     };
 
     // Handle balance click – navigates to transaction history page
@@ -194,7 +207,7 @@ const Users = () => {
         try {
             // Fetch ALL users from all pages
             const allUsers = await fetchAllUsersForExport();
-            
+
             if (allUsers.length === 0) {
                 alert('No users to export');
                 return;
@@ -226,7 +239,7 @@ const Users = () => {
                 user.status === '1' ? 'Active' : 'Inactive',
                 formatBalance(user.balance),
                 user.role?.toUpperCase() || 'USER',
-                formatDate(user.created_at),
+                formatDate(user.create_date),
                 formatDate(user.last_login)
             ]);
 
@@ -252,7 +265,7 @@ const Users = () => {
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            
+
             alert(`Successfully exported ${allUsers.length} users`);
         } catch (error) {
             console.error('Export failed:', error);
@@ -287,13 +300,13 @@ const Users = () => {
                             <p className="text-sm text-gray-500 dark:text-gray-400">Manage, monitor and verify system users across all projects.</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <button 
+                            <button
                                 onClick={() => fetchUsers(pagination.page)}
                                 className="flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm"
                             >
                                 <FiRefreshCw className="mr-2" /> Refresh
                             </button>
-                            <button 
+                            <button
                                 onClick={exportAllToCSV}
                                 disabled={exportLoading}
                                 className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -358,7 +371,7 @@ const Users = () => {
                         <div className="flex flex-col md:flex-row gap-4">
                             <div className="relative flex-1">
                                 <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input 
+                                <input
                                     type="text"
                                     placeholder="Search by name, email, username or mobile..."
                                     className="w-full pl-10 pr-10 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
@@ -366,7 +379,7 @@ const Users = () => {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                                 {searchTerm && (
-                                    <button 
+                                    <button
                                         onClick={() => setSearchTerm('')}
                                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                     >
@@ -376,15 +389,14 @@ const Users = () => {
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="relative">
-                                    <button 
+                                    <button
                                         onClick={() => setShowFilters(!showFilters)}
-                                        className={`flex items-center justify-center px-4 py-2.5 border rounded-lg text-sm font-medium transition-all ${
-                                            filterStatus !== 'all'
-                                                ? 'border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' 
-                                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                        }`}
+                                        className={`flex items-center justify-center px-4 py-2.5 border rounded-lg text-sm font-medium transition-all ${filterStatus !== 'all'
+                                            ? 'border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                                            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                            }`}
                                     >
-                                        <FiFilter className="mr-2" /> 
+                                        <FiFilter className="mr-2" />
                                         Status
                                         {filterStatus !== 'all' && (
                                             <span className="ml-2 w-5 h-5 rounded-full bg-indigo-200 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs flex items-center justify-center">
@@ -392,24 +404,24 @@ const Users = () => {
                                             </span>
                                         )}
                                     </button>
-                                    
+
                                     {showFilters && (
                                         <>
                                             <div className="fixed inset-0 z-40" onClick={() => setShowFilters(false)}></div>
                                             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 p-1 z-50">
-                                                <button 
+                                                <button
                                                     onClick={() => { setFilterStatus('all'); setShowFilters(false); }}
                                                     className={`w-full text-left px-3 py-2 rounded-md text-sm ${filterStatus === 'all' ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                                                 >
                                                     All Users
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => { setFilterStatus('active'); setShowFilters(false); }}
                                                     className={`w-full text-left px-3 py-2 rounded-md text-sm ${filterStatus === 'active' ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                                                 >
                                                     Active Only
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => { setFilterStatus('inactive'); setShowFilters(false); }}
                                                     className={`w-full text-left px-3 py-2 rounded-md text-sm ${filterStatus === 'inactive' ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                                                 >
@@ -431,10 +443,11 @@ const Users = () => {
                                 <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
                                     <tr>
                                         <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[5%] text-center">#</th>
-                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[20%] text-center">Contact</th>
+                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[20%] text-start">Contact</th>
                                         <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[10%] text-center">Status</th>
+                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[8%] text-center">Projects</th>
                                         <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[10%] text-center">Balance</th>
-                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[15%] text-center">Joined</th>
+                                        <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[12%] text-center">Joined</th>
                                         <th className="px-3 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[15%] text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -450,6 +463,7 @@ const Users = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-3 py-4 text-center"><div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto"></div></td>
+                                                <td className="px-3 py-4 text-center"><div className="h-6 w-12 bg-gray-200 dark:bg-gray-700 rounded mx-auto"></div></td>
                                                 <td className="px-3 py-4 text-center"><div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded mx-auto"></div></td>
                                                 <td className="px-3 py-4 text-center"><div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded mx-auto"></div></td>
                                                 <td className="px-3 py-4 text-center"><div className="flex justify-center gap-1"><div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div><div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div><div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div></div></td>
@@ -457,34 +471,34 @@ const Users = () => {
                                         ))
                                     ) : filteredUsers.length > 0 ? (
                                         filteredUsers.map((user, index) => (
-                                            <tr 
-                                                key={user.id} 
+                                            <tr
+                                                key={user.username}
                                                 className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors"
                                             >
                                                 <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap text-center">
                                                     {(pagination.page - 1) * pagination.limit + index + 1}
                                                 </td>
-                                               <td className="px-3 py-4">
-    <div className="space-y-1 min-w-0 text-left">
-         <div className="flex items-center justify-start text-xs text-gray-600 dark:text-gray-300">
-            <FiUser className="mr-1.5 flex-shrink-0" size={11} />
-            <span className="truncate">{user.name}</span>
-        </div>
-        <div className="flex items-center justify-start text-xs text-gray-600 dark:text-gray-300">
-            <FiMail className="mr-1.5 flex-shrink-0" size={11} />
-            <span className="truncate">{user.email}</span>
-        </div>
+                                                <td className="px-3 py-4">
+                                                    <div className="space-y-1 min-w-0 text-left">
+                                                        <div className="flex items-center justify-start text-xs text-gray-600 dark:text-gray-300">
+                                                            <FiUser className="mr-1.5 flex-shrink-0" size={11} />
+                                                            <span className="truncate">{user.name}</span>
+                                                        </div>
+                                                        <div className="flex items-center justify-start text-xs text-gray-600 dark:text-gray-300">
+                                                            <FiMail className="mr-1.5 flex-shrink-0" size={11} />
+                                                            <span className="truncate">{user.email}</span>
+                                                        </div>
 
-        <div className="flex items-center justify-start text-xs text-gray-500 dark:text-gray-400">
-            <FiPhone className="mr-1.5 flex-shrink-0" size={11} />
-            <span className="truncate">
-                {user.country_code
-                    ? `${user.country_code} ${user.mobile || ''}`
-                    : user.mobile || 'No phone'}
-            </span>
-        </div>
-    </div>
-</td>
+                                                        <div className="flex items-center justify-start text-xs text-gray-500 dark:text-gray-400">
+                                                            <FiPhone className="mr-1.5 flex-shrink-0" size={11} />
+                                                            <span className="truncate">
+                                                                {user.country_code
+                                                                    ? `${user.country_code} ${user.mobile || ''}`
+                                                                    : user.mobile || 'No phone'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                                 <td className="px-3 py-4 whitespace-nowrap text-center">
                                                     {user.status === '1' ? (
                                                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">
@@ -500,6 +514,16 @@ const Users = () => {
                                                 </td>
                                                 <td className="px-3 py-4 whitespace-nowrap text-center">
                                                     <button
+                                                        onClick={() => handleOpenProjectsModal(user)}
+                                                        className="inline-flex items-center justify-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all cursor-pointer min-w-[2rem]"
+                                                        title="View projects"
+                                                    >
+                                                        <FiBriefcase className="mr-1" size={10} />
+                                                        {Array.isArray(user.projects) ? user.projects.length : 0}
+                                                    </button>
+                                                </td>
+                                                <td className="px-3 py-4 whitespace-nowrap text-center">
+                                                    <button
                                                         onClick={() => handleBalanceClick(user)}
                                                         className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-purple-100 dark:hover:bg-purple-900/30 hover:text-purple-700 dark:hover:text-purple-400 hover:border-purple-200 dark:hover:border-purple-800 transition-all cursor-pointer"
                                                         title="View Transaction History"
@@ -511,12 +535,12 @@ const Users = () => {
                                                 <td className="px-3 py-4 whitespace-nowrap text-center">
                                                     <div className="flex items-center justify-center text-xs text-gray-600 dark:text-gray-400">
                                                         <FiCalendar className="mr-1.5 flex-shrink-0" size={11} />
-                                                        <span className="truncate">{formatDate(user.created_at)}</span>
+                                                        <span className="truncate">{formatDate(user.create_date)}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-3 py-4 whitespace-nowrap text-center">
                                                     <div className="flex items-center justify-center gap-1">
-                                                        <button 
+                                                        <button
                                                             onClick={() => navigate(`/users/${user.username}`)}
                                                             className="p-1.5 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
                                                             title="View Profile"
@@ -543,17 +567,17 @@ const Users = () => {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                            <td colSpan="7" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                                 <div className="flex flex-col items-center justify-center">
                                                     <FiUsers size={40} className="text-gray-300 dark:text-gray-600 mb-3" />
                                                     <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">No users found</p>
                                                     <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm">
-                                                        {searchTerm || filterStatus !== 'all' 
+                                                        {searchTerm || filterStatus !== 'all'
                                                             ? 'Try adjusting your search or filter criteria'
                                                             : 'No users have been created yet'}
                                                     </p>
                                                     {(searchTerm || filterStatus !== 'all') && (
-                                                        <button 
+                                                        <button
                                                             onClick={() => {
                                                                 setSearchTerm('');
                                                                 setFilterStatus('all');
@@ -588,7 +612,7 @@ const Users = () => {
                                             <button
                                                 type="button"
                                                 disabled={pagination.page <= 1}
-                                                onClick={() => setPagination(prev => ({...prev, page: 1}))}
+                                                onClick={() => setPagination(prev => ({ ...prev, page: 1 }))}
                                                 className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                                 title="First"
                                             >
@@ -597,7 +621,7 @@ const Users = () => {
                                             <button
                                                 type="button"
                                                 disabled={pagination.page <= 1}
-                                                onClick={() => setPagination(prev => ({...prev, page: prev.page - 1}))}
+                                                onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                                                 className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                                 title="Previous"
                                             >
@@ -609,7 +633,7 @@ const Users = () => {
                                             <button
                                                 type="button"
                                                 disabled={pagination.page >= totalPages}
-                                                onClick={() => setPagination(prev => ({...prev, page: prev.page + 1}))}
+                                                onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                                                 className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                                 title="Next"
                                             >
@@ -618,7 +642,7 @@ const Users = () => {
                                             <button
                                                 type="button"
                                                 disabled={pagination.page >= totalPages}
-                                                onClick={() => setPagination(prev => ({...prev, page: totalPages}))}
+                                                onClick={() => setPagination(prev => ({ ...prev, page: totalPages }))}
                                                 className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                                 title="Last"
                                             >
@@ -631,7 +655,7 @@ const Users = () => {
                                             onSubmit={(e) => {
                                                 e.preventDefault();
                                                 const val = parseInt(pageJumpInput || String(pagination.page), 10);
-                                                if (val >= 1 && val <= totalPages) setPagination(prev => ({...prev, page: val}));
+                                                if (val >= 1 && val <= totalPages) setPagination(prev => ({ ...prev, page: val }));
                                                 setPageJumpInput('');
                                             }}
                                             className="flex items-center gap-2"
@@ -641,10 +665,10 @@ const Users = () => {
                                                 type="number"
                                                 min={1}
                                                 max={totalPages}
-                                                value={pageJumpInput !== '' ? pageJumpInput : String(pagination.page)}
+                                                value={pageJumpInput}
                                                 onChange={(e) => setPageJumpInput(e.target.value)}
                                                 placeholder={`${start}-${end}`}
-                                                className="w-14 px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
+                                                className="w-20 min-w-[5rem] px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
                                             />
                                             <button
                                                 type="submit"
@@ -660,6 +684,61 @@ const Users = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Projects Modal */}
+            {projectsModalOpen && selectedUserForProjects && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div className="fixed inset-0 bg-black/50" onClick={handleCloseProjectsModal} aria-hidden="true" />
+                    <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[80vh] flex flex-col">
+                        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                Projects – {selectedUserForProjects.name || selectedUserForProjects.email}
+                            </h3>
+                            <button
+                                type="button"
+                                onClick={handleCloseProjectsModal}
+                                className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            >
+                                <FiX size={20} />
+                            </button>
+                        </div>
+                        <div className="overflow-y-auto flex-1 p-5">
+                            {Array.isArray(selectedUserForProjects.projects) && selectedUserForProjects.projects.length > 0 ? (
+                                <div className="space-y-2">
+                                    {selectedUserForProjects.projects.map((project, idx) => (
+                                        <button
+                                            key={project.project_id || idx}
+                                            type="button"
+                                            onClick={() => {
+                                                handleCloseProjectsModal();
+                                                navigate(`/projects/${project.project_id}`);
+                                            }}
+                                            className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all text-left group"
+                                        >
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                                                    <FiBriefcase size={16} />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                                        {project.project_name || 'Unnamed Project'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                                        {project.project_id}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <FiEye size={16} className="text-gray-400 group-hover:text-indigo-600 flex-shrink-0 ml-2" />
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">No projects found.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Billing Modal - For payments and invoices */}
             <UserBillingModal
