@@ -8,6 +8,7 @@ import {
 } from 'react-icons/fi';
 import axios from 'axios';
 import { Encrypt } from '../pages/encryption/payload-encryption';
+import { API_BASE_URL } from '../config/api';
 
 const AllSubscriptions = () => {
     const navigate = useNavigate();
@@ -54,7 +55,7 @@ const AllSubscriptions = () => {
             setError(null);
             
             const response = await axios.get(
-                'https://api.w1chat.com/admin/packages',
+                `${API_BASE_URL}/admin/packages`,
                 {
                     headers: { 'x-token': tokens.token }
                 }
@@ -125,7 +126,7 @@ const AllSubscriptions = () => {
 
             // Make the API call with encrypted data
             const response = await axios.patch(
-                'https://api.w1chat.com/admin/update-packages',
+                `${API_BASE_URL}/admin/update-packages`,
                 encryptedData,  // This already contains { data, key }
                 {
                     headers: { 'x-token': tokens.token }

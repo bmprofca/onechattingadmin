@@ -22,6 +22,7 @@ import {
     FiChevronRight
 } from 'react-icons/fi';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 function AdminDashboard() {
     const navigate = useNavigate();
@@ -56,7 +57,7 @@ function AdminDashboard() {
 
             try {
                 setLoading(true);
-                const response = await axios.get('https://api.w1chat.com/admin/dashboard/summary', {
+                const response = await axios.get(`${API_BASE_URL}/admin/dashboard/summary`, {
                     headers: {
                         'x-token': tokens.token,
                         'username': tokens.username

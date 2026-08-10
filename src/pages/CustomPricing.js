@@ -2,15 +2,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Header, Sidebar } from '../component/Menu';
 import { useNavigate } from 'react-router-dom';
 import {
-    FiSearch, FiDollarSign, FiUsers, FiPackage, FiRefreshCw,
+    FiSearch, FiUsers, FiPackage, FiRefreshCw,
     FiTrash2, FiAlertCircle, FiCheckCircle, FiX, FiFilter, FiChevronDown,
-    FiEdit2, FiPlus, FiUser, FiCalendar, FiPercent
+    FiEdit2, FiPlus, FiUser, FiPercent
 } from 'react-icons/fi';
 import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Encrypt } from '../pages/encryption/payload-encryption';
+import { API_BASE_URL } from '../config/api';
 
-const BASE_URL = 'https://api.w1chat.com/admin';
+const BASE_URL = `${API_BASE_URL}/admin`;
 const BASE_PACKAGE = {
     monthly: 499,
     yearly: 4999
@@ -137,6 +138,7 @@ const CustomPricing = () => {
         if (showUserSearchModal) {
             fetchUsers(userSearchTerm);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showUserSearchModal, userSearchTerm, tokens]);
 
     const handleCreatePackage = async () => {
@@ -935,7 +937,7 @@ const CustomPricing = () => {
                                                             {user.country_code} {user.mobile} • @{user.username}
                                                         </p>
                                                     </div>
-                                                    {user.status == 1 && (
+                                                    {user.status === 1 && (
                                                         <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2 py-1 rounded">
                                                             Active
                                                         </span>

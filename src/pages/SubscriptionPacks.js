@@ -3,11 +3,12 @@ import { Header, Sidebar } from '../component/Menu';
 import { useNavigate } from 'react-router-dom';
 import {
     FiSearch, FiPlus, FiEdit2, FiTrash2, FiPackage, FiDollarSign,
-    FiCheckCircle, FiXCircle, FiAlertCircle, FiRefreshCw, FiSave, FiX
+    FiCheckCircle, FiAlertCircle, FiRefreshCw, FiSave, FiX
 } from 'react-icons/fi';
 import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Encrypt } from './encryption/payload-encryption';
+import { API_BASE_URL } from '../config/api';
 
 const SubscriptionPacks = () => {
     const navigate = useNavigate();
@@ -54,7 +55,7 @@ const SubscriptionPacks = () => {
         if (!tokens?.token) return;
         setLoading(true);
         try {
-            const response = await axios.get('https://api.w1chat.com/admin/subscription/all-packs', {
+            const response = await axios.get(`${API_BASE_URL}/admin/subscription/all-packs`, {
                 headers: { 'x-token': tokens.token }
             });
 
@@ -151,7 +152,7 @@ const SubscriptionPacks = () => {
             if (editingPack) {
                 // Update existing pack
                 response = await axios.post(
-                    'https://api.w1chat.com/admin/subscription/update-pack',
+                    `${API_BASE_URL}/admin/subscription/update-pack`,
                     { data, key },
                     {
                         headers: {
@@ -163,7 +164,7 @@ const SubscriptionPacks = () => {
             } else {
                 // Create new pack
                 response = await axios.post(
-                    'https://api.w1chat.com/admin/subscription/create-pack',
+                    `${API_BASE_URL}/admin/subscription/create-pack`,
                     { data, key },
                     {
                         headers: {
@@ -205,7 +206,7 @@ const SubscriptionPacks = () => {
             const { data, key } = Encrypt(payload);
 
             const response = await axios.post(
-                'https://api.w1chat.com/admin/subscription/delete-pack',
+                `${API_BASE_URL}/admin/subscription/delete-pack`,
                 { data, key },
                 {
                     headers: {

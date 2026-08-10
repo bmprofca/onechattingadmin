@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { Encrypt } from '../pages/encryption/payload-encryption';
-
-const API_BASE_URL = 'https://api.w1chat.com';
+import { API_BASE_URL } from '../config/api';
 
 // Helper to get auth token
 const getAuthToken = () => {

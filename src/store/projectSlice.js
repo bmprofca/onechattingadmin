@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { Encrypt } from '../pages/encryption/payload-encryption';
+import { API_BASE_URL } from '../config/api';
 
 // Fetch project info (wallet balance and other info) by project id
 export const fetchProjectInfo = createAsyncThunk(
@@ -33,7 +34,7 @@ export const fetchProjectInfo = createAsyncThunk(
       const data_pass = JSON.stringify({ data, key });
 
       const response = await axios.post(
-        'https://api.w1chat.com/project/info',
+        `${API_BASE_URL}/project/info`,
         data_pass,
         {
           headers: {

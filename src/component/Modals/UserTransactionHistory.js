@@ -8,7 +8,6 @@ import {
     FiUser,
     FiMail,
     FiPhone,
-    FiCreditCard,
     FiDownload,
     FiRefreshCw,
     FiChevronLeft,
@@ -19,10 +18,7 @@ import {
     FiXCircle,
     FiCopy,
     FiCheckCircle,
-    FiTrendingUp,
-    FiTrendingDown,
     FiHash,
-    FiTag,
     FiArrowLeft,
     FiPlusCircle,
     FiMinusCircle
@@ -31,9 +27,7 @@ import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Header, Sidebar } from '../Menu';
 import { Encrypt } from "../../pages/encryption/payload-encryption";
-
-// API Base URL
-const API_BASE_URL = 'https://api.w1chat.com';
+import { API_BASE_URL } from '../../config/api';
 
 const UserTransactionHistoryPage = ({ user: propUser, tokens: propTokens }) => {
     const navigate = useNavigate();
@@ -185,6 +179,7 @@ const username = state.username || urlUsername;
         };
 
         fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [username, user]);
 
     // Initialize dates on mount
@@ -205,6 +200,7 @@ const username = state.username || urlUsername;
                 fetchTransactions(1);
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, filters.from_date, filters.to_date, filters.transaction_type, filters.type]);
 
     // Handle wallet credit/debit

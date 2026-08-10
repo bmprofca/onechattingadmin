@@ -18,7 +18,6 @@ import {
     FiUsers,
     FiActivity,
     FiLogIn,
-    FiCreditCard,
     FiCalendar,
     FiBriefcase,
     FiX,
@@ -28,6 +27,7 @@ import {
 } from 'react-icons/fi';
 import axios from 'axios';
 import UserBillingModal from '../component/Modals/UserBillingModal';
+import { API_BASE_URL } from '../config/api';
 
 const Users = () => {
     const navigate = useNavigate();
@@ -72,7 +72,7 @@ const Users = () => {
         setLoading(true);
         try {
             const limit = Math.min(Math.max(pagination.limit || 10, 1), 100);
-            const response = await axios.get(`https://api.w1chat.com/admin/users?page=${page}&limit=${limit}`, {
+            const response = await axios.get(`${API_BASE_URL}/admin/users?page=${page}&limit=${limit}`, {
                 headers: { 'x-token': tokens.token }
             });
 
@@ -96,7 +96,7 @@ const Users = () => {
         if (!tokens?.token) return [];
         try {
             // First get total count
-            const firstPage = await axios.get(`https://api.w1chat.com/admin/users?page=1&limit=1`, {
+            const firstPage = await axios.get(`${API_BASE_URL}/admin/users?page=1&limit=1`, {
                 headers: { 'x-token': tokens.token }
             });
 
@@ -107,7 +107,7 @@ const Users = () => {
 
             // Fetch all pages
             for (let page = 1; page <= totalPages; page++) {
-                const response = await axios.get(`https://api.w1chat.com/admin/users?page=${page}&limit=100`, {
+                const response = await axios.get(`${API_BASE_URL}/admin/users?page=${page}&limit=100`, {
                     headers: { 'x-token': tokens.token }
                 });
 
@@ -150,11 +150,6 @@ const Users = () => {
         window.open(url, '_blank', 'noopener,noreferrer');
     };
 
-    const handleOpenBilling = (user) => {
-        setSelectedUser(user);
-        setBillingModalOpen(true);
-    };
-
     const handleCloseBilling = () => {
         setBillingModalOpen(false);
         setSelectedUser(null);
@@ -194,11 +189,6 @@ const Users = () => {
         if (balance === undefined || balance === null) return '0.00';
         const num = parseFloat(balance);
         return num.toFixed(2);
-    };
-
-    const getInitials = (name) => {
-        if (!name) return 'U';
-        return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     };
 
     // Export ALL Data to CSV

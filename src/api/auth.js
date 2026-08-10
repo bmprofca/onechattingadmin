@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Encrypt } from '../pages/encryption/payload-encryption';
+import { API_BASE_URL } from '../config/api';
 
 // Perform login and return the raw API response data
 export const loginUser = async ({ email, password }) => {
@@ -15,7 +16,7 @@ export const loginUser = async ({ email, password }) => {
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/admin/login',
+    url: `${API_BASE_URL}/admin/login`,
     headers: {
       'Content-Type': 'application/json'
     },
@@ -38,14 +39,14 @@ export const fetchUserProfile = async () => {
       return null;
     }
   };
-  
+
   const userData = getUserData();
   const token = userData?.token;
   const username = userData?.username;
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/account/profile',
+    url: `${API_BASE_URL}/account/profile`,
     headers: {
       'token': token,
       'username': username,
@@ -68,7 +69,7 @@ export const updateUserProfile = async ({ name, email, country_code, mobile, gen
       return null;
     }
   };
-  
+
   const userData = getUserData();
   const token = userData?.token;
   const username = userData?.username;
@@ -96,7 +97,7 @@ export const updateUserProfile = async ({ name, email, country_code, mobile, gen
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/account/edit-profile',
+    url: `${API_BASE_URL}/account/edit-profile`,
     headers: {
       'token': token,
       'username': username,
@@ -121,13 +122,13 @@ export const createPaymentOrder = async ({ project_id, amount, redirect_url }) =
   if (!token || !username) {
     throw new Error('Session expired');
   }
-  
+
   const payload = {
     project_id,
     amount,
     redirect_url
   };
-  
+
 
   // Encrypt the payload
   const { data, key } = Encrypt(payload);
@@ -140,7 +141,7 @@ export const createPaymentOrder = async ({ project_id, amount, redirect_url }) =
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/payment/wallet-topup',
+    url: `${API_BASE_URL}/payment/wallet-topup`,
     headers: {
       'Content-Type': 'application/json',
       'token': token,
@@ -154,16 +155,16 @@ export const createPaymentOrder = async ({ project_id, amount, redirect_url }) =
 };
 
 // Verify payment
-export const verifyPayment = async ({ 
-  razorpay_payment_id, 
-  razorpay_order_id, 
+export const verifyPayment = async ({
+  razorpay_payment_id,
+  razorpay_order_id,
   razorpay_signature,
   amount,
   bonus,
   discount
 }) => {
   const token = localStorage.getItem('token');
-  
+
   const payload = {
     razorpay_payment_id,
     razorpay_order_id,
@@ -184,7 +185,7 @@ export const verifyPayment = async ({
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/payment/verify',
+    url: `${API_BASE_URL}/payment/verify`,
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
@@ -199,11 +200,11 @@ export const verifyPayment = async ({
 // Validate promo code
 export const validatePromoCode = async (code) => {
   const token = localStorage.getItem('token');
-  
+
   const config = {
     method: 'get',
     maxBodyLength: Infinity,
-    url: `https://api.w1chat.com/payment/promo-code/validate?code=${code}`,
+    url: `${API_BASE_URL}/payment/promo-code/validate?code=${code}`,
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -216,11 +217,11 @@ export const validatePromoCode = async (code) => {
 // Get payment transactions
 export const getPaymentTransactions = async () => {
   const token = localStorage.getItem('token');
-  
+
   const config = {
     method: 'get',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/payment/transactions',
+    url: `${API_BASE_URL}/payment/transactions`,
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -241,17 +242,17 @@ export const checkPaymentStatus = async ({ project_id, order_id }) => {
       return null;
     }
   };
-  
+
   const userData = getUserData();
   const token = userData?.token;
   const username = userData?.username;
   console.log(token, username);
-  
+
 
   if (!token || !username) {
     throw new Error('Session expired');
   }
-  
+
   const payload = {
     project_id,
     order_id
@@ -268,7 +269,7 @@ export const checkPaymentStatus = async ({ project_id, order_id }) => {
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/payment/payment-status',
+    url: `${API_BASE_URL}/payment/payment-status`,
     headers: {
       'Content-Type': 'application/json',
       'token': token,
@@ -293,7 +294,7 @@ export const getProjectMetaDetails = async ({ project_id }) => {
       return null;
     }
   };
-  
+
   const userData = getUserData();
   const token = userData?.token;
   const username = userData?.username;
@@ -301,7 +302,7 @@ export const getProjectMetaDetails = async ({ project_id }) => {
   if (!token || !username) {
     throw new Error('Session expired 2');
   }
-  
+
   const payload = {
     project_id
   };
@@ -317,7 +318,7 @@ export const getProjectMetaDetails = async ({ project_id }) => {
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/project/meta-details',
+    url: `${API_BASE_URL}/project/meta-details`,
     headers: {
       'Content-Type': 'application/json',
       'token': token,
@@ -342,7 +343,7 @@ export const updateWabaProfilePicture = async ({ project_id, profile_picture }) 
   if (!token || !username) {
     throw new Error('Session expired');
   }
-  
+
   const payload = {
     project_id,
     profile_picture
@@ -359,7 +360,7 @@ export const updateWabaProfilePicture = async ({ project_id, profile_picture }) 
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/project/update-waba-profile-picture',
+    url: `${API_BASE_URL}/project/update-waba-profile-picture`,
     headers: {
       'Content-Type': 'application/json',
       'token': token,
@@ -373,14 +374,14 @@ export const updateWabaProfilePicture = async ({ project_id, profile_picture }) 
 };
 
 // Update WABA profile details
-export const updateWabaProfileDetails = async ({ 
-  project_id, 
-  about, 
-  address, 
-  vertical, 
-  email, 
-  websites, 
-  description 
+export const updateWabaProfileDetails = async ({
+  project_id,
+  about,
+  address,
+  vertical,
+  email,
+  websites,
+  description
 }) => {
   // Load auth tokens from localStorage to match existing API requirements
   const stored =
@@ -392,7 +393,7 @@ export const updateWabaProfileDetails = async ({
   if (!token || !username) {
     throw new Error('Session expired');
   }
-  
+
   const payload = {
     project_id,
     about,
@@ -414,7 +415,7 @@ export const updateWabaProfileDetails = async ({
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/project/update-waba-profile-details',
+    url: `${API_BASE_URL}/project/update-waba-profile-details`,
     headers: {
       'Content-Type': 'application/json',
       'token': token,
@@ -439,7 +440,7 @@ export const getEmbedSignupLink = async ({ project_id }) => {
   if (!token || !username) {
     throw new Error('Session expired');
   }
-  
+
   const payload = {
     project_id
   };
@@ -455,7 +456,7 @@ export const getEmbedSignupLink = async ({ project_id }) => {
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/project/embed-signup',
+    url: `${API_BASE_URL}/project/embed-signup`,
     headers: {
       'Content-Type': 'application/json',
       'token': token,
@@ -480,7 +481,7 @@ export const createProject = async ({ company_name, project_name }) => {
       return null;
     }
   };
-  
+
   const userData = getUserData();
   const token = userData?.token;
   const username = userData?.username;
@@ -488,7 +489,7 @@ export const createProject = async ({ company_name, project_name }) => {
   if (!token || !username) {
     throw new Error('Session expired');
   }
-  
+
   const payload = {
     company_name,
     project_name
@@ -505,7 +506,7 @@ export const createProject = async ({ company_name, project_name }) => {
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://api.w1chat.com/project/create-project',
+    url: `${API_BASE_URL}/project/create-project`,
     headers: {
       'Content-Type': 'application/json',
       'token': token,

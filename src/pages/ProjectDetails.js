@@ -9,6 +9,7 @@ import {
     FiThumbsUp, FiTrendingUp, FiAward, FiLock, FiUnlock
 } from 'react-icons/fi';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const ProjectDetails = () => {
     const { project_id } = useParams();
@@ -45,7 +46,7 @@ const ProjectDetails = () => {
             setError('');
             try {
                 const response = await axios.get(
-                    `https://api.w1chat.com/admin/projects/${project_id}/meta-details`,
+                    `${API_BASE_URL}/admin/projects/${project_id}/meta-details`,
                     { headers: { 'x-token': tokens.token, 'username': tokens.username } }
                 );
                 if (!response.data.error) {

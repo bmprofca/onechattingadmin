@@ -44,9 +44,9 @@ import {
 import axios from 'axios';
 import { Encrypt } from './encryption/payload-encryption';
 import { AnimatePresence, motion } from 'framer-motion';
+import { API_BASE_URL } from '../config/api';
 
-const API_BASE = 'https://api.w1chat.com/admin/users';
-const API_BASE_URL = 'https://api.w1chat.com';
+const API_BASE = `${API_BASE_URL}/admin/users`;
 
 const UserDetails = () => {
   const { username } = useParams();
@@ -222,6 +222,7 @@ const UserDetails = () => {
     };
 
     fetchProfile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username]);
 
   // Fetch projects when Projects tab is active
@@ -255,6 +256,7 @@ const UserDetails = () => {
     };
 
     fetchProjects();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username, activeTab, projectsPage, projectsSearch, projectsLimit]);
 
   // Fetch login tokens when Login tab is active
@@ -287,6 +289,7 @@ const UserDetails = () => {
     };
 
     fetchLoginTokens();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username, activeTab, loginPage, loginLimit]);
 
   // Fetch transactions when Transactions tab is active
@@ -342,6 +345,7 @@ const UserDetails = () => {
     if (activeTab === 'transactions') {
       fetchTransactions();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username, activeTab, transactionsPage, transactionsLimit, transactionsFilters]);
 
   // Fetch subscriptions when Subscriptions tab is active
@@ -378,6 +382,7 @@ const UserDetails = () => {
     if (activeTab === 'subscriptions') {
       fetchSubscriptions();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username, activeTab, subscriptionsPage, subscriptionsSearch, subscriptionsLimit]);
 
   // Fetch custom package when Subscriptions tab is active
@@ -414,6 +419,7 @@ const UserDetails = () => {
     if (activeTab === 'subscriptions') {
       fetchCustomPackage();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username, activeTab]);
 
   // Handle wallet credit/debit

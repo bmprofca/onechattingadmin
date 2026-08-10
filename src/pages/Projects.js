@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fi';
 import axios from 'axios';
 import ProjectChargesModal from '../component/Modals/ProjectChargesModal';
+import { API_BASE_URL } from '../config/api';
 
 const Projects = () => {
     const navigate = useNavigate();
@@ -57,7 +58,7 @@ const Projects = () => {
         setLoading(true);
         setError('');
         try {
-            const response = await axios.get('https://api.w1chat.com/admin/projects', {
+            const response = await axios.get(`${API_BASE_URL}/admin/projects`, {
                 headers: {
                     'x-token': tokens.token,
                     'username': tokens.username

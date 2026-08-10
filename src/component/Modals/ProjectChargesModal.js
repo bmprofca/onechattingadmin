@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FiX, FiDollarSign, FiSave, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
 import axios from 'axios';
+import { API_BASE_URL } from '../../config/api';
 
 const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) => {
   const [marketingCharge, setMarketingCharge] = useState('');
@@ -49,7 +50,7 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
       };
 
       const response = await axios.patch(
-        `https://api.w1chat.com/admin/projects/${project.project_id}/prices`,
+        `${API_BASE_URL}/admin/projects/${project.project_id}/prices`,
         body,
         {
           headers: {

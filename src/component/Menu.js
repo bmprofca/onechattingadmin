@@ -2,12 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  FiMenu, FiBriefcase, FiChevronDown, FiCreditCard, 
-  FiPlus, FiBell, FiUser, FiSettings, FiHelpCircle, 
-  FiLogOut, FiPieChart, FiMessageSquare, FiUsers, 
-  FiMail, FiZap, FiCpu, FiLock, FiChevronRight, FiX,
-  FiPackage, FiDollarSign, FiList
+import {
+  FiMenu, FiBriefcase, FiBell, FiUser, FiSettings, FiHelpCircle,
+  FiLogOut, FiPieChart, FiUsers, FiLock, FiChevronRight, FiX, FiPackage
 } from 'react-icons/fi';
 
 // Adjust these import paths if necessary
@@ -194,13 +191,12 @@ const NavItem = ({ item, isMobile, isMinimized, isHovered, currentPath, openSubm
 export const Header = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsMinimized }) => {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [switchProjectModalOpen, setSwitchProjectModalOpen] = useState(false);
-  const [selectedCompany, setSelectedCompany] = useState(null);
-  const [selectedProjectName, setSelectedProjectName] = useState(null);
+  const [, setSelectedCompany] = useState(null);
+  const [, setSelectedProjectName] = useState(null);
   const [userProfile, setUserProfile] = useState({ name: '', email: '' });
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const walletBalance = useSelector((state) => state.project?.walletBalance || 0);
   const projectInfoStatus = useSelector((state) => state.project?.status || 'idle');
 
   useEffect(() => {

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FiX, FiCreditCard, FiCalendar, FiCheckCircle, FiXCircle, FiRefreshCw, FiEdit, FiSave, FiAlertCircle, FiInfo, FiClock, FiPackage, FiChevronRight, FiTrash2 } from 'react-icons/fi';
+import { FiX, FiCheckCircle, FiRefreshCw, FiEdit, FiSave, FiAlertCircle, FiPackage, FiChevronRight, FiTrash2 } from 'react-icons/fi';
 import axios from 'axios';
 import { Encrypt } from '../../pages/encryption/payload-encryption';
+import { API_BASE_URL } from '../../config/api';
 
 const UserBillingModal = ({ isOpen, onClose, user, tokens, onUpdated }) => {
   const [packs, setPacks] = useState([]);
@@ -32,7 +33,7 @@ const UserBillingModal = ({ isOpen, onClose, user, tokens, onUpdated }) => {
     setError('');
     
     try {
-      const url = `https://api.w1chat.com/admin/subscription/user-plans/${user.username}`;
+      const url = `${API_BASE_URL}/admin/subscription/user-plans/${user.username}`;
       const response = await axios.get(url, {
         headers: { 'x-token': tokens.token }
       });
@@ -92,7 +93,7 @@ const UserBillingModal = ({ isOpen, onClose, user, tokens, onUpdated }) => {
       const { data, key } = Encrypt(payload);
       
       const response = await axios.post(
-        'https://api.w1chat.com/admin/subscription/set-user-pricing',
+        `${API_BASE_URL}/admin/subscription/set-user-pricing`,
         { data, key },
         {
           headers: {
@@ -139,7 +140,7 @@ const UserBillingModal = ({ isOpen, onClose, user, tokens, onUpdated }) => {
       const { data, key } = Encrypt(payload);
       
       const response = await axios.post(
-        'https://api.w1chat.com/admin/subscription/remove-user-pricing',
+        `${API_BASE_URL}/admin/subscription/remove-user-pricing`,
         { data, key },
         {
           headers: {
@@ -346,7 +347,6 @@ const UserBillingModal = ({ isOpen, onClose, user, tokens, onUpdated }) => {
                   {sortedPacks.map((pack) => {
                     const features = parseFeatures(pack.features);
                     const hasSubscriptions = pack.subscriptions && pack.subscriptions.length > 0;
-                    const displayAmount = pack.has_custom_pricing ? pack.custom_amount : pack.default_amount;
                     const isEditing = editingPack?.pack_id === pack.pack_id;
 
                     return (
