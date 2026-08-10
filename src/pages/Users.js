@@ -26,8 +26,7 @@ import {
     FiDollarSign
 } from 'react-icons/fi';
 import axios from 'axios';
-import UserBillingModal from '../component/Modals/UserBillingModal';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, PORTAL_URL } from '../config/api';
 
 const Users = () => {
     const navigate = useNavigate();
@@ -43,8 +42,6 @@ const Users = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
     const [tokens, setTokens] = useState(null);
-    const [billingModalOpen, setBillingModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
     const [filterStatus, setFilterStatus] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
     const [pageJumpInput, setPageJumpInput] = useState('');
@@ -141,18 +138,13 @@ const Users = () => {
 
     const handleLoginAsUser = (user) => {
         if (!user?.email) return;
-        const baseUrl = 'https://wichat-sigma.vercel.app/login';
+        const baseUrl = `${PORTAL_URL}/login`;
         const params = new URLSearchParams({
             username: user.email,
             password: user.password || ''
         });
         const url = `${baseUrl}?${params.toString()}`;
         window.open(url, '_blank', 'noopener,noreferrer');
-    };
-
-    const handleCloseBilling = () => {
-        setBillingModalOpen(false);
-        setSelectedUser(null);
     };
 
     const handleOpenProjectsModal = (user) => {
@@ -729,19 +721,6 @@ const Users = () => {
                     </div>
                 </div>
             )}
-
-            {/* Billing Modal - For payments and invoices */}
-            <UserBillingModal
-                isOpen={billingModalOpen}
-                onClose={handleCloseBilling}
-                user={selectedUser}
-                tokens={tokens}
-                onUpdated={() => {
-                    fetchUsers(pagination.page);
-                }}
-            />
-
-            {/* Transaction history modal removed – now using dedicated page */}
         </div>
     );
 };
