@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useCallback, useEffect, useState } from 'react';
 import { FiDollarSign, FiEdit2, FiPackage, FiPlus, FiRefreshCw, FiSave, FiSearch, FiTrash2, FiX } from 'react-icons/fi';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -11,19 +10,6 @@ import ManagementTable from '../component/common/ManagementTable';
 import ActionCard from '../component/common/ActionCard';
 
 const initialForm = { package_id: '', name: '', amount: '', validity: '1m' };
-=======
-import React, { useState, useEffect, useCallback } from 'react';
-import { Header, Sidebar } from '../component/Menu';
-import { useNavigate } from 'react-router-dom';
-import {
-    FiSearch, FiPlus, FiEdit2, FiTrash2, FiPackage, FiDollarSign,
-    FiCheckCircle, FiAlertCircle, FiRefreshCw, FiSave, FiX
-} from 'react-icons/fi';
-import axios from 'axios';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Encrypt } from './encryption/payload-encryption';
-import { API_BASE_URL } from '../config/api';
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
 const SubscriptionPacks = () => {
     const navigate = useNavigate();
@@ -50,7 +36,6 @@ const SubscriptionPacks = () => {
         if (!tokens?.token) return;
         setLoading(true);
         try {
-<<<<<<< HEAD
             const params = new URLSearchParams({ page: String(pagination.page), limit: String(pagination.limit) });
             if (searchTerm) params.set('search', searchTerm);
             Object.entries(filters).forEach(([key, value]) => value !== '' && params.set(key, value));
@@ -63,11 +48,6 @@ const SubscriptionPacks = () => {
             toast.error(error.message || 'Failed to fetch packages');
         } finally { setLoading(false); }
     }, [filters, headers, pagination.limit, pagination.page, searchTerm, tokens]);
-=======
-            const response = await axios.get(`${API_BASE_URL}/admin/subscription/all-packs`, {
-                headers: { 'x-token': tokens.token }
-            });
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
     useEffect(() => { fetchPacks(); }, [fetchPacks]);
 
@@ -84,7 +64,6 @@ const SubscriptionPacks = () => {
         if (!editingPack) payload.package_id = formData.package_id.trim();
         setSaving(true);
         try {
-<<<<<<< HEAD
             const endpoint = editingPack ? `/subscription/packages/${encodeURIComponent(editingPack.package_id)}` : '/subscription/packages';
             const response = await apiCall(endpoint, editingPack ? 'PATCH' : 'POST', payload, headers());
             const result = await response.json();
@@ -93,113 +72,17 @@ const SubscriptionPacks = () => {
             setShowModal(false); setEditingPack(null); await fetchPacks();
         } catch (error) { toast.error(error.message || 'Unable to save package'); }
         finally { setSaving(false); }
-=======
-            const featuresArray = formData.features.split(',').map(f => f.trim()).filter(f => f);
-            
-            const payload = {
-                pack_name: formData.pack_name,
-                pack_type: formData.pack_type,
-                amount: parseFloat(formData.amount),
-                description: formData.description,
-                billing_cycle: formData.billing_cycle,
-                features: JSON.stringify(featuresArray),
-                is_active: formData.is_active
-            };
-
-            // Add pack_id for update operations
-            if (editingPack) {
-                payload.pack_id = editingPack.pack_id;
-            }
-
-            // Encrypt the payload
-            const { data, key } = Encrypt(payload);
-
-            let response;
-            if (editingPack) {
-                // Update existing pack
-                response = await axios.post(
-                    `${API_BASE_URL}/admin/subscription/update-pack`,
-                    { data, key },
-                    {
-                        headers: {
-                            'x-token': tokens.token,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
-            } else {
-                // Create new pack
-                response = await axios.post(
-                    `${API_BASE_URL}/admin/subscription/create-pack`,
-                    { data, key },
-                    {
-                        headers: {
-                            'x-token': tokens.token,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
-            }
-
-            if (response.data?.error) {
-                setError(typeof response.data.error === 'string' ? response.data.error : (response.data.message || 'Operation failed'));
-            } else {
-                setSuccess(editingPack ? 'Pack updated successfully!' : 'Pack created successfully!');
-                setTimeout(() => {
-                    handleCloseModal();
-                    fetchPacks();
-                }, 1500);
-            }
-        } catch (err) {
-            const errorMsg = err?.response?.data?.error || err?.response?.data?.message || err?.message || 'Operation failed';
-            setError(typeof errorMsg === 'string' ? errorMsg : 'Operation failed');
-        }
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
     };
 
     const handleDelete = async (packageId) => {
         if (!window.confirm('Are you sure you want to delete this package?')) return;
         try {
-<<<<<<< HEAD
             const response = await apiCall(`/subscription/packages/${encodeURIComponent(packageId)}`, 'DELETE', null, headers());
             const result = await response.json();
             if (!response.ok || result?.error) throw new Error(result?.message || result?.error || 'Unable to delete package');
             toast.success(result.message || 'Package deleted successfully.');
             await fetchPacks();
         } catch (error) { toast.error(error.message || 'Unable to delete package'); }
-=======
-            const payload = {
-                pack_id: packId
-            };
-
-            // Encrypt the payload
-            const { data, key } = Encrypt(payload);
-
-            const response = await axios.post(
-                `${API_BASE_URL}/admin/subscription/delete-pack`,
-                { data, key },
-                {
-                    headers: {
-                        'x-token': tokens.token,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
-
-            if (response.data?.error) {
-                setError(typeof response.data.error === 'string' ? response.data.error : (response.data.message || 'Delete failed'));
-            } else {
-                setSuccess('Pack deleted successfully!');
-                setTimeout(() => {
-                    setSuccess('');
-                    fetchPacks();
-                }, 2000);
-            }
-        } catch (err) {
-            const errorMsg = err?.response?.data?.error || err?.response?.data?.message || err?.message || 'Delete failed';
-            setError(typeof errorMsg === 'string' ? errorMsg : 'Delete failed');
-        }
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
     };
 
     const updateFilter = (key, value) => { setPagination(current => ({ ...current, page: 1 })); setFilters(current => ({ ...current, [key]: value })); };

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FiEdit2, FiPlus, FiRefreshCw, FiSave, FiSearch, FiTrash2, FiX } from 'react-icons/fi';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
 import toast from 'react-hot-toast';
 import { apiCall } from '../utils/apiCall';
 import Pagination from '../component/common/PaginationComponent';
@@ -11,16 +10,6 @@ import SelectField from '../component/common/SelectField';
 
 const emptyForm = { username: '', package_id: '', project_id: '', type: 'project', amount: '', start_date: '', end_date: '' };
 const inputClass = 'w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white';
-=======
-import {
-    FiCheckCircle, FiClock, FiTrendingUp, FiPackage,
-    FiRefreshCw, FiXCircle, FiEdit2, FiSave, FiDollarSign,
-    FiPercent, FiAward, FiStar, FiZap, FiLock
-} from 'react-icons/fi';
-import axios from 'axios';
-import { Encrypt } from '../pages/encryption/payload-encryption';
-import { API_BASE_URL } from '../config/api';
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
 const AllSubscriptions = () => {
     const navigate = useNavigate();
@@ -47,7 +36,6 @@ const AllSubscriptions = () => {
         const params = new URLSearchParams({ page: String(page), limit: String(pagination.limit) });
         Object.entries(filters).forEach(([key, value]) => value && params.set(key, value));
         try {
-<<<<<<< HEAD
             const response = await apiCall(`/subscription/user-packages?${params}`, 'GET', null, authHeaders());
             const result = await response.json();
             if (!response.ok || result?.error) throw new Error(result?.message || result?.error || 'Failed to load user packages');
@@ -56,17 +44,6 @@ const AllSubscriptions = () => {
         } catch (error) { toast.error(error.message || 'Failed to load user packages'); }
         finally { setLoading(false); }
     }, [authHeaders, filters, pagination.limit, pagination.page, tokens]);
-=======
-            setLoading(true);
-            setError(null);
-            
-            const response = await axios.get(
-                `${API_BASE_URL}/admin/packages`,
-                {
-                    headers: { 'x-token': tokens.token }
-                }
-            );
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
     useEffect(() => { fetchSubscriptions(); }, [fetchSubscriptions]);
 
@@ -82,7 +59,6 @@ const AllSubscriptions = () => {
         event.preventDefault(); setSaving(true);
         const payload = editing ? { amount: Number(formData.amount), end_date: formData.end_date } : { ...formData, amount: Number(formData.amount) };
         try {
-<<<<<<< HEAD
             const endpoint = editing ? `/subscription/user-packages/${editing.id}` : '/subscription/user-packages';
             const response = await apiCall(endpoint, editing ? 'PATCH' : 'POST', payload, authHeaders());
             const result = await response.json();
@@ -99,56 +75,6 @@ const AllSubscriptions = () => {
             if (!response.ok || result?.error) throw new Error(result?.message || result?.error || 'Unable to delete user package');
             toast.success(result.message || 'User package deleted successfully.'); await fetchSubscriptions();
         } catch (error) { toast.error(error.message || 'Unable to delete user package'); }
-=======
-            setUpdating(true);
-            setError(null);
-            setSuccess(null);
-
-            // Prepare data for encryption
-            const payload = {
-                monthly_package: monthlyAmount,
-                yearly_package: yearlyAmount
-            };
-
-            // Encrypt the data using the imported Encrypt function
-            const encryptedData = Encrypt(payload);
-
-            // Make the API call with encrypted data
-            const response = await axios.patch(
-                `${API_BASE_URL}/admin/update-packages`,
-                encryptedData,  // This already contains { data, key }
-                {
-                    headers: { 'x-token': tokens.token }
-                }
-            );
-
-            if (!response.data.error) {
-                setSuccess('Packages updated successfully!');
-                setPackagePrices({
-                    monthly_package: monthlyAmount,
-                    yearly_package: yearlyAmount
-                });
-                setIsEditing(false);
-                
-                // Refresh the prices
-                await fetchPackagePrices();
-            }
-        } catch (err) {
-            console.error("Failed to update package prices", err);
-            
-            // Handle different error responses
-            if (err.response?.status === 400) {
-                setError(err.response.data.error || 'Invalid data provided');
-            } else if (err.response?.status === 500) {
-                console.error("Server error details:", err.response.data.e);
-                setError('Server error. Please try again later.');
-            } else {
-                setError(err.response?.data?.error || 'Failed to update package prices');
-            }
-        } finally {
-            setUpdating(false);
-        }
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
     };
 
     const typeOptions = [{ value: '', label: 'All types' }, { value: 'project', label: 'Project' }];

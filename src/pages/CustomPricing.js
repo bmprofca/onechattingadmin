@@ -8,17 +8,11 @@ import {
 import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Encrypt } from '../pages/encryption/payload-encryption';
-<<<<<<< HEAD
 import toast from 'react-hot-toast';
 import ManagementTable from '../component/common/ManagementTable';
 import ActionCard from '../component/common/ActionCard';
 
 const BASE_URL = (process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540') + '/admin';
-=======
-import { API_BASE_URL } from '../config/api';
-
-const BASE_URL = `${API_BASE_URL}/admin`;
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 const BASE_PACKAGE = {
     monthly: 499,
     yearly: 4999

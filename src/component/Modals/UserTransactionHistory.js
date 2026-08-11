@@ -26,14 +26,10 @@ import {
 import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Encrypt } from "../../pages/encryption/payload-encryption";
-<<<<<<< HEAD
 import toast from 'react-hot-toast';
 
 // API Base URL
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540';
-=======
-import { API_BASE_URL } from '../../config/api';
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
 const UserTransactionHistoryPage = ({ user: propUser, tokens: propTokens }) => {
 

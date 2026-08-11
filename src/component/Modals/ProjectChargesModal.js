@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FiX, FiDollarSign, FiSave, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
-<<<<<<< HEAD
 import { apiCall } from '../../utils/apiCall';
 import toast from 'react-hot-toast';
-=======
-import axios from 'axios';
-import { API_BASE_URL } from '../../config/api';
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
 const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) => {
 
@@ -55,14 +50,9 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
         authentication_charge: authenticationCharge
       };
 
-<<<<<<< HEAD
       const response = await apiCall(
         `/admin/projects/${project.project_id}/prices`,
         'PATCH',
-=======
-      const response = await axios.patch(
-        `${API_BASE_URL}/admin/projects/${project.project_id}/prices`,
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
         body,
       );
       const data = await response.json();

@@ -43,14 +43,9 @@ import {
 import axios from 'axios';
 import { Encrypt } from './encryption/payload-encryption';
 import { AnimatePresence, motion } from 'framer-motion';
-<<<<<<< HEAD
 import toast from 'react-hot-toast';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540';
-=======
-import { API_BASE_URL } from '../config/api';
-
->>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 const API_BASE = `${API_BASE_URL}/admin/users`;
 
 const UserDetails = () => {
