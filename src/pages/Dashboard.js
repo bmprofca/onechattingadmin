@@ -22,6 +22,7 @@ import {
 } from 'react-icons/fi';
 import { apiCall } from '../utils/apiCall';
 import toast from 'react-hot-toast';
+import ActionCard from '../component/common/ActionCard';
 
 function AdminDashboard() {
 
@@ -404,15 +405,9 @@ function AdminDashboard() {
                     </div>
 
                     {/* Quick Actions Section */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        {['View Reports', 'Manage Templates', 'System Settings', 'Audit Logs'].map((action, idx) => (
-                            <button
-                                key={idx}
-                                className="p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 flex items-center justify-between group"
-                            >
-                                <span className="text-gray-700 font-medium">{action}</span>
-                                <FiExternalLink className="text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
-                            </button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                        {[{ title: 'Manage Users', description: 'Review users, balances, and KYC information.', path: '/users', icon: <FiUsers className="text-white text-2xl" />, gradient: 'blue' }, { title: 'Projects', description: 'Review connected projects and WABA status.', path: '/projects', icon: <FiActivity className="text-white text-2xl" />, gradient: 'indigo' }, { title: 'Subscriptions', description: 'Manage packages and user subscriptions.', path: '/subscriptions', icon: <FiCreditCard className="text-white text-2xl" />, gradient: 'purple' }, { title: 'AI Providers', description: 'Configure provider credentials and availability.', path: '/ai-providers', icon: <FiZap className="text-white text-2xl" />, gradient: 'blue' }].map((action, idx) => (
+                            <ActionCard key={action.path} {...action} buttonText="Open" onClick={() => navigate(action.path)} delay={idx * 0.08} />
                         ))}
                     </div>
                 </>

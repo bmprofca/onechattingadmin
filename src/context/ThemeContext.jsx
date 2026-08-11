@@ -29,6 +29,8 @@ export const ThemeProvider = ({ children }) => {
     try {
       localStorage.setItem('theme', theme);
     } catch {}
+
+    return () => root.classList.remove('dark');
   }, [theme]);
 
   const toggleTheme = () => {

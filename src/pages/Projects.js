@@ -18,6 +18,8 @@ import { apiCall } from '../utils/apiCall';
 import ProjectChargesModal from '../component/Modals/ProjectChargesModal';
 import toast from 'react-hot-toast';
 import Pagination from '../component/common/PaginationComponent';
+import SelectField from '../component/common/SelectField';
+import ManagementTable from '../component/common/ManagementTable';
 
 const Projects = () => {
 
@@ -113,6 +115,14 @@ const Projects = () => {
         setWabaFilter('all');
     };
 
+    const projectColumns = [
+        { key: 'project', label: 'Project', render: project => <div><p className="font-semibold text-gray-900 dark:text-white">{project.project_name}</p><p className="text-xs text-gray-500">Business: {project.business_id || '—'}</p></div> },
+        { key: 'references', label: 'IDs & References', render: project => <div className="font-mono text-xs space-y-1"><p>{project.project_id}</p><p className="text-gray-500">#{project.id}</p></div> },
+        { key: 'status', label: 'Status', render: project => <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${String(project.status) === '1' || project.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>{String(project.status) === '1' || project.status === 'active' ? 'Active' : 'Inactive'}</span> },
+        { key: 'waba', label: 'WABA Connection', render: project => <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${String(project.is_waba_connected) === '1' || project.is_waba_connected === true ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>{String(project.is_waba_connected) === '1' || project.is_waba_connected === true ? 'Connected' : 'Not connected'}</span> },
+    ];
+    const projectActions = project => [{ label: 'View charges', icon: <FiDollarSign />, onClick: () => handleOpenCharges(project) }];
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
             <div className={`transition-all duration-300 ease-in-out `}>
@@ -206,26 +216,10 @@ const Projects = () => {
                                 </div>
 
                                 {/* Status Filter */}
-                                <select
-                                    value={statusFilter}
-                                    onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setStatusFilter(e.target.value); }}
-                                    className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white text-sm"
-                                >
-                                    <option value="all">All Status</option>
-                                    <option value="active">Active Only</option>
-                                    <option value="inactive">Inactive Only</option>
-                                </select>
+                                <SelectField options={[{ value: 'all', label: 'All Status' }, { value: 'active', label: 'Active Only' }, { value: 'inactive', label: 'Inactive Only' }]} value={[{ value: 'all', label: 'All Status' }, { value: 'active', label: 'Active Only' }, { value: 'inactive', label: 'Inactive Only' }].find(option => option.value === statusFilter)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setStatusFilter(option.value); }} isSearchable={false} />
 
                                 {/* WABA Connection Filter */}
-                                <select
-                                    value={wabaFilter}
-                                    onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setWabaFilter(e.target.value); }}
-                                    className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white text-sm"
-                                >
-                                    <option value="all">All Connections</option>
-                                    <option value="connected">WABA Connected</option>
-                                    <option value="not_connected">WABA Not Connected</option>
-                                </select>
+                                <SelectField options={[{ value: 'all', label: 'All Connections' }, { value: 'connected', label: 'WABA Connected' }, { value: 'not_connected', label: 'WABA Not Connected' }]} value={[{ value: 'all', label: 'All Connections' }, { value: 'connected', label: 'WABA Connected' }, { value: 'not_connected', label: 'WABA Not Connected' }].find(option => option.value === wabaFilter)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setWabaFilter(option.value); }} isSearchable={false} />
 
                                 {/* Active Filters Count */}
                                 {(statusFilter !== 'all' || wabaFilter !== 'all' || searchTerm) && (
@@ -274,6 +268,8 @@ const Projects = () => {
 
                     {/* Professional Table - No Card, No Horizontal Scroll */}
                     <div className="w-full overflow-x-visible">
+                        {!loading && <ManagementTable rows={filteredProjects} columns={projectColumns} rowKey="project_id" getActions={projectActions} onRowClick={project => navigate(`/projects/${project.project_id}`)} accent="indigo" emptyState={<div className="py-20 text-center text-gray-500 dark:text-gray-400">No projects found. Adjust or clear the active filters.</div>} />}
+                        <div className={loading ? '' : 'hidden'}>
                         <table className="w-full text-center border-separate border-spacing-0">
                             <thead className="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900">
                                 <tr>
@@ -451,6 +447,7 @@ const Projects = () => {
                                 </tfoot>
                             )}
                         </table>
+                        </div>
                     </div>
 
                     <Pagination currentPage={pagination.page} totalItems={pagination.total} itemsPerPage={pagination.limit} onPageChange={page => setPagination(p => ({ ...p, page }))} onLimitChange={limit => setPagination(p => ({ ...p, limit, page: 1 }))} className="mt-4" />

@@ -9,6 +9,8 @@ import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Encrypt } from '../pages/encryption/payload-encryption';
 import toast from 'react-hot-toast';
+import ManagementTable from '../component/common/ManagementTable';
+import ActionCard from '../component/common/ActionCard';
 
 const BASE_URL = (process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540') + '/admin';
 const BASE_PACKAGE = {
@@ -292,6 +294,15 @@ const CustomPricing = () => {
         return { discount, discountPercent };
     };
 
+    const packageColumns = [
+        { key: 'user', label: 'User', render: item => <div><p className="font-semibold text-gray-900 dark:text-white">{item.user?.name || 'N/A'}</p><p className="font-mono text-xs text-gray-500">{item.user?.username || 'N/A'}</p></div> },
+        { key: 'contact', label: 'Contact', render: item => <div className="text-xs"><p>{item.user?.email || '—'}</p><p className="text-gray-500">{item.user?.country_code} {item.user?.mobile}</p></div> },
+        { key: 'monthly', label: 'Monthly', render: item => `₹${item.package?.monthly || 0}` },
+        { key: 'yearly', label: 'Yearly', render: item => `₹${item.package?.yearly || 0}` },
+        { key: 'status', label: 'Status', render: item => <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${item.user?.status ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>{item.user?.status ? 'Active' : 'Inactive'}</span> },
+    ];
+    const packageActions = item => [{ label: 'Edit custom package', icon: <FiEdit2 />, onClick: () => openEditModal(item) }, { label: 'Delete custom package', icon: <FiTrash2 />, className: 'text-rose-600 dark:text-rose-400', onClick: () => handleDeletePackage(item.custom_id) }];
+
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= pagination.total_pages) {
             fetchCustomPackages(newPage);
@@ -473,6 +484,7 @@ const CustomPricing = () => {
                     </div>
 
                     {/* Table */}
+                    <ActionCard icon={<FiPlus className="text-white text-2xl" />} title="Custom pricing" description="Assign user-specific monthly and yearly pricing." buttonText="Create pricing" onClick={openCreateModal} gradient="purple" delay={0.1} />
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                         {loading ? (
                             <div className="flex items-center justify-center py-20">
@@ -489,7 +501,8 @@ const CustomPricing = () => {
                                     Create your first custom package
                                 </button>
                             </div>
-                        ) : (
+                        ) : (<><ManagementTable rows={filteredPackages} columns={packageColumns} rowKey="custom_id" getActions={packageActions} onRowClick={openEditModal} accent="indigo" />
+                            <div className="hidden">
                             <>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
@@ -626,7 +639,7 @@ const CustomPricing = () => {
                                         </div>
                                     </div>
                                 )}
-                            </>
+                            </></div></>
                         )}
                     </div>
                 </div>

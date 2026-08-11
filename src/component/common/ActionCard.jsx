@@ -20,14 +20,14 @@ function ActionCard({ icon, title, description, buttonText, onClick, gradient, d
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay }}
       whileHover={{ y: -5 }}
-      className="bg-white/80 backdrop-blur-xl rounded-lg shadow-xl border border-gray-100 p-8 hover:shadow-2xl transition-all duration-300"
+      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-lg shadow-xl dark:shadow-black/20 border border-gray-100 dark:border-gray-700 p-8 hover:shadow-2xl transition-all duration-300"
     >
       <div className={`w-14 h-14 bg-gradient-to-br ${iconGradients[gradient]} rounded-lg flex items-center justify-center mb-6 shadow-lg`}>
         {icon}
       </div>
 
-      <h3 className="text-2xl font-bold text-gray-900 mb-3">{title}</h3>
-      <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{title}</h3>
+      <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm leading-relaxed">
         {description}
       </p>
 

@@ -74,7 +74,7 @@ const Sidebar = ({
         <div
           className={`
           fixed left-0 top-16 z-30 w-72 h-[calc(100vh-4rem)]
-          bg-white transform transition-transform duration-300 ease-out
+          bg-white dark:bg-gray-900 transform transition-transform duration-300 ease-out
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           overflow-y-auto overflow-x-hidden shadow-2xl
         `}
@@ -93,8 +93,8 @@ const Sidebar = ({
                     className={`
                       flex items-center px-3 py-3 rounded-lg transition-all duration-200 mb-1
                       ${isActive
-                        ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700"
-                        : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+                        ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 text-blue-700 dark:text-blue-300"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400"
                       }
                     `}
                   >
@@ -102,8 +102,8 @@ const Sidebar = ({
                       className={`
                       p-2 rounded-lg mr-3
                       ${isActive
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-gray-100 text-gray-600"
+                          ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300"
+                          : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
                         }
                     `}
                     >
@@ -134,8 +134,8 @@ const Sidebar = ({
           flex items-center rounded-lg transition-all duration-200 group
           ${isExpandedState ? "px-3 py-2.5 gap-3" : "px-0 py-2.5 justify-center"}
           ${isActive
-            ? "bg-blue-50 text-blue-700"
-            : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+            ? "bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300"
+            : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400"
           }
         `}
         title={!isExpandedState ? item.label : ""}
@@ -145,8 +145,8 @@ const Sidebar = ({
           p-2 rounded-lg transition-all duration-200
           ${isExpandedState ? "" : "mx-auto"}
           ${isActive
-              ? "bg-blue-100 text-blue-700"
-              : "bg-gray-100 text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600"
+              ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300"
+              : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/50 group-hover:text-blue-600 dark:group-hover:text-blue-400"
             }
         `}
         >
@@ -186,11 +186,11 @@ const Sidebar = ({
   return (
     <div
       className={`
-        fixed left-0 top-16 z-20 bg-white
+        fixed left-0 top-16 z-20 bg-white dark:bg-gray-900
         transition-all duration-300 ease-out
         ${isSidebarExpanded ? "w-64" : "w-16"}
         h-[calc(100vh-4rem)]
-        shadow-lg border-r border-gray-200
+        shadow-lg dark:shadow-black/30 border-r border-gray-200 dark:border-gray-800
         overflow-y-auto overflow-x-hidden
       `}
       onMouseEnter={handleMouseEnter}

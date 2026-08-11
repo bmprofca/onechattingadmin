@@ -27,6 +27,7 @@ import { apiCall } from '../utils/apiCall';
 import ManagementTable from '../component/common/ManagementTable';
 import ActionMenu from '../component/common/ActionMenu';
 import Pagination from '../component/common/PaginationComponent';
+import SelectField from '../component/common/SelectField';
 
 const Users = () => {
     const navigate = useNavigate();
@@ -300,9 +301,9 @@ const Users = () => {
                         )}
                     </div>
                 </div>
-                <select value={filterStatus} onChange={e => { setPagination(p => ({ ...p, page: 1 })); setFilterStatus(e.target.value); }} className="px-3 py-2.5 border rounded-lg bg-gray-50 text-sm"><option value="all">All statuses</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
-                <select value={filterRole} onChange={e => { setPagination(p => ({ ...p, page: 1 })); setFilterRole(e.target.value); }} className="px-3 py-2.5 border rounded-lg bg-gray-50 text-sm"><option value="">All roles</option><option value="user">User</option><option value="admin">Admin</option></select>
-                <select value={filterKycVerified} onChange={e => { setPagination(p => ({ ...p, page: 1 })); setFilterKycVerified(e.target.value); }} className="px-3 py-2.5 border rounded-lg bg-gray-50 text-sm"><option value="">All KYC</option><option value="1">KYC verified</option><option value="0">KYC unverified</option></select>
+                <SelectField options={[{ value: 'all', label: 'All statuses' }, { value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]} value={{ value: filterStatus, label: filterStatus === 'all' ? 'All statuses' : filterStatus === 'active' ? 'Active' : 'Inactive' }} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterStatus(option.value); }} isSearchable={false} />
+                <SelectField options={[{ value: '', label: 'All roles' }, { value: 'user', label: 'User' }, { value: 'admin', label: 'Admin' }]} value={[{ value: '', label: 'All roles' }, { value: 'user', label: 'User' }, { value: 'admin', label: 'Admin' }].find(option => option.value === filterRole)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterRole(option.value); }} isSearchable={false} />
+                <SelectField options={[{ value: '', label: 'All KYC' }, { value: '1', label: 'KYC verified' }, { value: '0', label: 'KYC unverified' }]} value={[{ value: '', label: 'All KYC' }, { value: '1', label: 'KYC verified' }, { value: '0', label: 'KYC unverified' }].find(option => option.value === filterKycVerified)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterKycVerified(option.value); }} isSearchable={false} />
             </div>
 
             <ManagementTable 
@@ -312,6 +313,7 @@ const Users = () => {
                 getActions={getActions}
                 activeId={activeActionId}
                 onToggleAction={setActiveActionId}
+                onRowClick={(user) => navigate(`/users/${encodeURIComponent(user.username)}`)}
             />
 
             <Pagination currentPage={pagination.page} totalItems={pagination.total} itemsPerPage={pagination.limit} onPageChange={page => setPagination(p => ({ ...p, page }))} onLimitChange={limit => setPagination(p => ({ ...p, limit, page: 1 }))} className="mt-4" />

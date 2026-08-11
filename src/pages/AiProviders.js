@@ -21,6 +21,8 @@ import {
 import { apiCall } from '../utils/apiCall';
 import toast from 'react-hot-toast';
 import Pagination from '../component/common/PaginationComponent';
+import SelectField from '../component/common/SelectField';
+import ManagementTable from '../component/common/ManagementTable';
 
 /* -------------------------------------------------------------------------- */
 /*  Helpers                                                                    */
@@ -385,6 +387,15 @@ const AiProviders = () => {
         setStatusFilter('all');
     };
 
+    const providerColumns = [
+        { key: 'provider', label: 'Provider', render: provider => <div><p className="font-semibold text-gray-900 dark:text-white">{provider.provider}</p><p className="text-xs text-gray-500">ID: {provider.id}</p></div> },
+        { key: 'api_key', label: 'API Key', render: provider => <div className="flex items-center gap-2"><code className="text-xs font-mono">{revealedKeys[provider.id] ? provider.api_key : maskKey(provider.api_key)}</code><button type="button" onClick={() => toggleReveal(provider.id)} className="text-gray-400 hover:text-indigo-600">{revealedKeys[provider.id] ? <FiEyeOff /> : <FiEye />}</button><button type="button" onClick={() => handleCopy(provider.id, provider.api_key)} className="text-gray-400 hover:text-indigo-600">{copiedId === provider.id ? <FiCheck className="text-green-500" /> : <FiCopy />}</button></div> },
+        { key: 'is_active', label: 'Status', render: provider => <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${isActiveValue(provider.is_active) ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>{isActiveValue(provider.is_active) ? 'Active' : 'Inactive'}</span> },
+        { key: 'create_date', label: 'Created', render: provider => formatDate(provider.create_date) },
+        { key: 'modify_date', label: 'Updated', render: provider => formatDate(provider.modify_date) },
+    ];
+    const providerActions = provider => [{ label: 'Edit provider', icon: <FiEdit2 />, onClick: () => openEditModal(provider) }, { label: 'Delete provider', icon: <FiTrash2 />, className: 'text-rose-600 dark:text-rose-400', onClick: () => openDeleteModal(provider) }];
+
     const toggleReveal = (id) => {
         setRevealedKeys((prev) => ({ ...prev, [id]: !prev[id] }));
     };
@@ -501,15 +512,7 @@ const AiProviders = () => {
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                                <select
-                                    value={statusFilter}
-                                    onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setStatusFilter(e.target.value); }}
-                                    className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white text-sm"
-                                >
-                                    <option value="all">All Status</option>
-                                    <option value="active">Active Only</option>
-                                    <option value="inactive">Inactive Only</option>
-                                </select>
+                                <SelectField options={[{ value: 'all', label: 'All Status' }, { value: 'active', label: 'Active Only' }, { value: 'inactive', label: 'Inactive Only' }]} value={[{ value: 'all', label: 'All Status' }, { value: 'active', label: 'Active Only' }, { value: 'inactive', label: 'Inactive Only' }].find(option => option.value === statusFilter)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setStatusFilter(option.value); }} isSearchable={false} />
 
                                 {(statusFilter !== 'all' || searchTerm) && (
                                     <button
@@ -535,6 +538,8 @@ const AiProviders = () => {
 
                     {/* Table */}
                     <div className="w-full overflow-x-auto">
+                        {!loading && <ManagementTable rows={filteredProviders} columns={providerColumns} rowKey="id" getActions={providerActions} onRowClick={openEditModal} accent="indigo" emptyState={<div className="py-20 text-center text-gray-500 dark:text-gray-400">No AI providers found.</div>} />}
+                        <div className={loading ? '' : 'hidden'}>
                         <table className="w-full text-center border-separate border-spacing-0">
                             <thead className="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900">
                                 <tr>
@@ -717,6 +722,7 @@ const AiProviders = () => {
                                 </tfoot>
                             )}
                         </table>
+                        </div>
                     </div>
 
                     <Pagination currentPage={pagination.page} totalItems={pagination.total} itemsPerPage={pagination.limit} onPageChange={page => setPagination(p => ({ ...p, page }))} onLimitChange={limit => setPagination(p => ({ ...p, limit, page: 1 }))} className="mt-4" />

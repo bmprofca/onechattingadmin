@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+import { ThemeProvider } from '../../context/ThemeContext';
 
 const MainLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -71,6 +72,7 @@ const MainLayout = ({ children }) => {
   };
 
   return (
+    <ThemeProvider>
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-950 dark:to-gray-900 transition-colors duration-300 overflow-hidden">
       <Navbar
         toggleSidebar={toggleSidebar}
@@ -117,6 +119,7 @@ const MainLayout = ({ children }) => {
         </main>
       </div>
     </div>
+    </ThemeProvider>
   );
 };
 
