@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { apiCall } from '../utils/apiCall';
 import { Encrypt } from '../pages/encryption/payload-encryption';
 
 // Fetch project info (wallet balance and other info) by project id
@@ -8,7 +8,9 @@ export const fetchProjectInfo = createAsyncThunk(
   async (maybeProjectId, { rejectWithValue }) => {
     try {
       // Load tokens and project id from storage
-      const stored = (typeof window !== 'undefined') ? localStorage.getItem('userData') : null;
+      const stored = (typeof window !== 'undefined')
+        ? localStorage.getItem('user_data') || localStorage.getItem('userData') || sessionStorage.getItem('userData')
+        : null;
       const parsed = stored ? JSON.parse(stored) : null;
 
       const token = parsed?.token;
@@ -32,20 +34,14 @@ export const fetchProjectInfo = createAsyncThunk(
       const { data, key } = Encrypt(payload);
       const data_pass = JSON.stringify({ data, key });
 
-      const response = await axios.post(
-        'https://api.w1chat.com/project/info',
-        data_pass,
-        {
-          headers: {
-            'token': token,
-            'username': username,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      const response = await apiCall('/project/info', 'POST', data_pass, {
+        token,
+        username,
+      });
+      const responseData = await response.json();
 
-      if (response?.data?.error) {
-        return rejectWithValue(response?.data?.message || 'Failed to fetch project info');
+      if (!response.ok || responseData?.error) {
+        return rejectWithValue(responseData?.message || responseData?.error || 'Failed to fetch project info');
       }
 
       // Normalize wallet balance and permissions based on actual API shape
@@ -55,7 +51,7 @@ export const fetchProjectInfo = createAsyncThunk(
       //   project: { balance: number, ... },
       //   permissions: { ... }
       // }
-      const root = response?.data ?? {};
+      const root = responseData ?? {};
       const walletBalance = Number(
         (root.project && root.project.balance != null ? root.project.balance : null) ??
         (root.balance != null ? root.balance : null) ??
@@ -65,7 +61,7 @@ export const fetchProjectInfo = createAsyncThunk(
       const permissions = root.permissions ?? null;
 
       return {
-        raw: response?.data,
+        raw: responseData,
         walletBalance,
         permissions
       };

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Header, Sidebar } from '../component/Menu';
 import {
     FiSearch,
     FiBriefcase,
@@ -15,12 +14,14 @@ import {
     FiWifiOff,
     FiFilter
 } from 'react-icons/fi';
-import axios from 'axios';
+import { apiCall } from '../utils/apiCall';
 import ProjectChargesModal from '../component/Modals/ProjectChargesModal';
+import toast from 'react-hot-toast';
+import Pagination from '../component/common/PaginationComponent';
 
 const Projects = () => {
+
     const navigate = useNavigate();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(() => {
         const saved = localStorage.getItem('sidebarMinimized');
         return saved ? JSON.parse(saved) : false;
@@ -31,19 +32,16 @@ const Projects = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [wabaFilter, setWabaFilter] = useState('all');
+    const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, total_pages: 1 });
     const [tokens, setTokens] = useState(null);
     const [error, setError] = useState('');
     const [chargesModalOpen, setChargesModalOpen] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
 
     // Sync Sidebar State
-    useEffect(() => {
-        localStorage.setItem('sidebarMinimized', JSON.stringify(isMinimized));
-    }, [isMinimized]);
-
     // Load tokens
     useEffect(() => {
-        const data = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+        const data = localStorage.getItem('user_data') || localStorage.getItem('userData') || sessionStorage.getItem('userData');
         if (data) {
             setTokens(JSON.parse(data));
         } else {
@@ -55,62 +53,33 @@ const Projects = () => {
     const fetchProjects = useCallback(async () => {
         if (!tokens?.token) return;
         setLoading(true);
-        setError('');
-        try {
-            const response = await axios.get('https://api.w1chat.com/admin/projects', {
-                headers: {
-                    'x-token': tokens.token,
-                    'username': tokens.username
-                }
-            });
 
-            if (!response.data.error) {
-                setProjects(response.data.data || []);
+        try {
+            const params = new URLSearchParams({ page: String(pagination.page), limit: String(pagination.limit) });
+            if (searchTerm) params.set('search', searchTerm);
+            if (statusFilter !== 'all') params.set('status', statusFilter === 'active' ? '1' : '0');
+            if (wabaFilter !== 'all') params.set('is_waba_connected', wabaFilter === 'connected' ? '1' : '0');
+            const response = await apiCall(`/admin/projects?${params}`);
+            const data = await response.json();
+
+            if (response.ok && !data?.error) {
+                setProjects(data.data || []);
+                setPagination(current => ({ ...current, ...(data.pagination || {}) }));
             } else {
-                setError(response.data.message || 'Failed to fetch projects');
+                toast.error(data?.message || data?.error || 'Failed to fetch projects');
             }
         } catch (err) {
-            setError('Authorization failed or server error');
+            toast.error('Authorization failed or server error');
         } finally {
             setLoading(false);
         }
-    }, [tokens]);
+    }, [pagination.limit, pagination.page, searchTerm, statusFilter, tokens, wabaFilter]);
 
     useEffect(() => {
         fetchProjects();
     }, [fetchProjects]);
 
-    // Apply filters
-    const filteredProjects = projects.filter(project => {
-        const term = searchTerm.toLowerCase();
-        
-        // Search filter
-        const matchesSearch = 
-            project.project_name?.toLowerCase().includes(term) ||
-            project.project_id?.toString().toLowerCase().includes(term) ||
-            project.business_id?.toString().toLowerCase().includes(term) ||
-            project.id?.toString().toLowerCase().includes(term);
-        
-        if (!matchesSearch) return false;
-
-        // Status filter
-        const isActive = project.status === '1' || project.status === 1 || project.status === 'active';
-        if (statusFilter !== 'all') {
-            if (statusFilter === 'active' && !isActive) return false;
-            if (statusFilter === 'inactive' && isActive) return false;
-        }
-
-        // WABA Connection filter
-        const isConnected = project.is_waba_connected === 1 || 
-                           project.is_waba_connected === '1' || 
-                           project.is_waba_connected === true;
-        if (wabaFilter !== 'all') {
-            if (wabaFilter === 'connected' && !isConnected) return false;
-            if (wabaFilter === 'not_connected' && isConnected) return false;
-        }
-
-        return true;
-    });
+    const filteredProjects = projects;
 
     const totalProjects = projects.length;
     const activeProjects = projects.filter(
@@ -138,6 +107,7 @@ const Projects = () => {
     };
 
     const clearFilters = () => {
+        setPagination(current => ({ ...current, page: 1 }));
         setSearchTerm('');
         setStatusFilter('all');
         setWabaFilter('all');
@@ -145,21 +115,8 @@ const Projects = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-            <Header
-                mobileMenuOpen={mobileMenuOpen}
-                setMobileMenuOpen={setMobileMenuOpen}
-                isMinimized={isMinimized}
-                setIsMinimized={setIsMinimized}
-            />
-            <Sidebar
-                mobileMenuOpen={mobileMenuOpen}
-                setMobileMenuOpen={setMobileMenuOpen}
-                isMinimized={isMinimized}
-                setIsMinimized={setIsMinimized}
-            />
-
-            <div className={`pt-16 transition-all duration-300 ease-in-out ${isMinimized ? 'md:pl-20' : 'md:pl-72'}`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8">
+            <div className={`transition-all duration-300 ease-in-out `}>
+                <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8 py-8">
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div>
@@ -205,7 +162,7 @@ const Projects = () => {
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Projects</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{activeProjects}</h3>
-                                    <p className="text-xs text-green-500 dark:text-green-400 mt-1">{((activeProjects/totalProjects)*100 || 0).toFixed(1)}% of total</p>
+                                    <p className="text-xs text-green-500 dark:text-green-400 mt-1">{((activeProjects / totalProjects) * 100 || 0).toFixed(1)}% of total</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg shadow-green-500/20">
                                     <FiActivity className="text-white" size={24} />
@@ -217,7 +174,7 @@ const Projects = () => {
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">WABA Connected</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{wabaConnected}</h3>
-                                    <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">{((wabaConnected/totalProjects)*100 || 0).toFixed(1)}% connected</p>
+                                    <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">{((wabaConnected / totalProjects) * 100 || 0).toFixed(1)}% connected</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg shadow-emerald-500/20">
                                     <FiToggleRight className="text-white" size={24} />
@@ -237,21 +194,21 @@ const Projects = () => {
                                     placeholder="Search by project name, project ID or business ID..."
                                     className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
                                     value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setSearchTerm(e.target.value); }}
                                 />
                             </div>
-                            
+
                             {/* Filter Row */}
                             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                                     <FiFilter size={16} />
                                     <span>Filters:</span>
                                 </div>
-                                
+
                                 {/* Status Filter */}
                                 <select
                                     value={statusFilter}
-                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setStatusFilter(e.target.value); }}
                                     className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white text-sm"
                                 >
                                     <option value="all">All Status</option>
@@ -262,7 +219,7 @@ const Projects = () => {
                                 {/* WABA Connection Filter */}
                                 <select
                                     value={wabaFilter}
-                                    onChange={(e) => setWabaFilter(e.target.value)}
+                                    onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setWabaFilter(e.target.value); }}
                                     className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white text-sm"
                                 >
                                     <option value="all">All Connections</option>
@@ -314,7 +271,7 @@ const Projects = () => {
                             </div>
                         </div>
                     )}
-                    
+
                     {/* Professional Table - No Card, No Horizontal Scroll */}
                     <div className="w-full overflow-x-visible">
                         <table className="w-full text-center border-separate border-spacing-0">
@@ -362,15 +319,14 @@ const Projects = () => {
                                             project.is_waba_connected === 1 ||
                                             project.is_waba_connected === '1' ||
                                             project.is_waba_connected === true;
-                                        
+
                                         const isLast = index === filteredProjects.length - 1;
 
                                         return (
                                             <tr
                                                 key={project.id || project.project_id}
-                                                className={`hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-blue-50/50 dark:hover:from-indigo-900/20 dark:hover:to-blue-900/20 transition-all duration-200 cursor-pointer group border-b border-gray-100 dark:border-gray-700 ${
-                                                    isLast ? 'border-b-0' : ''
-                                                }`}
+                                                className={`hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-blue-50/50 dark:hover:from-indigo-900/20 dark:hover:to-blue-900/20 transition-all duration-200 cursor-pointer group border-b border-gray-100 dark:border-gray-700 ${isLast ? 'border-b-0' : ''
+                                                    }`}
                                                 onClick={() => navigate(`/projects/${project.project_id}`)}
                                             >
                                                 <td className="px-6 py-5">
@@ -474,7 +430,7 @@ const Projects = () => {
                                     </tr>
                                 )}
                             </tbody>
-                            
+
                             {/* Table Footer */}
                             {filteredProjects.length > 0 && (
                                 <tfoot>
@@ -496,6 +452,8 @@ const Projects = () => {
                             )}
                         </table>
                     </div>
+
+                    <Pagination currentPage={pagination.page} totalItems={pagination.total} itemsPerPage={pagination.limit} onPageChange={page => setPagination(p => ({ ...p, page }))} onLimitChange={limit => setPagination(p => ({ ...p, limit, page: 1 }))} className="mt-4" />
 
                     <ProjectChargesModal
                         isOpen={chargesModalOpen}

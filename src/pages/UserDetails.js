@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Header, Sidebar } from '../component/Menu';
 import {
   FiArrowLeft,
   FiUser,
@@ -44,15 +43,16 @@ import {
 import axios from 'axios';
 import { Encrypt } from './encryption/payload-encryption';
 import { AnimatePresence, motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
-const API_BASE = 'https://api.w1chat.com/admin/users';
-const API_BASE_URL = 'https://api.w1chat.com';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540';
+const API_BASE = `${API_BASE_URL}/admin/users`;
 
 const UserDetails = () => {
+
   const { username } = useParams();
   const navigate = useNavigate();
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(() => {
     const saved = localStorage.getItem('sidebarMinimized');
     return saved ? JSON.parse(saved) : false;
@@ -79,7 +79,7 @@ const UserDetails = () => {
   const [basePackages, setBasePackages] = useState({ monthly: 0, yearly: 0 });
   const [hasCustomPackage, setHasCustomPackage] = useState(false);
   const [loadingCustomPackage, setLoadingCustomPackage] = useState(false);
-  
+
   // Custom Package Modal state
   const [showCustomPackageModal, setShowCustomPackageModal] = useState(false);
   const [editingCustomPackage, setEditingCustomPackage] = useState(false);
@@ -105,13 +105,13 @@ const UserDetails = () => {
   const [loginPage, setLoginPage] = useState(1);
   const [projectsPageJump, setProjectsPageJump] = useState('');
   const [loginPageJump, setLoginPageJump] = useState('');
-  
+
   // Transactions data
-  const [transactionsData, setTransactionsData] = useState({ 
-    data: [], 
+  const [transactionsData, setTransactionsData] = useState({
+    data: [],
     summary: { total_debit: '0.00', total_credit: '0.00', current_balance: '0.00' },
     pagination: { page: 1, limit: 15, total_records: 0, total_pages: 1, has_more: false },
-    loading: false 
+    loading: false
   });
   const [transactionsPage, setTransactionsPage] = useState(1);
   const [transactionsLimit] = useState(15);
@@ -126,10 +126,10 @@ const UserDetails = () => {
   const [copiedId, setCopiedId] = useState(null);
 
   // Subscriptions data
-  const [subscriptionsData, setSubscriptionsData] = useState({ 
-    data: [], 
+  const [subscriptionsData, setSubscriptionsData] = useState({
+    data: [],
     pagination: { page: 1, limit: 10, total: 0, total_pages: 1 },
-    loading: false 
+    loading: false
   });
   const [subscriptionsPage, setSubscriptionsPage] = useState(1);
   const [subscriptionsLimit] = useState(10);
@@ -143,7 +143,7 @@ const UserDetails = () => {
 
   const getTransactionAuthHeaders = () => {
     const token = adminTokens?.token;
-    return { 
+    return {
       'x-auth-token': token,
       'x-token': token,
       'Authorization': `Bearer ${token}`,
@@ -160,13 +160,9 @@ const UserDetails = () => {
     });
   };
 
-  useEffect(() => {
-    localStorage.setItem('sidebarMinimized', JSON.stringify(isMinimized));
-  }, [isMinimized]);
-
   // Load admin tokens
   useEffect(() => {
-    const data = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+    const data = localStorage.getItem('user_data') || localStorage.getItem('userData') || sessionStorage.getItem('userData');
     if (data) {
       setAdminTokens(JSON.parse(data));
     } else {
@@ -202,7 +198,7 @@ const UserDetails = () => {
     const fetchProfile = async () => {
       if (!adminTokens?.token || !username) return;
       setLoading(true);
-      setError('');
+
 
       try {
         const response = await axios.get(`${API_BASE}/${encodeURIComponent(username)}`, {
@@ -212,10 +208,10 @@ const UserDetails = () => {
         if (!response.data?.error) {
           setDetails(response.data.data);
         } else {
-          setError(response.data.message || 'Failed to fetch user details.');
+          toast.error(response.data.message || 'Failed to fetch user details.');
         }
       } catch (err) {
-        setError('Authorization failed or server error.');
+        toast.error('Authorization failed or server error.');
       } finally {
         setLoading(false);
       }
@@ -293,7 +289,7 @@ const UserDetails = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       if (!adminTokens?.token || !username || activeTab !== 'transactions') return;
-      
+
       setTransactionsData((p) => ({ ...p, loading: true }));
 
       try {
@@ -307,7 +303,7 @@ const UserDetails = () => {
         if (transactionsFilters.transaction_type) {
           params.append('transaction_type', transactionsFilters.transaction_type);
         }
-        
+
         if (transactionsFilters.type !== '') {
           params.append('type', transactionsFilters.type);
         }
@@ -321,12 +317,12 @@ const UserDetails = () => {
           setTransactionsData({
             data: response.data.data || [],
             summary: response.data.summary || { total_debit: '0.00', total_credit: '0.00', current_balance: '0.00' },
-            pagination: response.data.pagination || { 
-              page: transactionsPage, 
-              limit: transactionsLimit, 
-              total_records: 0, 
+            pagination: response.data.pagination || {
+              page: transactionsPage,
+              limit: transactionsLimit,
+              total_records: 0,
               total_pages: 1,
-              has_more: false 
+              has_more: false
             },
             loading: false
           });
@@ -384,9 +380,9 @@ const UserDetails = () => {
   useEffect(() => {
     const fetchCustomPackage = async () => {
       if (!adminTokens?.token || !username || activeTab !== 'subscriptions') return;
-      
+
       setLoadingCustomPackage(true);
-      
+
       try {
         const payload = { username };
         const { data, key } = Encrypt(payload);
@@ -401,7 +397,7 @@ const UserDetails = () => {
           setBasePackages(response.data.data.base);
           setHasCustomPackage(response.data.data.has_custom_price);
           setCustomPackage(response.data.data.custom);
-          
+
           console.log('Custom package data:', response.data.data); // For debugging
         }
       } catch (err) {
@@ -419,18 +415,18 @@ const UserDetails = () => {
   // Handle wallet credit/debit
   const handleWalletAction = async () => {
     if (!walletAmount || parseFloat(walletAmount) <= 0) {
-      setWalletError('Please enter a valid amount');
+      toast.error('Please enter a valid amount');
       return;
     }
 
     setWalletLoading(true);
-    setWalletError('');
-    setSuccess('');
+
+
 
     try {
       const endpoint = walletAction === 'credit' ? 'credit-wallet' : 'debit-wallet';
       const amount = parseFloat(walletAmount);
-      
+
       const payload = {
         amount: amount,
         remark: walletRemark || `${walletAction === 'credit' ? 'Credit' : 'Debit'} by admin`
@@ -445,24 +441,24 @@ const UserDetails = () => {
       );
 
       if (response.data && response.data.error === false) {
-        setSuccess(`Wallet ${walletAction}ed successfully!`);
+        toast.success(`Wallet ${walletAction}ed successfully!`);
         setShowWalletModal(false);
         setWalletAmount('');
         setWalletRemark('');
-        
+
         const userResponse = await axios.get(`${API_BASE}/${encodeURIComponent(username)}`, {
           headers: getAuthHeaders()
         });
-        
+
         if (!userResponse.data?.error) {
           setDetails(userResponse.data.data);
         }
-        
+
         if (activeTab === 'transactions') {
           setTransactionsPage(1);
         }
       } else {
-        setWalletError(response.data.error || response.data.msg || `Failed to ${walletAction} wallet`);
+        toast.error(response.data.error || response.data.msg || `Failed to ${walletAction} wallet`);
       }
     } catch (err) {
       console.error(`Failed to ${walletAction} wallet:`, err);
@@ -476,7 +472,7 @@ const UserDetails = () => {
       } else {
         errorMessage += 'Please try again.';
       }
-      setWalletError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setWalletLoading(false);
     }
@@ -485,18 +481,18 @@ const UserDetails = () => {
   // Handle create/update custom package
   const handleCustomPackageSubmit = async () => {
     if (!customPackageForm.monthly || parseFloat(customPackageForm.monthly) <= 0) {
-      setCustomPackageError('Please enter a valid monthly amount');
+      toast.error('Please enter a valid monthly amount');
       return;
     }
     if (!customPackageForm.yearly || parseFloat(customPackageForm.yearly) <= 0) {
-      setCustomPackageError('Please enter a valid yearly amount');
+      toast.error('Please enter a valid yearly amount');
       return;
     }
 
     setCustomPackageLoading(true);
-    setCustomPackageError('');
-    setError('');
-    setSuccess('');
+
+
+
 
     try {
       // Base payload
@@ -516,7 +512,7 @@ const UserDetails = () => {
       const { data, key } = Encrypt(payload);
 
       const endpoint = editingCustomPackage ? 'update-custom-package' : 'create-custom-package';
-      
+
       const response = await axios.post(
         `${API_BASE_URL}/admin/${endpoint}`,
         { data, key },
@@ -524,13 +520,13 @@ const UserDetails = () => {
       );
 
       if (response.data && response.data.error === false) {
-        setSuccess(editingCustomPackage ? 'Custom package updated successfully!' : 'Custom package created successfully!');
+        toast.success(editingCustomPackage ? 'Custom package updated successfully!' : 'Custom package created successfully!');
         setShowCustomPackageModal(false);
-        
+
         // Refresh custom package data
         const refreshPayload = { username };
         const { data: refreshData, key: refreshKey } = Encrypt(refreshPayload);
-        
+
         const refreshResponse = await axios.post(
           `${API_BASE_URL}/admin/user-custom-packages/${encodeURIComponent(username)}`,
           { data: refreshData, key: refreshKey },
@@ -543,11 +539,11 @@ const UserDetails = () => {
           setCustomPackage(refreshResponse.data.data.custom);
         }
       } else {
-        setCustomPackageError(response.data.error || response.data.message || 'Operation failed');
+        toast.error(response.data.error || response.data.message || 'Operation failed');
       }
     } catch (err) {
       console.error('Failed to save custom package:', err);
-      setCustomPackageError(err.response?.data?.error || err.response?.data?.message || 'Failed to save custom package');
+      toast.error(err.response?.data?.error || err.response?.data?.message || 'Failed to save custom package');
     } finally {
       setCustomPackageLoading(false);
     }
@@ -558,8 +554,8 @@ const UserDetails = () => {
     if (!customPackage?.custom_id) return;
 
     setDeletingCustomPackage(true);
-    setError('');
-    setSuccess('');
+
+
 
     try {
       const payload = {
@@ -575,15 +571,15 @@ const UserDetails = () => {
       );
 
       if (response.data && response.data.error === false) {
-        setSuccess('Custom package deleted successfully!');
+        toast.success('Custom package deleted successfully!');
         setShowDeleteModal(false);
         setCustomPackage(null);
         setHasCustomPackage(false);
-        
+
         // Refresh custom package data to show base packages
         const refreshPayload = { username };
         const { data: refreshData, key: refreshKey } = Encrypt(refreshPayload);
-        
+
         const refreshResponse = await axios.post(
           `${API_BASE_URL}/admin/user-custom-packages/${encodeURIComponent(username)}`,
           { data: refreshData, key: refreshKey },
@@ -595,11 +591,11 @@ const UserDetails = () => {
           setHasCustomPackage(refreshResponse.data.data.has_custom_price);
         }
       } else {
-        setError(response.data.error || response.data.message || 'Delete failed');
+        toast.error(response.data.error || response.data.message || 'Delete failed');
       }
     } catch (err) {
       console.error('Failed to delete custom package:', err);
-      setError(err.response?.data?.error || err.response?.data?.message || 'Failed to delete custom package');
+      toast.error(err.response?.data?.error || err.response?.data?.message || 'Failed to delete custom package');
     } finally {
       setDeletingCustomPackage(false);
     }
@@ -612,7 +608,7 @@ const UserDetails = () => {
       monthly: basePackages.monthly?.toString() || '',
       yearly: basePackages.yearly?.toString() || ''
     });
-    setCustomPackageError('');
+
     setShowCustomPackageModal(true);
   };
 
@@ -624,7 +620,7 @@ const UserDetails = () => {
         monthly: customPackage.monthly?.toString() || '',
         yearly: customPackage.yearly?.toString() || ''
       });
-      setCustomPackageError('');
+
       setShowCustomPackageModal(true);
     }
   };
@@ -783,10 +779,10 @@ const UserDetails = () => {
   // Format amount for transactions
   const formatAmount = (amount, type) => {
     if (!amount && amount !== 0) return { formatted: '₹0.00', class: '', icon: null, prefix: '' };
-    
+
     const num = parseFloat(amount);
     const isCredit = type === true || type === '1' || type === 1;
-    
+
     const absNum = Math.abs(num);
     const formattedNum = new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -794,12 +790,12 @@ const UserDetails = () => {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(absNum);
-    
+
     return {
       formatted: formattedNum,
       class: isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400',
-      icon: isCredit ? 
-        <FiArrowDownLeft className="inline mr-1" size={14} /> : 
+      icon: isCredit ?
+        <FiArrowDownLeft className="inline mr-1" size={14} /> :
         <FiArrowUpRight className="inline mr-1" size={14} />,
       prefix: isCredit ? '+' : '-'
     };
@@ -808,7 +804,7 @@ const UserDetails = () => {
   // Get transaction badge
   const getTransactionBadge = (transactionType) => {
     const type = transactionType?.toLowerCase() || '';
-    
+
     if (type.includes('wallet topup') || type.includes('credit')) {
       return {
         bg: 'bg-emerald-100 dark:bg-emerald-900/30',
@@ -891,9 +887,9 @@ const UserDetails = () => {
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.map(cell => 
-        typeof cell === 'string' && (cell.includes(',') || cell.includes('"')) 
-          ? `"${cell.replace(/"/g, '""')}"` 
+      ...rows.map(row => row.map(cell =>
+        typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))
+          ? `"${cell.replace(/"/g, '""')}"`
           : cell
       ).join(','))
     ].join('\n');
@@ -939,8 +935,8 @@ const UserDetails = () => {
   ];
 
   // Filter transactions by search term
-  const filteredTransactions = transactionsData.data.filter(t => 
-    transactionsSearch === '' || 
+  const filteredTransactions = transactionsData.data.filter(t =>
+    transactionsSearch === '' ||
     t.transaction_id?.toString().includes(transactionsSearch) ||
     t.transaction_type?.toLowerCase().includes(transactionsSearch.toLowerCase()) ||
     t.remark?.toLowerCase().includes(transactionsSearch.toLowerCase()) ||
@@ -1226,24 +1222,10 @@ const UserDetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        isMinimized={isMinimized}
-        setIsMinimized={setIsMinimized}
-      />
-      <Sidebar
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        isMinimized={isMinimized}
-        setIsMinimized={setIsMinimized}
-      />
-
       <div
-        className={`pt-16 transition-all duration-300 ease-in-out ${isMinimized ? 'md:pl-20' : 'md:pl-72'
-          }`}
+        className={`transition-all duration-300 ease-in-out`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8 py-8">
           {/* Success Message */}
           {success && (
             <div className="mb-4 flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300">
@@ -1532,7 +1514,7 @@ const UserDetails = () => {
                         onClick={() => {
                           setWalletAction('credit');
                           setShowWalletModal(true);
-                          setWalletError('');
+
                         }}
                         className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
                       >
@@ -1543,7 +1525,7 @@ const UserDetails = () => {
                         onClick={() => {
                           setWalletAction('debit');
                           setShowWalletModal(true);
-                          setWalletError('');
+
                         }}
                         className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
                       >
@@ -1578,11 +1560,10 @@ const UserDetails = () => {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => setShowFilters(!showFilters)}
-                              className={`px-4 py-2.5 border rounded-lg text-sm font-medium flex items-center transition-all ${
-                                Object.values(transactionsFilters).some(v => v && v !== get30DaysAgo() && v !== getTodayDate() && v !== '')
+                              className={`px-4 py-2.5 border rounded-lg text-sm font-medium flex items-center transition-all ${Object.values(transactionsFilters).some(v => v && v !== get30DaysAgo() && v !== getTodayDate() && v !== '')
                                   ? 'border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
                                   : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                              }`}
+                                }`}
                             >
                               <FiFilter className="mr-2" size={14} />
                               Filters
@@ -1774,7 +1755,7 @@ const UserDetails = () => {
                                     <FiFileText size={48} className="text-gray-300 dark:text-gray-600 mb-3" />
                                     <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">No transactions found</p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm">
-                                      {transactionsSearch || Object.values(transactionsFilters).some(v => v && v !== get30DaysAgo() && v !== getTodayDate() && v !== '') 
+                                      {transactionsSearch || Object.values(transactionsFilters).some(v => v && v !== get30DaysAgo() && v !== getTodayDate() && v !== '')
                                         ? 'No transactions match your current filters.'
                                         : 'This user has no transaction history yet.'}
                                     </p>
@@ -1879,11 +1860,10 @@ const UserDetails = () => {
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {/* Monthly Package */}
-                          <div className={`p-4 rounded-lg border-2 transition-all ${
-                            hasCustomPackage 
-                              ? 'border-purple-200 bg-purple-50 dark:border-purple-900 dark:bg-purple-900/10' 
+                          <div className={`p-4 rounded-lg border-2 transition-all ${hasCustomPackage
+                              ? 'border-purple-200 bg-purple-50 dark:border-purple-900 dark:bg-purple-900/10'
                               : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800'
-                          }`}>
+                            }`}>
                             <div className="flex items-center justify-between mb-2">
                               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Monthly</h3>
                               {hasCustomPackage && (
@@ -1899,11 +1879,10 @@ const UserDetails = () => {
                           </div>
 
                           {/* Yearly Package */}
-                          <div className={`p-4 rounded-lg border-2 transition-all ${
-                            hasCustomPackage 
-                              ? 'border-purple-200 bg-purple-50 dark:border-purple-900 dark:bg-purple-900/10' 
+                          <div className={`p-4 rounded-lg border-2 transition-all ${hasCustomPackage
+                              ? 'border-purple-200 bg-purple-50 dark:border-purple-900 dark:bg-purple-900/10'
                               : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800'
-                          }`}>
+                            }`}>
                             <div className="flex items-center justify-between mb-2">
                               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Yearly</h3>
                               {hasCustomPackage && (
@@ -1967,7 +1946,7 @@ const UserDetails = () => {
                 <FiX size={18} className="text-gray-500 dark:text-gray-400" />
               </button>
             </div>
-            
+
             <div className="p-5">
               {walletError && (
                 <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg text-xs text-red-600 dark:text-red-400 flex items-center gap-2">
@@ -1975,7 +1954,7 @@ const UserDetails = () => {
                   <span>{walletError}</span>
                 </div>
               )}
-              
+
               <div className="mb-4">
                 <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                   Amount (₹)
@@ -1990,7 +1969,7 @@ const UserDetails = () => {
                   className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
                 />
               </div>
-              
+
               <div className="mb-4">
                 <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                   Remark (Optional)
@@ -2003,16 +1982,15 @@ const UserDetails = () => {
                   className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
                 />
               </div>
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={handleWalletAction}
                   disabled={walletLoading || !walletAmount}
-                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium text-white transition-colors flex items-center justify-center gap-2 ${
-                    walletAction === 'credit' 
-                      ? 'bg-emerald-600 hover:bg-emerald-700' 
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium text-white transition-colors flex items-center justify-center gap-2 ${walletAction === 'credit'
+                      ? 'bg-emerald-600 hover:bg-emerald-700'
                       : 'bg-rose-600 hover:bg-rose-700'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {walletLoading ? (
                     <>

@@ -29,13 +29,14 @@ import {
 } from 'react-icons/fi';
 import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Header, Sidebar } from '../Menu';
 import { Encrypt } from "../../pages/encryption/payload-encryption";
+import toast from 'react-hot-toast';
 
 // API Base URL
-const API_BASE_URL = 'https://api.w1chat.com';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540';
 
 const UserTransactionHistoryPage = ({ user: propUser, tokens: propTokens }) => {
+
     const navigate = useNavigate();
    const { username: urlUsername } = useParams();
 const location = useLocation();
@@ -43,17 +44,12 @@ const state = location.state || {};
 const username = state.username || urlUsername;
 
     // Sidebar state
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(() => {
         const saved = localStorage.getItem('sidebarMinimized');
         return saved ? JSON.parse(saved) : false;
     });
 
     // Sync sidebar state
-    useEffect(() => {
-        localStorage.setItem('sidebarMinimized', JSON.stringify(isMinimized));
-    }, [isMinimized]);
-
     // User and tokens from props or navigation state
     const [user, setUser] = useState(propUser || state.user || null);
     const [tokens] = useState(propTokens || state.tokens || null);
@@ -152,13 +148,13 @@ const username = state.username || urlUsername;
                 return;
             }
             if (!username) {
-                setError('No username provided');
+                toast.error('No username provided');
                 return;
             }
 
             const token = getAuthToken();
             if (!token) {
-                setError('Authentication token missing');
+                toast.error('Authentication token missing');
                 return;
             }
 
@@ -175,10 +171,10 @@ const username = state.username || urlUsername;
                 if (response.data && !response.data.error) {
                     setUser(response.data.data || response.data.user || response.data);
                 } else {
-                    setError('User not found');
+                    toast.error('User not found');
                 }
             } catch (err) {
-                setError('Failed to load user details');
+                toast.error('Failed to load user details');
             } finally {
                 setLoadingUser(false);
             }
@@ -211,23 +207,23 @@ const username = state.username || urlUsername;
    // Handle wallet credit/debit
 const handleWalletAction = async () => {
     if (!user?.username) {
-        setWalletError('User not found');
+        toast.error('User not found');
         return;
     }
 
     if (!walletAmount || parseFloat(walletAmount) <= 0) {
-        setWalletError('Please enter a valid amount');
+        toast.error('Please enter a valid amount');
         return;
     }
 
     const token = getAuthToken();
     if (!token) {
-        setWalletError('Authentication token missing');
+        toast.error('Authentication token missing');
         return;
     }
 
     setWalletLoading(true);
-    setWalletError('');
+    
     setWalletSuccess('');
 
     try {
@@ -291,28 +287,28 @@ const handleWalletAction = async () => {
                 setWalletSuccess('');
             }, 2000);
         } else {
-            setWalletError(response.data?.error || `Failed to ${walletAction} wallet`);
+            toast.error(response.data?.error || `Failed to ${walletAction} wallet`);
         }
     } catch (error) {
         console.error(`Failed to ${walletAction} wallet:`, error);
         
         if (error.code === 'ERR_NETWORK') {
-            setWalletError('Cannot connect to server. Please check if the API server is running.');
+            toast.error('Cannot connect to server. Please check if the API server is running.');
         } else if (error.response) {
             if (error.response.status === 401) {
-                setWalletError('Unauthorized: Your session has expired. Please login again.');
+                toast.error('Unauthorized: Your session has expired. Please login again.');
             } else if (error.response.status === 404) {
-                setWalletError('User not found');
+                toast.error('User not found');
             } else if (error.response.status === 500) {
-                setWalletError('Server error. Please try again later.');
+                toast.error('Server error. Please try again later.');
                 console.error('Server error details:', error.response.data);
             } else {
-                setWalletError(error.response.data?.error || `Server error: ${error.response.status}`);
+                toast.error(error.response.data?.error || `Server error: ${error.response.status}`);
             }
         } else if (error.request) {
-            setWalletError('No response from server. Please check your network connection.');
+            toast.error('No response from server. Please check your network connection.');
         } else {
-            setWalletError(`Request failed: ${error.message}`);
+            toast.error(`Request failed: ${error.message}`);
         }
     } finally {
         setWalletLoading(false);
@@ -329,19 +325,19 @@ const handleWalletAction = async () => {
     // API Call to GET /admin/user/transaction-history/:username
     const fetchTransactions = async (page = 1) => {
         if (!user?.username) {
-            setError('Username is required');
+            toast.error('Username is required');
             return;
         }
         
         const token = getAuthToken();
         
         if (!token) {
-            setError('Authentication token is missing. Please login again.');
+            toast.error('Authentication token is missing. Please login again.');
             return;
         }
 
         setLoading(true);
-        setError('');
+        
         
         try {
             const params = new URLSearchParams({
@@ -391,16 +387,16 @@ const handleWalletAction = async () => {
                     });
                 }
             } else if (response.data && response.data.error) {
-                setError(response.data.error);
+                toast.error(response.data.error);
             }
         } catch (error) {
             console.error('Failed to fetch transaction history:', error);
             
             if (error.code === 'ERR_NETWORK') {
-                setError('Cannot connect to server. Please check if the API server is running.');
+                toast.error('Cannot connect to server. Please check if the API server is running.');
             } else if (error.response) {
                 if (error.response.status === 401) {
-                    setError('Unauthorized: Your session has expired. Please login again.');
+                    toast.error('Unauthorized: Your session has expired. Please login again.');
                     localStorage.removeItem('adminToken');
                     localStorage.removeItem('token');
                     localStorage.removeItem('x-auth-token');
@@ -408,16 +404,16 @@ const handleWalletAction = async () => {
                         window.location.href = '/login';
                     }, 2000);
                 } else if (error.response.status === 404) {
-                    setError('User not found or has no transactions.');
+                    toast.error('User not found or has no transactions.');
                 } else if (error.response.status === 500) {
-                    setError('Server error. Please try again later.');
+                    toast.error('Server error. Please try again later.');
                 } else {
-                    setError(error.response.data?.error || `Server error: ${error.response.status}`);
+                    toast.error(error.response.data?.error || `Server error: ${error.response.status}`);
                 }
             } else if (error.request) {
-                setError('No response from server. Please check your network connection and API URL.');
+                toast.error('No response from server. Please check your network connection and API URL.');
             } else {
-                setError(`Request failed: ${error.message}`);
+                toast.error(`Request failed: ${error.message}`);
             }
         } finally {
             setLoading(false);
@@ -599,19 +595,7 @@ const handleWalletAction = async () => {
     if (loadingUser) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-                <Header
-                    mobileMenuOpen={mobileMenuOpen}
-                    setMobileMenuOpen={setMobileMenuOpen}
-                    isMinimized={isMinimized}
-                    setIsMinimized={setIsMinimized}
-                />
-                <Sidebar
-                    mobileMenuOpen={mobileMenuOpen}
-                    setMobileMenuOpen={setMobileMenuOpen}
-                    isMinimized={isMinimized}
-                    setIsMinimized={setIsMinimized}
-                />
-                <div className={`pt-16 transition-all duration-300 ease-in-out ${isMinimized ? 'md:pl-20' : 'md:pl-72'}`}>
+                <div className={`transition-all duration-300 ease-in-out `}>
                     <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
                         <div className="text-center">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
@@ -626,19 +610,7 @@ const handleWalletAction = async () => {
     if (!user) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-                <Header
-                    mobileMenuOpen={mobileMenuOpen}
-                    setMobileMenuOpen={setMobileMenuOpen}
-                    isMinimized={isMinimized}
-                    setIsMinimized={setIsMinimized}
-                />
-                <Sidebar
-                    mobileMenuOpen={mobileMenuOpen}
-                    setMobileMenuOpen={setMobileMenuOpen}
-                    isMinimized={isMinimized}
-                    setIsMinimized={setIsMinimized}
-                />
-                <div className={`pt-16 transition-all duration-300 ease-in-out ${isMinimized ? 'md:pl-20' : 'md:pl-72'}`}>
+                <div className={`transition-all duration-300 ease-in-out `}>
                     <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
                         <div className="text-center">
                             <FiXCircle className="mx-auto h-12 w-12 text-red-500" />
@@ -660,19 +632,6 @@ const handleWalletAction = async () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <Header
-                mobileMenuOpen={mobileMenuOpen}
-                setMobileMenuOpen={setMobileMenuOpen}
-                isMinimized={isMinimized}
-                setIsMinimized={setIsMinimized}
-            />
-            <Sidebar
-                mobileMenuOpen={mobileMenuOpen}
-                setMobileMenuOpen={setMobileMenuOpen}
-                isMinimized={isMinimized}
-                setIsMinimized={setIsMinimized}
-            />
-
             {/* Wallet Action Modal */}
             {showWalletModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -685,7 +644,7 @@ const handleWalletAction = async () => {
                                 <button
                                     onClick={() => {
                                         setShowWalletModal(false);
-                                        setWalletError('');
+                                        
                                         setWalletSuccess('');
                                         setWalletAmount('');
                                         setWalletRemark('');
@@ -779,7 +738,7 @@ const handleWalletAction = async () => {
                                     <button
                                         onClick={() => {
                                             setShowWalletModal(false);
-                                            setWalletError('');
+                                            
                                             setWalletSuccess('');
                                             setWalletAmount('');
                                             setWalletRemark('');
@@ -797,8 +756,8 @@ const handleWalletAction = async () => {
             )}
 
             {/* Main content */}
-            <div className={`pt-16 transition-all duration-300 ease-in-out ${isMinimized ? 'md:pl-20' : 'md:pl-72'}`}>
-                <div className="w-full px-4 sm:px-6 py-8">
+            <div className={`transition-all duration-300 ease-in-out `}>
+                <div className="w-full px-2 sm:px-6 py-4">
                     {/* Page header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Header, Sidebar } from '../component/Menu';
 import { useNavigate } from 'react-router-dom';
 import {
     FiSearch, FiDollarSign, FiUsers, FiPackage, FiRefreshCw,
@@ -9,16 +8,17 @@ import {
 import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Encrypt } from '../pages/encryption/payload-encryption';
+import toast from 'react-hot-toast';
 
-const BASE_URL = 'https://api.w1chat.com/admin';
+const BASE_URL = (process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540') + '/admin';
 const BASE_PACKAGE = {
     monthly: 499,
     yearly: 4999
 };
 
 const CustomPricing = () => {
+
     const navigate = useNavigate();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(() => {
         const saved = localStorage.getItem('sidebarMinimized');
         return saved ? JSON.parse(saved) : false;
@@ -32,7 +32,7 @@ const CustomPricing = () => {
     const [success, setSuccess] = useState('');
     const [showFilters, setShowFilters] = useState(false);
     const [filterStatus, setFilterStatus] = useState('all');
-    
+
     // Modal states
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -41,7 +41,7 @@ const CustomPricing = () => {
     const [users, setUsers] = useState([]);
     const [userSearchTerm, setUserSearchTerm] = useState('');
     const [loadingUsers, setLoadingUsers] = useState(false);
-    
+
     // Form states
     const [formData, setFormData] = useState({
         username: '',
@@ -59,11 +59,7 @@ const CustomPricing = () => {
     });
 
     useEffect(() => {
-        localStorage.setItem('sidebarMinimized', JSON.stringify(isMinimized));
-    }, [isMinimized]);
-
-    useEffect(() => {
-        const data = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+        const data = localStorage.getItem('user_data') || localStorage.getItem('userData') || sessionStorage.getItem('userData');
         if (data) {
             setTokens(JSON.parse(data));
         } else {
@@ -82,7 +78,7 @@ const CustomPricing = () => {
                 `${BASE_URL}/custom-packages?page=${page}&limit=${pagination.limit}`,
                 { data, key },
                 {
-                    headers: { 
+                    headers: {
                         'x-token': tokens.token,
                         'Content-Type': 'application/json'
                     }
@@ -100,7 +96,7 @@ const CustomPricing = () => {
             }
         } catch (err) {
             console.error("Failed to fetch custom packages", err);
-            setError('Failed to fetch custom packages data');
+            toast.error('Failed to fetch custom packages data');
         } finally {
             setLoading(false);
         }
@@ -141,14 +137,14 @@ const CustomPricing = () => {
 
     const handleCreatePackage = async () => {
         if (!tokens?.token) return;
-        
+
         if (!formData.username) {
-            setError('Please select a user');
+            toast.error('Please select a user');
             return;
         }
 
         if (!formData.monthly || !formData.yearly) {
-            setError('Please enter both monthly and yearly prices');
+            toast.error('Please enter both monthly and yearly prices');
             return;
         }
 
@@ -173,16 +169,15 @@ const CustomPricing = () => {
             );
 
             if (response.data?.error) {
-                setError(response.data.error || 'Failed to create custom package');
+                toast.error(response.data.error || 'Failed to create custom package');
             } else {
-                setSuccess('Custom package created successfully');
+                toast.success('Custom package created successfully');
                 setShowCreateModal(false);
                 resetForm();
                 fetchCustomPackages(1);
-                setTimeout(() => setSuccess(''), 3000);
             }
         } catch (err) {
-            setError(err?.response?.data?.error || 'Failed to create custom package');
+            toast.error(err?.response?.data?.error || 'Failed to create custom package');
         }
     };
 
@@ -210,17 +205,16 @@ const CustomPricing = () => {
             );
 
             if (response.data?.error) {
-                setError(response.data.error || 'Failed to update custom package');
+                toast.error(response.data.error || 'Failed to update custom package');
             } else {
-                setSuccess('Custom package updated successfully');
+                toast.success('Custom package updated successfully');
                 setShowEditModal(false);
                 setSelectedPackage(null);
                 resetForm();
                 fetchCustomPackages(pagination.page);
-                setTimeout(() => setSuccess(''), 3000);
             }
         } catch (err) {
-            setError(err?.response?.data?.error || 'Failed to update custom package');
+            toast.error(err?.response?.data?.error || 'Failed to update custom package');
         }
     };
 
@@ -244,14 +238,13 @@ const CustomPricing = () => {
             );
 
             if (response.data?.error) {
-                setError(response.data.error || 'Failed to delete custom package');
+                toast.error(response.data.error || 'Failed to delete custom package');
             } else {
-                setSuccess('Custom package deleted successfully');
+                toast.success('Custom package deleted successfully');
                 fetchCustomPackages(pagination.page);
-                setTimeout(() => setSuccess(''), 3000);
             }
         } catch (err) {
-            setError(err?.response?.data?.error || 'Failed to delete custom package');
+            toast.error(err?.response?.data?.error || 'Failed to delete custom package');
         }
     };
 
@@ -283,8 +276,8 @@ const CustomPricing = () => {
     };
 
     const selectUser = (user) => {
-        setFormData(prev => ({ 
-            ...prev, 
+        setFormData(prev => ({
+            ...prev,
             username: user.username,
             userName: user.name
         }));
@@ -325,22 +318,9 @@ const CustomPricing = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <Header
-                mobileMenuOpen={mobileMenuOpen}
-                setMobileMenuOpen={setMobileMenuOpen}
-                isMinimized={isMinimized}
-                setIsMinimized={setIsMinimized}
-            />
-            <Sidebar
-                mobileMenuOpen={mobileMenuOpen}
-                setMobileMenuOpen={setMobileMenuOpen}
-                isMinimized={isMinimized}
-                setIsMinimized={setIsMinimized}
-            />
+            <div className={`transition-all duration-300 ease-in-out`}>
+                <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8 py-8">
 
-            <div className={`pt-16 transition-all duration-300 ease-in-out ${isMinimized ? 'md:pl-20' : 'md:pl-72'}`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8">
-                    
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div>
@@ -413,15 +393,14 @@ const CustomPricing = () => {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg border mb-6 text-sm ${
-                                    error
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg border mb-6 text-sm ${error
                                         ? 'bg-rose-50 border-rose-100 text-rose-700 dark:bg-rose-900/10 dark:border-rose-900/20 dark:text-rose-400'
                                         : 'bg-emerald-50 border-emerald-100 text-emerald-700 dark:bg-emerald-900/10 dark:border-emerald-900/20 dark:text-emerald-400'
-                                }`}
+                                    }`}
                             >
                                 {error ? <FiAlertCircle size={16} /> : <FiCheckCircle size={16} />}
                                 <span className="font-medium">{error || success}</span>
-                                <button onClick={() => { setError(''); setSuccess(''); }} className="ml-auto">
+                                <button onClick={() => { }} className="ml-auto">
                                     <FiX size={16} />
                                 </button>
                             </motion.div>
@@ -454,7 +433,7 @@ const CustomPricing = () => {
                                         Filter
                                         <FiChevronDown size={14} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
                                     </button>
-                                    
+
                                     {showFilters && (
                                         <>
                                             <div className="fixed inset-0 z-40" onClick={() => setShowFilters(false)}></div>
@@ -470,11 +449,10 @@ const CustomPricing = () => {
                                                             setFilterStatus(filter.value);
                                                             setShowFilters(false);
                                                         }}
-                                                        className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                                                            filterStatus === filter.value
+                                                        className={`w-full text-left px-4 py-2 text-sm transition-colors ${filterStatus === filter.value
                                                                 ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
                                                                 : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {filter.label}
                                                     </button>
@@ -717,7 +695,7 @@ const CustomPricing = () => {
                                     />
                                     {formData.monthly && (
                                         <p className="mt-1 text-xs text-green-600 dark:text-green-400">
-                                            Save: ₹{BASE_PACKAGE.monthly - parseFloat(formData.monthly)} 
+                                            Save: ₹{BASE_PACKAGE.monthly - parseFloat(formData.monthly)}
                                             ({((BASE_PACKAGE.monthly - parseFloat(formData.monthly)) / BASE_PACKAGE.monthly * 100).toFixed(1)}% off)
                                         </p>
                                     )}
@@ -738,7 +716,7 @@ const CustomPricing = () => {
                                     />
                                     {formData.yearly && (
                                         <p className="mt-1 text-xs text-green-600 dark:text-green-400">
-                                            Save: ₹{BASE_PACKAGE.yearly - parseFloat(formData.yearly)} 
+                                            Save: ₹{BASE_PACKAGE.yearly - parseFloat(formData.yearly)}
                                             ({((BASE_PACKAGE.yearly - parseFloat(formData.yearly)) / BASE_PACKAGE.yearly * 100).toFixed(1)}% off)
                                         </p>
                                     )}

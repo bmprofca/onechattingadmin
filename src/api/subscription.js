@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { Encrypt } from '../pages/encryption/payload-encryption';
 
-const API_BASE_URL = 'https://api.w1chat.com';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540';
 
 // Helper to get auth token
 const getAuthToken = () => {
-  const userData = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+  const userData = localStorage.getItem('user_data') || localStorage.getItem('userData') || sessionStorage.getItem('userData');
   if (userData) {
     const parsed = JSON.parse(userData);
     return parsed.token;
@@ -307,7 +307,7 @@ export const cancelSubscription = async (subscriptionId) => {
  * @param {string} autoRenew - "1" or "0"
  */
 export const subscribeToPackClient = async (packId, useWallet = true, billingCycle = 'monthly', autoRenew = '1') => {
-  const userData = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+  const userData = localStorage.getItem('user_data') || localStorage.getItem('userData') || sessionStorage.getItem('userData');
   const parsed = userData ? JSON.parse(userData) : null;
   const token = parsed?.token;
   const username = parsed?.username;
@@ -340,7 +340,7 @@ export const subscribeToPackClient = async (packId, useWallet = true, billingCyc
  * @param {string} orderId - Order ID
  */
 export const checkSubscriptionPaymentStatus = async (orderId) => {
-  const userData = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+  const userData = localStorage.getItem('user_data') || localStorage.getItem('userData') || sessionStorage.getItem('userData');
   const parsed = userData ? JSON.parse(userData) : null;
   const token = parsed?.token;
   const username = parsed?.username;
@@ -370,7 +370,7 @@ export const checkSubscriptionPaymentStatus = async (orderId) => {
  * @param {boolean} includeExpired - Include expired subscriptions
  */
 export const getMySubscriptions = async (includeExpired = false) => {
-  const userData = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+  const userData = localStorage.getItem('user_data') || localStorage.getItem('userData') || sessionStorage.getItem('userData');
   const parsed = userData ? JSON.parse(userData) : null;
   const token = parsed?.token;
   const username = parsed?.username;

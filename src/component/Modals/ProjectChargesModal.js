@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FiX, FiDollarSign, FiSave, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
-import axios from 'axios';
+import { apiCall } from '../../utils/apiCall';
+import toast from 'react-hot-toast';
 
 const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) => {
+
   const [marketingCharge, setMarketingCharge] = useState('');
   const [utilityCharge, setUtilityCharge] = useState('');
   const [authenticationCharge, setAuthenticationCharge] = useState('');
@@ -17,8 +19,8 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
       setMarketingCharge(project.marketing_charge ?? '');
       setUtilityCharge(project.utility_charge ?? '');
       setAuthenticationCharge(project.authentication_charge ?? '');
-      setError('');
-      setSuccess('');
+      
+      
     }
   }, [isOpen, project]);
 
@@ -32,14 +34,14 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
       utilityCharge === '' &&
       authenticationCharge === ''
     ) {
-      setError('Please set at least one charge before saving.');
-      setSuccess('');
+      toast.error('Please set at least one charge before saving.');
+      
       return;
     }
 
     setSubmitting(true);
-    setError('');
-    setSuccess('');
+    
+    
 
     try {
       const body = {
@@ -48,33 +50,25 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
         authentication_charge: authenticationCharge
       };
 
-      const response = await axios.patch(
-        `https://api.w1chat.com/admin/projects/${project.project_id}/prices`,
+      const response = await apiCall(
+        `/admin/projects/${project.project_id}/prices`,
+        'PATCH',
         body,
-        {
-          headers: {
-            'x-token': tokens.token,
-            username: tokens.username,
-            'Content-Type': 'application/json'
-          }
-        }
       );
+      const data = await response.json();
 
-      if (response.data?.error) {
-        setError(response.data.message || 'Failed to update charges.');
+      if (!response.ok || data?.error) {
+        toast.error(data?.message || data?.error || 'Failed to update charges.');
       } else {
-        setSuccess('Charges updated successfully.');
-        const updatedProject = response.data?.data || project;
+        toast.success('Charges updated successfully.');
+        const updatedProject = data?.data || project;
         if (onUpdated) {
           onUpdated(updatedProject);
         }
       }
     } catch (err) {
-      const msg =
-        err?.response?.data?.error ||
-        err?.response?.data?.message ||
-        'Server error while updating prices.';
-      setError(typeof msg === 'string' ? msg : 'Server error while updating prices.');
+      const msg = err?.message || 'Server error while updating prices.';
+      toast.error(typeof msg === 'string' ? msg : 'Server error while updating prices.');
     } finally {
       setSubmitting(false);
     }
@@ -82,8 +76,8 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
 
   const handleClose = () => {
     if (submitting) return;
-    setError('');
-    setSuccess('');
+    
+    
     onClose();
   };
 

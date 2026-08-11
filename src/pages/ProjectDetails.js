@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Header, Sidebar } from '../component/Menu';
 import {
     FiArrowLeft, FiBriefcase, FiClock, FiCheckCircle,
     FiAlertTriangle, FiPhone, FiMail, FiGlobe,
@@ -8,13 +7,14 @@ import {
     FiDollarSign, FiStar, FiCpu, FiHash, FiCalendar,
     FiThumbsUp, FiTrendingUp, FiAward, FiLock, FiUnlock
 } from 'react-icons/fi';
-import axios from 'axios';
+import { apiCall } from '../utils/apiCall';
+import toast from 'react-hot-toast';
 
 const ProjectDetails = () => {
+
     const { project_id } = useParams();
     const navigate = useNavigate();
 
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(() => {
         const saved = localStorage.getItem('sidebarMinimized');
         return saved ? JSON.parse(saved) : false;
@@ -26,11 +26,7 @@ const ProjectDetails = () => {
     const [metaDetails, setMetaDetails] = useState(null);
 
     useEffect(() => {
-        localStorage.setItem('sidebarMinimized', JSON.stringify(isMinimized));
-    }, [isMinimized]);
-
-    useEffect(() => {
-        const data = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+        const data = localStorage.getItem('user_data') || localStorage.getItem('userData') || sessionStorage.getItem('userData');
         if (data) {
             setTokens(JSON.parse(data));
         } else {
@@ -42,19 +38,18 @@ const ProjectDetails = () => {
         const fetchMetaDetails = async () => {
             if (!tokens?.token || !project_id) return;
             setLoading(true);
-            setError('');
+
             try {
-                const response = await axios.get(
-                    `https://api.w1chat.com/admin/projects/${project_id}/meta-details`,
-                    { headers: { 'x-token': tokens.token, 'username': tokens.username } }
-                );
-                if (!response.data.error) {
-                    setMetaDetails(response.data.data);
+                const response = await apiCall(`/admin/projects/${project_id}/meta-details`);
+                const data = await response.json();
+
+                if (response.ok && !data?.error) {
+                    setMetaDetails(data.data);
                 } else {
-                    setError(response.data.message || 'Failed to fetch project details');
+                    toast.error(data?.message || data?.error || 'Failed to fetch project details');
                 }
             } catch (err) {
-                setError('Authorization failed or server error');
+                toast.error('Authorization failed or server error');
             } finally {
                 setLoading(false);
             }
@@ -71,7 +66,7 @@ const ProjectDetails = () => {
     const DetailRow = ({ label, value, icon: Icon, badge = false }) => (
         <div className="flex items-center justify-between py-4 border-b border-gray-100 dark:border-gray-700/50 last:border-0 group hover:bg-gray-50/50 dark:hover:bg-gray-700/10 px-3 rounded-lg transition-colors">
             <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                {Icon && <Icon className="text-indigo-500 dark:text-indigo-400" size={14} />} 
+                {Icon && <Icon className="text-indigo-500 dark:text-indigo-400" size={14} />}
                 <span>{label}</span>
             </dt>
             <dd className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -88,22 +83,9 @@ const ProjectDetails = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-            <Header 
-                mobileMenuOpen={mobileMenuOpen} 
-                setMobileMenuOpen={setMobileMenuOpen} 
-                isMinimized={isMinimized} 
-                setIsMinimized={setIsMinimized} 
-            />
-            <Sidebar 
-                mobileMenuOpen={mobileMenuOpen} 
-                setMobileMenuOpen={setMobileMenuOpen} 
-                isMinimized={isMinimized} 
-                setIsMinimized={setIsMinimized} 
-            />
+            <main className={`transition-all duration-300 `}>
+                <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-            <main className={`pt-20 transition-all duration-300 ${isMinimized ? 'md:pl-20' : 'md:pl-72'}`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    
                     {/* Error Message */}
                     {error && (
                         <div className="mb-6 px-6 py-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-900/20 rounded-2xl border border-red-200 dark:border-red-800">
@@ -115,7 +97,7 @@ const ProjectDetails = () => {
                     )}
 
                     {/* Breadcrumb & Navigation */}
-                    <button 
+                    <button
                         onClick={() => navigate('/projects')}
                         className="group mb-6 flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-all duration-200"
                     >
@@ -143,7 +125,7 @@ const ProjectDetails = () => {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {/* Loading Skeleton - Grid */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                                 <div className="lg:col-span-8">
@@ -174,7 +156,7 @@ const ProjectDetails = () => {
                                 {/* Decorative Gradient Background */}
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
                                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 rounded-full blur-3xl translate-y-16 -translate-x-16"></div>
-                                
+
                                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                     <div className="flex items-center gap-6">
                                         <div className="relative">
@@ -215,28 +197,28 @@ const ProjectDetails = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex flex-wrap gap-3">
-                                        <StatusBadge 
-                                            condition={isActive} 
-                                            trueLabel="Active" 
-                                            falseLabel="Inactive" 
-                                            icon={FiActivity} 
+                                        <StatusBadge
+                                            condition={isActive}
+                                            trueLabel="Active"
+                                            falseLabel="Inactive"
+                                            icon={FiActivity}
                                             color="green"
                                         />
-                                        <StatusBadge 
-                                            condition={isWabaConnected} 
-                                            trueLabel="WABA Connected" 
-                                            falseLabel="WABA Disconnected" 
-                                            icon={FiBriefcase} 
+                                        <StatusBadge
+                                            condition={isWabaConnected}
+                                            trueLabel="WABA Connected"
+                                            falseLabel="WABA Disconnected"
+                                            icon={FiBriefcase}
                                             color="emerald"
                                         />
-                                        <StatusBadge 
-                                            condition={project.is_whatsapp_verified} 
-                                            trueLabel="Verified" 
-                                            falseLabel="Unverified" 
-                                            icon={FiShield} 
-                                            color="blue" 
+                                        <StatusBadge
+                                            condition={project.is_whatsapp_verified}
+                                            trueLabel="Verified"
+                                            falseLabel="Unverified"
+                                            icon={FiShield}
+                                            color="blue"
                                         />
                                     </div>
                                 </div>
@@ -262,51 +244,51 @@ const ProjectDetails = () => {
                                         </div>
                                         <div className="p-6">
                                             <dl className="divide-y divide-gray-100 dark:divide-gray-700/50">
-                                                <DetailRow 
-                                                    label="Messaging Tier" 
-                                                    value={project.wa_messaging_tier || 'Standard'} 
-                                                    icon={FiTrendingUp} 
-                                                    badge 
+                                                <DetailRow
+                                                    label="Messaging Tier"
+                                                    value={project.wa_messaging_tier || 'Standard'}
+                                                    icon={FiTrendingUp}
+                                                    badge
                                                 />
-                                                <DetailRow 
-                                                    label="Quality Rating" 
-                                                    value={project.wa_quality_rating || 'High'} 
-                                                    icon={FiStar} 
-                                                    badge 
+                                                <DetailRow
+                                                    label="Quality Rating"
+                                                    value={project.wa_quality_rating || 'High'}
+                                                    icon={FiStar}
+                                                    badge
                                                 />
-                                                <DetailRow 
-                                                    label="Display Name" 
-                                                    value={project.wa_display_name || project.project_name || '-'} 
-                                                    icon={FiAward} 
+                                                <DetailRow
+                                                    label="Display Name"
+                                                    value={project.wa_display_name || project.project_name || '-'}
+                                                    icon={FiAward}
                                                 />
-                                                <DetailRow 
-                                                    label="Daily Template Limit" 
-                                                    value={project.daily_template_limit || 'Unlimited'} 
-                                                    icon={FiCpu} 
-                                                    badge 
+                                                <DetailRow
+                                                    label="Daily Template Limit"
+                                                    value={project.daily_template_limit || 'Unlimited'}
+                                                    icon={FiCpu}
+                                                    badge
                                                 />
-                                                <DetailRow 
-                                                    label="Business Manager Status" 
-                                                    value={project.fb_business_manager_status || 'Active'} 
-                                                    icon={project.fb_business_manager_status === 'Active' ? FiUnlock : FiLock} 
-                                                    badge 
+                                                <DetailRow
+                                                    label="Business Manager Status"
+                                                    value={project.fb_business_manager_status || 'Active'}
+                                                    icon={project.fb_business_manager_status === 'Active' ? FiUnlock : FiLock}
+                                                    badge
                                                 />
-                                                <DetailRow 
-                                                    label="Billing Currency" 
-                                                    value={project.billing_currency || 'USD'} 
-                                                    icon={FiDollarSign} 
-                                                    badge 
+                                                <DetailRow
+                                                    label="Billing Currency"
+                                                    value={project.billing_currency || 'USD'}
+                                                    icon={FiDollarSign}
+                                                    badge
                                                 />
-                                                <DetailRow 
-                                                    label="Created Date" 
-                                                    value={project.created_at ? new Date(project.created_at).toLocaleDateString() : '-'} 
-                                                    icon={FiCalendar} 
+                                                <DetailRow
+                                                    label="Created Date"
+                                                    value={project.created_at ? new Date(project.created_at).toLocaleDateString() : '-'}
+                                                    icon={FiCalendar}
                                                 />
                                                 {project.updated_at && (
-                                                    <DetailRow 
-                                                        label="Last Updated" 
-                                                        value={new Date(project.updated_at).toLocaleDateString()} 
-                                                        icon={FiClock} 
+                                                    <DetailRow
+                                                        label="Last Updated"
+                                                        value={new Date(project.updated_at).toLocaleDateString()}
+                                                        icon={FiClock}
                                                     />
                                                 )}
                                             </dl>
@@ -357,7 +339,7 @@ const ProjectDetails = () => {
                                                 Business Profile
                                             </h2>
                                         </div>
-                                        
+
                                         <div className="p-6 text-center">
                                             <div className="relative inline-block mb-5">
                                                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full blur-xl opacity-20"></div>
@@ -378,7 +360,7 @@ const ProjectDetails = () => {
                                                     </div>
                                                 )}
                                             </div>
-                                            
+
                                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
                                                 {profile.about || profile.name || 'Business Profile'}
                                             </h3>
@@ -406,11 +388,11 @@ const ProjectDetails = () => {
                                                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 text-left">Websites</p>
                                                     <div className="flex flex-wrap gap-2">
                                                         {profile.websites.map((site, i) => (
-                                                            <a 
-                                                                key={i} 
-                                                                href={site} 
-                                                                target="_blank" 
-                                                                rel="noreferrer" 
+                                                            <a
+                                                                key={i}
+                                                                href={site}
+                                                                target="_blank"
+                                                                rel="noreferrer"
                                                                 className="p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-200"
                                                             >
                                                                 <FiLink size={16} />
@@ -448,8 +430,8 @@ const StatusBadge = ({ condition, trueLabel, falseLabel, icon: Icon, color = "gr
         if (!condition) {
             return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700';
         }
-        
-        switch(color) {
+
+        switch (color) {
             case 'green':
                 return 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-700 border-green-200 dark:text-green-400 dark:border-green-800';
             case 'emerald':
