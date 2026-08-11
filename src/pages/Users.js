@@ -23,11 +23,16 @@ import {
     FiRefreshCw,
     FiDollarSign
 } from 'react-icons/fi';
+<<<<<<< HEAD
 import { apiCall } from '../utils/apiCall';
 import ManagementTable from '../component/common/ManagementTable';
 import ActionMenu from '../component/common/ActionMenu';
 import Pagination from '../component/common/PaginationComponent';
 import SelectField from '../component/common/SelectField';
+=======
+import axios from 'axios';
+import { API_BASE_URL, PORTAL_URL } from '../config/api';
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
 const Users = () => {
     const navigate = useNavigate();
@@ -36,7 +41,12 @@ const Users = () => {
     const [loading, setLoading] = useState(true);
     const [exportLoading, setExportLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+<<<<<<< HEAD
     const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, total_pages: 1 });
+=======
+    const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
+    const [tokens, setTokens] = useState(null);
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterRole, setFilterRole] = useState('');
     const [filterKycVerified, setFilterKycVerified] = useState('');
@@ -48,6 +58,7 @@ const Users = () => {
         setLoading(true);
         try {
             const limit = Math.min(Math.max(pagination.limit || 10, 1), 100);
+<<<<<<< HEAD
             const params = new URLSearchParams({ page: String(page), limit: String(limit) });
             if (searchTerm) params.set('search', searchTerm);
             if (filterStatus !== 'all') params.set('status', filterStatus === 'active' ? '1' : '0');
@@ -60,6 +71,15 @@ const Users = () => {
                     setUsers(data.data);
                     setPagination(data.pagination);
                 }
+=======
+            const response = await axios.get(`${API_BASE_URL}/admin/users?page=${page}&limit=${limit}`, {
+                headers: { 'x-token': tokens.token }
+            });
+
+            if (!response.data.error) {
+                setUsers(response.data.data);
+                setPagination(response.data.pagination);
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
             }
         } catch (err) {
             console.error("Failed to fetch users", err);
@@ -74,19 +94,39 @@ const Users = () => {
 
     const fetchAllUsersForExport = async () => {
         try {
+<<<<<<< HEAD
             const firstPageRes = await apiCall(`/admin/users?page=1&limit=1`);
             const firstPage = await firstPageRes.json();
             const totalUsers = firstPage.pagination.total;
             const totalPages = Math.ceil(totalUsers / 100);
+=======
+            // First get total count
+            const firstPage = await axios.get(`${API_BASE_URL}/admin/users?page=1&limit=1`, {
+                headers: { 'x-token': tokens.token }
+            });
+
+            const totalUsers = firstPage.data.pagination.total;
+            const totalPages = Math.ceil(totalUsers / 100); // Fetch 100 per page for export
+
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
             let allUsers = [];
 
             for (let page = 1; page <= totalPages; page++) {
+<<<<<<< HEAD
                 const response = await apiCall(`/admin/users?page=${page}&limit=100`);
                 if (response.ok) {
                     const data = await response.json();
                     if (!data.error) {
                         allUsers = [...allUsers, ...data.data];
                     }
+=======
+                const response = await axios.get(`${API_BASE_URL}/admin/users?page=${page}&limit=100`, {
+                    headers: { 'x-token': tokens.token }
+                });
+
+                if (!response.data.error) {
+                    allUsers = [...allUsers, ...response.data.data];
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
                 }
             }
             return allUsers;
@@ -100,7 +140,7 @@ const Users = () => {
 
     const handleLoginAsUser = (user) => {
         if (!user?.email) return;
-        const baseUrl = 'https://wichat-sigma.vercel.app/login';
+        const baseUrl = `${PORTAL_URL}/login`;
         const params = new URLSearchParams({
             username: user.email,
             password: user.password || ''
@@ -109,6 +149,25 @@ const Users = () => {
         window.open(url, '_blank', 'noopener,noreferrer');
     };
 
+<<<<<<< HEAD
+=======
+    const handleOpenProjectsModal = (user) => {
+        setSelectedUserForProjects(user);
+        setProjectsModalOpen(true);
+    };
+
+    const handleCloseProjectsModal = () => {
+        setProjectsModalOpen(false);
+        setSelectedUserForProjects(null);
+    };
+
+    // Handle balance click – navigates to transaction history page
+    const handleBalanceClick = (user) => {
+        // Navigate to the transaction history page, passing user and tokens via state
+        navigate(`/users/${user.username}/transactions`, { state: { user, tokens } });
+    };
+
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
         try {
@@ -129,6 +188,10 @@ const Users = () => {
         return num.toFixed(2);
     };
 
+<<<<<<< HEAD
+=======
+    // Export ALL Data to CSV
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
     const exportAllToCSV = async () => {
         setExportLoading(true);
         try {
@@ -301,6 +364,7 @@ const Users = () => {
                         )}
                     </div>
                 </div>
+<<<<<<< HEAD
                 <SelectField options={[{ value: 'all', label: 'All statuses' }, { value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]} value={{ value: filterStatus, label: filterStatus === 'all' ? 'All statuses' : filterStatus === 'active' ? 'Active' : 'Inactive' }} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterStatus(option.value); }} isSearchable={false} />
                 <SelectField options={[{ value: '', label: 'All roles' }, { value: 'user', label: 'User' }, { value: 'admin', label: 'Admin' }]} value={[{ value: '', label: 'All roles' }, { value: 'user', label: 'User' }, { value: 'admin', label: 'Admin' }].find(option => option.value === filterRole)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterRole(option.value); }} isSearchable={false} />
                 <SelectField options={[{ value: '', label: 'All KYC' }, { value: '1', label: 'KYC verified' }, { value: '0', label: 'KYC unverified' }]} value={[{ value: '', label: 'All KYC' }, { value: '1', label: 'KYC verified' }, { value: '0', label: 'KYC unverified' }].find(option => option.value === filterKycVerified)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterKycVerified(option.value); }} isSearchable={false} />
@@ -317,6 +381,9 @@ const Users = () => {
             />
 
             <Pagination currentPage={pagination.page} totalItems={pagination.total} itemsPerPage={pagination.limit} onPageChange={page => setPagination(p => ({ ...p, page }))} onLimitChange={limit => setPagination(p => ({ ...p, limit, page: 1 }))} className="mt-4" />
+=======
+            )}
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
         </div>
     );
 };

@@ -16,10 +16,14 @@ import {
 } from 'react-icons/fi';
 import { apiCall } from '../utils/apiCall';
 import ProjectChargesModal from '../component/Modals/ProjectChargesModal';
+<<<<<<< HEAD
 import toast from 'react-hot-toast';
 import Pagination from '../component/common/PaginationComponent';
 import SelectField from '../component/common/SelectField';
 import ManagementTable from '../component/common/ManagementTable';
+=======
+import { API_BASE_URL } from '../config/api';
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
 const Projects = () => {
 
@@ -55,6 +59,17 @@ const Projects = () => {
     const fetchProjects = useCallback(async () => {
         if (!tokens?.token) return;
         setLoading(true);
+<<<<<<< HEAD
+=======
+        setError('');
+        try {
+            const response = await axios.get(`${API_BASE_URL}/admin/projects`, {
+                headers: {
+                    'x-token': tokens.token,
+                    'username': tokens.username
+                }
+            });
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
         try {
             const params = new URLSearchParams({ page: String(pagination.page), limit: String(pagination.limit) });

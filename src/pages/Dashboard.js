@@ -20,9 +20,14 @@ import {
     FiRefreshCw,
     FiChevronRight
 } from 'react-icons/fi';
+<<<<<<< HEAD
 import { apiCall } from '../utils/apiCall';
 import toast from 'react-hot-toast';
 import ActionCard from '../component/common/ActionCard';
+=======
+import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
 function AdminDashboard() {
 
@@ -49,9 +54,17 @@ function AdminDashboard() {
 
             try {
                 setLoading(true);
+<<<<<<< HEAD
                 const response = await apiCall('/admin/dashboard/summary', 'GET', null, {
                     'x-token': tokens.token,
                     'username': tokens.username
+=======
+                const response = await axios.get(`${API_BASE_URL}/admin/dashboard/summary`, {
+                    headers: {
+                        'x-token': tokens.token,
+                        'username': tokens.username
+                    }
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
                 });
 
                 if (response.ok) {

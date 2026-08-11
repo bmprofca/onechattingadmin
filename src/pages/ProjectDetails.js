@@ -7,8 +7,13 @@ import {
     FiDollarSign, FiStar, FiCpu, FiHash, FiCalendar,
     FiThumbsUp, FiTrendingUp, FiAward, FiLock, FiUnlock
 } from 'react-icons/fi';
+<<<<<<< HEAD
 import { apiCall } from '../utils/apiCall';
 import toast from 'react-hot-toast';
+=======
+import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 
 const ProjectDetails = () => {
 
@@ -40,11 +45,20 @@ const ProjectDetails = () => {
             setLoading(true);
 
             try {
+<<<<<<< HEAD
                 const response = await apiCall(`/admin/projects/${project_id}/meta-details`);
                 const data = await response.json();
 
                 if (response.ok && !data?.error) {
                     setMetaDetails(data.data);
+=======
+                const response = await axios.get(
+                    `${API_BASE_URL}/admin/projects/${project_id}/meta-details`,
+                    { headers: { 'x-token': tokens.token, 'username': tokens.username } }
+                );
+                if (!response.data.error) {
+                    setMetaDetails(response.data.data);
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
                 } else {
                     toast.error(data?.message || data?.error || 'Failed to fetch project details');
                 }

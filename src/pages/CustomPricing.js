@@ -1,18 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    FiSearch, FiDollarSign, FiUsers, FiPackage, FiRefreshCw,
+    FiSearch, FiUsers, FiPackage, FiRefreshCw,
     FiTrash2, FiAlertCircle, FiCheckCircle, FiX, FiFilter, FiChevronDown,
-    FiEdit2, FiPlus, FiUser, FiCalendar, FiPercent
+    FiEdit2, FiPlus, FiUser, FiPercent
 } from 'react-icons/fi';
 import axios from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Encrypt } from '../pages/encryption/payload-encryption';
+<<<<<<< HEAD
 import toast from 'react-hot-toast';
 import ManagementTable from '../component/common/ManagementTable';
 import ActionCard from '../component/common/ActionCard';
 
 const BASE_URL = (process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540') + '/admin';
+=======
+import { API_BASE_URL } from '../config/api';
+
+const BASE_URL = `${API_BASE_URL}/admin`;
+>>>>>>> 962a69ede8c64156e6e1174651a3c12c0e6cf412
 const BASE_PACKAGE = {
     monthly: 499,
     yearly: 4999
@@ -135,6 +141,7 @@ const CustomPricing = () => {
         if (showUserSearchModal) {
             fetchUsers(userSearchTerm);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showUserSearchModal, userSearchTerm, tokens]);
 
     const handleCreatePackage = async () => {
@@ -926,7 +933,7 @@ const CustomPricing = () => {
                                                             {user.country_code} {user.mobile} • @{user.username}
                                                         </p>
                                                     </div>
-                                                    {user.status == 1 && (
+                                                    {user.status === 1 && (
                                                         <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2 py-1 rounded">
                                                             Active
                                                         </span>
