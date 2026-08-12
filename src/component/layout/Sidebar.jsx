@@ -5,7 +5,8 @@ import {
   Briefcase,
   Package,
   Gift,
-  Bot
+  Bot,
+  Coins
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 
@@ -55,6 +56,11 @@ const Sidebar = ({
       icon: Bot,
       label: "AI Providers",
       path: "/ai-providers",
+    },
+    {
+      icon:Coins,
+      label:"AI Pricing",
+      path: "/ai-pricing",
     }
   ];
 

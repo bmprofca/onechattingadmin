@@ -13,6 +13,7 @@ import UserTransactionHistory from "./component/Modals/UserTransactionHistory";
 import AiProviders from './pages/AiProviders';
 import MainLayout from './component/layout/MainLayout';
 import ProtectedRoute from './component/ProtectedRoute';
+import AiModelPricing from './pages/AiModelPricing';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path="/subscription-packs" element={<SubscriptionPacks />} />
           <Route path="/custom-pricing" element={<CustomPricing />} />
           <Route path="/ai-providers" element={<AiProviders />} />
+          <Route path="/ai-pricing" element={<AiModelPricing />} />
           <Route path="*" element={<Dashboard />} />
         </Route>
       </Route>
