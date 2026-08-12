@@ -95,18 +95,18 @@ const SubscriptionPacks = () => {
     const packageActions = pack => [{ label: 'Edit package', icon: <FiEdit2 />, onClick: () => openModal(pack) }, { label: 'Delete package', icon: <FiTrash2 />, className: 'text-rose-600 dark:text-rose-400', onClick: () => handleDelete(pack.package_id) }];
     const formatCurrency = amount => `₹${Number(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-    return <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8 py-8">
+    return <div className="min-h-screen">
+        <div className="max-w-8xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                <div><h1 className="text-2xl font-bold text-gray-900 dark:text-white">Subscription Packages</h1><p className="text-sm text-gray-500 dark:text-gray-400">Manage subscription plans and pricing</p></div>
-                <button onClick={() => openModal()} className="flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm"><FiPlus className="mr-2" /> Create Package</button>
+                <div className="flex items-center gap-3"><div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20"><FiPackage className="text-white" size={24} /></div><div><h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Subscription Packages</h1><p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage subscription plans and pricing</p></div></div>
+                <button onClick={() => openModal()} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:scale-[1.02] transition-all"><FiPlus size={16} /> Create Package</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <ActionCard icon={<FiPlus className="text-white text-2xl" />} title="New package" description="Create a package with its price and validity." buttonText="Create package" onClick={() => openModal()} gradient="indigo" delay={0.1} />
                 <Stat label="Total Packages" value={packs.length} icon={<FiPackage size={24} />} color="indigo" />
                 <Stat label="Starting Price" value={packs.length ? formatCurrency(Math.min(...packs.map(p => Number(p.amount) || 0))) : '—'} icon={<FiDollarSign size={24} />} color="green" />
+                <Stat label="Max Price" value={packs.length ? formatCurrency(Math.max(...packs.map(p => Number(p.amount) || 0))) : '—'} icon={<FiDollarSign size={24} />} color="green" />
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mb-6 flex gap-4">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6 flex gap-4">
                 <div className="relative flex-1"><FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" /><input value={searchTerm} onChange={e => { setPagination(p => ({ ...p, page: 1 })); setSearchTerm(e.target.value); }} placeholder="Search by name, package ID or validity..." className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg dark:text-white" /></div>
                 <button onClick={fetchPacks} title="Refresh packages" className="p-2 text-gray-400 hover:text-indigo-600"><FiRefreshCw size={20} className={loading ? 'animate-spin' : ''} /></button>
             </div>
@@ -119,11 +119,11 @@ const SubscriptionPacks = () => {
             </div>
             {loading ? <div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" /></div>
                 : !packs.length ? <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-xl border border-dashed border-gray-200"><FiPackage className="mx-auto text-gray-300 mb-3" size={48} /><p className="text-gray-500">No subscription packages found</p></div>
-                : <><ManagementTable rows={packs} columns={packageColumns} rowKey="package_id" getActions={packageActions} onRowClick={openModal} accent="indigo" /><div className="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{packs.map(pack => <div key={pack.package_id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
-                    <div className="flex items-start justify-between gap-3"><div><h3 className="font-semibold text-lg text-gray-900 dark:text-white">{pack.name}</h3><span className="font-mono text-xs text-gray-500">{pack.package_id}</span></div><span className="px-2 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 rounded text-xs font-medium">{pack.validity}</span></div>
-                    <div className="text-3xl font-bold text-gray-900 dark:text-white mt-6">{formatCurrency(pack.amount)}</div><p className="text-xs text-gray-500 mt-1">Validity: {pack.validity}</p>
-                    <div className="flex gap-2 pt-4 mt-4 border-t border-gray-100 dark:border-gray-700"><button onClick={() => openModal(pack)} className="flex-1 flex justify-center items-center gap-2 p-2 text-sm text-indigo-600"><FiEdit2 size={14} />Edit</button><button onClick={() => handleDelete(pack.package_id)} className="flex-1 flex justify-center items-center gap-2 p-2 text-sm text-rose-600"><FiTrash2 size={14} />Delete</button></div>
-                </div>)}</div></>}
+                    : <><ManagementTable rows={packs} columns={packageColumns} rowKey="package_id" getActions={packageActions} onRowClick={openModal} accent="indigo" /><div className="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{packs.map(pack => <div key={pack.package_id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+                        <div className="flex items-start justify-between gap-3"><div><h3 className="font-semibold text-lg text-gray-900 dark:text-white">{pack.name}</h3><span className="font-mono text-xs text-gray-500">{pack.package_id}</span></div><span className="px-2 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 rounded text-xs font-medium">{pack.validity}</span></div>
+                        <div className="text-3xl font-bold text-gray-900 dark:text-white mt-6">{formatCurrency(pack.amount)}</div><p className="text-xs text-gray-500 mt-1">Validity: {pack.validity}</p>
+                        <div className="flex gap-2 pt-4 mt-4 border-t border-gray-100 dark:border-gray-700"><button onClick={() => openModal(pack)} className="flex-1 flex justify-center items-center gap-2 p-2 text-sm text-indigo-600"><FiEdit2 size={14} />Edit</button><button onClick={() => handleDelete(pack.package_id)} className="flex-1 flex justify-center items-center gap-2 p-2 text-sm text-rose-600"><FiTrash2 size={14} />Delete</button></div>
+                    </div>)}</div></>}
             <Pagination currentPage={pagination.page} totalItems={pagination.total || packs.length} itemsPerPage={pagination.limit} onPageChange={page => setPagination(p => ({ ...p, page }))} onLimitChange={limit => setPagination(p => ({ ...p, limit, page: 1 }))} className="mt-6" />
         </div>
         <AnimatePresence>{showModal && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeModal} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"><motion.div initial={{ scale: .95 }} animate={{ scale: 1 }} onClick={e => e.stopPropagation()} className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-xl shadow-2xl">
@@ -134,6 +134,6 @@ const SubscriptionPacks = () => {
 };
 
 const Field = ({ label, children }) => <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}<span className="block mt-1">{children}</span></label>;
-const Stat = ({ label, value, icon, color }) => <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between"><div><p className="text-sm text-gray-500">{label}</p><h3 className="text-2xl font-bold dark:text-white">{value}</h3></div><div className={`p-3 rounded-lg ${color === 'green' ? 'bg-green-50 dark:bg-green-900/30 text-green-600' : 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600'}`}>{icon}</div></div>;
+const Stat = ({ label, value, icon, color }) => <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between hover:shadow-xl transition-shadow"><div><p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{label}</p><h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{value}</h3></div><div className={`p-4 rounded-2xl shadow-lg text-white ${color === 'green' ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-green-500/20' : 'bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-indigo-500/20'}`}>{icon}</div></div>;
 
 export default SubscriptionPacks;

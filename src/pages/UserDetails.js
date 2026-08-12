@@ -218,7 +218,7 @@ const UserDetails = () => {
     };
 
     fetchProfile();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username]);
 
   // Fetch projects when Projects tab is active
@@ -252,7 +252,7 @@ const UserDetails = () => {
     };
 
     fetchProjects();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username, activeTab, projectsPage, projectsSearch, projectsLimit]);
 
   // Fetch login tokens when Login tab is active
@@ -285,7 +285,7 @@ const UserDetails = () => {
     };
 
     fetchLoginTokens();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username, activeTab, loginPage, loginLimit]);
 
   // Fetch transactions when Transactions tab is active
@@ -341,7 +341,7 @@ const UserDetails = () => {
     if (activeTab === 'transactions') {
       fetchTransactions();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username, activeTab, transactionsPage, transactionsLimit, transactionsFilters]);
 
   // Fetch subscriptions when Subscriptions tab is active
@@ -378,7 +378,7 @@ const UserDetails = () => {
     if (activeTab === 'subscriptions') {
       fetchSubscriptions();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username, activeTab, subscriptionsPage, subscriptionsSearch, subscriptionsLimit]);
 
   // Fetch custom package when Subscriptions tab is active
@@ -415,7 +415,7 @@ const UserDetails = () => {
     if (activeTab === 'subscriptions') {
       fetchCustomPackage();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminTokens, username, activeTab]);
 
   // Handle wallet credit/debit
@@ -1231,7 +1231,7 @@ const UserDetails = () => {
       <div
         className={`transition-all duration-300 ease-in-out`}
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8 py-8">
+        <div className="max-w-8xl mx-auto">
           {/* Success Message */}
           {success && (
             <div className="mb-4 flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300">
@@ -1567,8 +1567,8 @@ const UserDetails = () => {
                             <button
                               onClick={() => setShowFilters(!showFilters)}
                               className={`px-4 py-2.5 border rounded-lg text-sm font-medium flex items-center transition-all ${Object.values(transactionsFilters).some(v => v && v !== get30DaysAgo() && v !== getTodayDate() && v !== '')
-                                  ? 'border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
-                                  : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                ? 'border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                                 }`}
                             >
                               <FiFilter className="mr-2" size={14} />
@@ -1867,8 +1867,8 @@ const UserDetails = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {/* Monthly Package */}
                           <div className={`p-4 rounded-lg border-2 transition-all ${hasCustomPackage
-                              ? 'border-purple-200 bg-purple-50 dark:border-purple-900 dark:bg-purple-900/10'
-                              : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800'
+                            ? 'border-purple-200 bg-purple-50 dark:border-purple-900 dark:bg-purple-900/10'
+                            : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800'
                             }`}>
                             <div className="flex items-center justify-between mb-2">
                               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Monthly</h3>
@@ -1886,8 +1886,8 @@ const UserDetails = () => {
 
                           {/* Yearly Package */}
                           <div className={`p-4 rounded-lg border-2 transition-all ${hasCustomPackage
-                              ? 'border-purple-200 bg-purple-50 dark:border-purple-900 dark:bg-purple-900/10'
-                              : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800'
+                            ? 'border-purple-200 bg-purple-50 dark:border-purple-900 dark:bg-purple-900/10'
+                            : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800'
                             }`}>
                             <div className="flex items-center justify-between mb-2">
                               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Yearly</h3>
@@ -1994,8 +1994,8 @@ const UserDetails = () => {
                   onClick={handleWalletAction}
                   disabled={walletLoading || !walletAmount}
                   className={`flex-1 py-2.5 rounded-lg text-sm font-medium text-white transition-colors flex items-center justify-center gap-2 ${walletAction === 'credit'
-                      ? 'bg-emerald-600 hover:bg-emerald-700'
-                      : 'bg-rose-600 hover:bg-rose-700'
+                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                    : 'bg-rose-600 hover:bg-rose-700'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {walletLoading ? (

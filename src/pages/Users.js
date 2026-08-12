@@ -238,86 +238,96 @@ const Users = () => {
     ];
 
     return (
-        <div className="w-full px-4 sm:px-6 py-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Manage, monitor and verify system users across all projects.</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <button onClick={() => fetchUsers(pagination.page)} className="flex items-center px-4 py-2 bg-white dark:bg-gray-800 border rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm">
-                        <FiRefreshCw className="mr-2" /> Refresh
-                    </button>
-                    <button onClick={exportAllToCSV} disabled={exportLoading} className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 shadow-sm disabled:opacity-50">
-                        {exportLoading ? <><FiRefreshCw className="mr-2 animate-spin" /> Exporting...</> : <><FiDownload className="mr-2" /> Export All</>}
-                    </button>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between">
+        <div className="min-h-screen">
+            <div className="max-w-8xl mx-auto">
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20"><FiUsers className="text-white" size={24} /></div>
                         <div>
-                            <p className="text-sm text-gray-500">Total Users</p>
-                            <h3 className="text-2xl font-bold">{pagination.total}</h3>
+                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">User Management</h1>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage, monitor and verify system users across all projects.</p>
                         </div>
-                        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg"><FiUsers size={24} /></div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => fetchUsers(pagination.page)} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/90 dark:bg-gray-800/90 border border-gray-200/50 dark:border-gray-700/50 text-sm font-medium hover:bg-white dark:hover:bg-gray-700 shadow-lg transition-all">
+                            <FiRefreshCw className="mr-2" /> Refresh
+                        </button>
+                        <button onClick={exportAllToCSV} disabled={exportLoading} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl transition-all disabled:opacity-50">
+                            {exportLoading ? <><FiRefreshCw className="mr-2 animate-spin" /> Exporting...</> : <><FiDownload className="mr-2" /> Export All</>}
+                        </button>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-500">Active Now</p>
-                            <h3 className="text-2xl font-bold">{users.filter(u => u.status === '1').length}</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Users</p>
+                                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{pagination.total}</h3>
+                            </div>
+                            <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/20"><FiUsers className="text-white" size={24} /></div>
                         </div>
-                        <div className="p-3 bg-green-50 text-green-600 rounded-lg"><FiActivity size={24} /></div>
+                    </div>
+                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Now</p>
+                                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{users.filter(u => u.status === '1').length}</h3>
+                            </div>
+                            <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg shadow-green-500/20"><FiActivity className="text-white" size={24} /></div>
+                        </div>
+                    </div>
+                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Inactive Users</p>
+                                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{users.filter(u => u.status !== '1').length}</h3>
+                            </div>
+                            <div className="p-4 bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl shadow-lg shadow-red-500/20"><FiUserX className="text-white" size={24} /></div>
+                        </div>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-500">Inactive Users</p>
-                            <h3 className="text-2xl font-bold">{users.filter(u => u.status !== '1').length}</h3>
+
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl lg:flex justify-between gap-3 shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6">
+                    <div className="flex w-full max-w-[600px] flex-col md:flex-row gap-4 md:mb-2 lg:mb-0 mb-2">
+                        <div className="relative flex-1">
+                            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search by name, email, username or mobile..."
+                                className="w-full pl-11 pr-10 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
+                                value={searchTerm}
+                                onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setSearchTerm(e.target.value); }}
+                            />
+                            {searchTerm && (
+                                <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                    <FiXCircle size={16} />
+                                </button>
+                            )}
                         </div>
-                        <div className="p-3 bg-red-50 text-red-600 rounded-lg"><FiUserX size={24} /></div>
                     </div>
+                    <div className="flex gap-2 justify-start items-center ">
+                        <SelectField options={[{ value: 'all', label: 'All statuses' }, { value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]} value={{ value: filterStatus, label: filterStatus === 'all' ? 'All statuses' : filterStatus === 'active' ? 'Active' : 'Inactive' }} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterStatus(option.value); }} isSearchable={false} />
+                        <SelectField options={[{ value: '', label: 'All roles' }, { value: 'user', label: 'User' }, { value: 'admin', label: 'Admin' }]} value={[{ value: '', label: 'All roles' }, { value: 'user', label: 'User' }, { value: 'admin', label: 'Admin' }].find(option => option.value === filterRole)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterRole(option.value); }} isSearchable={false} />
+                        <SelectField options={[{ value: '', label: 'All KYC' }, { value: '1', label: 'KYC verified' }, { value: '0', label: 'KYC unverified' }]} value={[{ value: '', label: 'All KYC' }, { value: '1', label: 'KYC verified' }, { value: '0', label: 'KYC unverified' }].find(option => option.value === filterKycVerified)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterKycVerified(option.value); }} isSearchable={false} />
+                    </div>
+
                 </div>
+
+                <div className="w-full overflow-x-auto rounded-2xl">
+                    <ManagementTable
+                        columns={columns}
+                        rows={filteredUsers}
+                        rowKey="username"
+                        getActions={getActions}
+                        activeId={activeActionId}
+                        onToggleAction={setActiveActionId}
+                        onRowClick={(user) => navigate(`/users/${encodeURIComponent(user.username)}`)}
+                    />
+                </div>
+
+                <Pagination currentPage={pagination.page} totalItems={pagination.total} itemsPerPage={pagination.limit} onPageChange={page => setPagination(p => ({ ...p, page }))} onLimitChange={limit => setPagination(p => ({ ...p, limit, page: 1 }))} className="mt-4" />
             </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
-                <div className="flex flex-col md:flex-row gap-4">
-                    <div className="relative flex-1">
-                        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Search by name, email, username or mobile..."
-                            className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                            value={searchTerm}
-                            onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setSearchTerm(e.target.value); }}
-                        />
-                        {searchTerm && (
-                            <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                <FiXCircle size={16} />
-                            </button>
-                        )}
-                    </div>
-                </div>
-                <SelectField options={[{ value: 'all', label: 'All statuses' }, { value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]} value={{ value: filterStatus, label: filterStatus === 'all' ? 'All statuses' : filterStatus === 'active' ? 'Active' : 'Inactive' }} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterStatus(option.value); }} isSearchable={false} />
-                <SelectField options={[{ value: '', label: 'All roles' }, { value: 'user', label: 'User' }, { value: 'admin', label: 'Admin' }]} value={[{ value: '', label: 'All roles' }, { value: 'user', label: 'User' }, { value: 'admin', label: 'Admin' }].find(option => option.value === filterRole)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterRole(option.value); }} isSearchable={false} />
-                <SelectField options={[{ value: '', label: 'All KYC' }, { value: '1', label: 'KYC verified' }, { value: '0', label: 'KYC unverified' }]} value={[{ value: '', label: 'All KYC' }, { value: '1', label: 'KYC verified' }, { value: '0', label: 'KYC unverified' }].find(option => option.value === filterKycVerified)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setFilterKycVerified(option.value); }} isSearchable={false} />
-            </div>
-
-            <ManagementTable 
-                columns={columns} 
-                rows={filteredUsers} 
-                rowKey="username"
-                getActions={getActions}
-                activeId={activeActionId}
-                onToggleAction={setActiveActionId}
-                onRowClick={(user) => navigate(`/users/${encodeURIComponent(user.username)}`)}
-            />
-
-            <Pagination currentPage={pagination.page} totalItems={pagination.total} itemsPerPage={pagination.limit} onPageChange={page => setPagination(p => ({ ...p, page }))} onLimitChange={limit => setPagination(p => ({ ...p, limit, page: 1 }))} className="mt-4" />
         </div>
     );
 };

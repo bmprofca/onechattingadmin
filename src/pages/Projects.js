@@ -124,9 +124,9 @@ const Projects = () => {
     const projectActions = project => [{ label: 'View charges', icon: <FiDollarSign />, onClick: () => handleOpenCharges(project) }];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="min-h-screen">
             <div className={`transition-all duration-300 ease-in-out `}>
-                <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8 py-8">
+                <div className="max-w-8xl mx-auto">
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div>
@@ -194,8 +194,8 @@ const Projects = () => {
                     </div>
 
                     {/* Search and Filters */}
-                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6">
-                        <div className="flex flex-col gap-4">
+                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm lg:flex justify-between gap-2 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6">
+                        <div className="flex w-full max-w-[600px] flex-col md:flex-row gap-4 md:mb-2 lg:mb-0 mb-2">
                             {/* Search Bar */}
                             <div className="relative flex-1">
                                 <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -207,13 +207,10 @@ const Projects = () => {
                                     onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setSearchTerm(e.target.value); }}
                                 />
                             </div>
-
+                        </div>
+                        <div className="flex gap-2 justify-start items-center ">
                             {/* Filter Row */}
                             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                                    <FiFilter size={16} />
-                                    <span>Filters:</span>
-                                </div>
 
                                 {/* Status Filter */}
                                 <SelectField options={[{ value: 'all', label: 'All Status' }, { value: 'active', label: 'Active Only' }, { value: 'inactive', label: 'Inactive Only' }]} value={[{ value: 'all', label: 'All Status' }, { value: 'active', label: 'Active Only' }, { value: 'inactive', label: 'Inactive Only' }].find(option => option.value === statusFilter)} onChange={option => { setPagination(p => ({ ...p, page: 1 })); setStatusFilter(option.value); }} isSearchable={false} />
@@ -270,183 +267,183 @@ const Projects = () => {
                     <div className="w-full overflow-x-visible">
                         {!loading && <ManagementTable rows={filteredProjects} columns={projectColumns} rowKey="project_id" getActions={projectActions} onRowClick={project => navigate(`/projects/${project.project_id}`)} accent="indigo" emptyState={<div className="py-20 text-center text-gray-500 dark:text-gray-400">No projects found. Adjust or clear the active filters.</div>} />}
                         <div className={loading ? '' : 'hidden'}>
-                        <table className="w-full text-center border-separate border-spacing-0">
-                            <thead className="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900">
-                                <tr>
-                                    <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700 rounded-tl-2xl">
-                                        Project Details
-                                    </th>
-                                    <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700">
-                                        IDs & References
-                                    </th>
-                                    <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700">
-                                        Status
-                                    </th>
-                                    <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700">
-                                        WABA Connection
-                                    </th>
-                                    <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700 rounded-tr-2xl">
-                                        Charges
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white dark:bg-gray-800">
-                                {loading ? (
-                                    [...Array(8)].map((_, i) => (
-                                        <tr key={i} className="animate-pulse hover:bg-gray-50/50 dark:hover:bg-gray-700/30 border-b border-gray-100 dark:border-gray-700">
-                                            <td className="px-6 py-5" colSpan="5">
-                                                <div className="flex items-center justify-center space-x-4">
-                                                    <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
-                                                    <div className="flex-1 space-y-3">
-                                                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto"></div>
-                                                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto"></div>
+                            <table className="w-full text-center border-separate border-spacing-0">
+                                <thead className="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900">
+                                    <tr>
+                                        <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700 rounded-tl-2xl">
+                                            Project Details
+                                        </th>
+                                        <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700">
+                                            IDs & References
+                                        </th>
+                                        <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700">
+                                            Status
+                                        </th>
+                                        <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700">
+                                            WABA Connection
+                                        </th>
+                                        <th className="px-6 py-5 text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider border-b-2 border-gray-200 dark:border-gray-700 rounded-tr-2xl">
+                                            Charges
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white dark:bg-gray-800">
+                                    {loading ? (
+                                        [...Array(8)].map((_, i) => (
+                                            <tr key={i} className="animate-pulse hover:bg-gray-50/50 dark:hover:bg-gray-700/30 border-b border-gray-100 dark:border-gray-700">
+                                                <td className="px-6 py-5" colSpan="5">
+                                                    <div className="flex items-center justify-center space-x-4">
+                                                        <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+                                                        <div className="flex-1 space-y-3">
+                                                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto"></div>
+                                                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto"></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : filteredProjects.length > 0 ? (
+                                        filteredProjects.map((project, index) => {
+                                            const isActive =
+                                                project.status === '1' ||
+                                                project.status === 1 ||
+                                                project.status === 'active';
+                                            const isConnected =
+                                                project.is_waba_connected === 1 ||
+                                                project.is_waba_connected === '1' ||
+                                                project.is_waba_connected === true;
+
+                                            const isLast = index === filteredProjects.length - 1;
+
+                                            return (
+                                                <tr
+                                                    key={project.id || project.project_id}
+                                                    className={`hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-blue-50/50 dark:hover:from-indigo-900/20 dark:hover:to-blue-900/20 transition-all duration-200 cursor-pointer group border-b border-gray-100 dark:border-gray-700 ${isLast ? 'border-b-0' : ''
+                                                        }`}
+                                                    onClick={() => navigate(`/projects/${project.project_id}`)}
+                                                >
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex items-center justify-center">
+                                                            <div className="flex items-center">
+                                                                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                                                                    {project.project_name?.charAt(0) || 'P'}
+                                                                </div>
+                                                                <div className="ml-4 text-left">
+                                                                    <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                                                        {project.project_name}
+                                                                    </div>
+                                                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                                        {project.business_id ? `Business ID: ${project.business_id}` : 'No Business ID'}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex flex-col items-center space-y-2">
+                                                            <div className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 block">Project ID</span>
+                                                                <span className="text-sm font-mono font-medium text-gray-900 dark:text-white">
+                                                                    {project.project_id}
+                                                                </span>
+                                                            </div>
+                                                            <div className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400 block">Internal ID</span>
+                                                                <span className="text-sm font-mono font-medium text-gray-900 dark:text-white">
+                                                                    {project.id}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex items-center justify-center">
+                                                            {isActive ? (
+                                                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-200 dark:border-green-800">
+                                                                    <FiCheckCircle className="text-green-500 dark:text-green-400" size={14} />
+                                                                    <span className="text-xs font-semibold text-green-700 dark:text-green-400">Active</span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-red-200 dark:border-red-800">
+                                                                    <FiXCircle className="text-red-500 dark:text-red-400" size={14} />
+                                                                    <span className="text-xs font-semibold text-red-700 dark:text-red-400">Inactive</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex items-center justify-center">
+                                                            {isConnected ? (
+                                                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-200 dark:border-emerald-800">
+                                                                    <FiWifi className="text-emerald-500 dark:text-emerald-400" size={14} />
+                                                                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Connected</span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-gray-500/10 to-gray-600/10 border border-gray-200 dark:border-gray-700">
+                                                                    <FiWifiOff className="text-gray-500 dark:text-gray-400" size={14} />
+                                                                    <span className="text-xs font-semibold text-gray-700 dark:text-gray-400">Not Connected</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex items-center justify-center">
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => handleOpenCharges(project, e)}
+                                                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-medium shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-105 transition-all duration-200"
+                                                            >
+                                                                <FiDollarSign size={14} />
+                                                                View Charges
+                                                                <FiChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="5" className="px-6 py-20 text-center border-b border-gray-100 dark:border-gray-700">
+                                                <div className="flex flex-col items-center justify-center">
+                                                    <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
+                                                        <FiDatabase className="text-gray-400 dark:text-gray-500" size={32} />
+                                                    </div>
+                                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No projects found</h3>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                                        No projects match your search criteria. Try adjusting your filters.
+                                                    </p>
+                                                    <button
+                                                        onClick={clearFilters}
+                                                        className="px-4 py-2 bg-indigo-500 text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors"
+                                                    >
+                                                        Clear All Filters
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+
+                                {/* Table Footer */}
+                                {filteredProjects.length > 0 && (
+                                    <tfoot>
+                                        <tr>
+                                            <td colSpan="5" className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-t-2 border-gray-200 dark:border-gray-700 rounded-b-2xl">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs text-gray-600 dark:text-gray-400">
+                                                        Showing <span className="font-semibold">{filteredProjects.length}</span> of <span className="font-semibold">{totalProjects}</span> projects
+                                                    </span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                            {activeProjects} active, {wabaConnected} WABA connected
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </td>
                                         </tr>
-                                    ))
-                                ) : filteredProjects.length > 0 ? (
-                                    filteredProjects.map((project, index) => {
-                                        const isActive =
-                                            project.status === '1' ||
-                                            project.status === 1 ||
-                                            project.status === 'active';
-                                        const isConnected =
-                                            project.is_waba_connected === 1 ||
-                                            project.is_waba_connected === '1' ||
-                                            project.is_waba_connected === true;
-
-                                        const isLast = index === filteredProjects.length - 1;
-
-                                        return (
-                                            <tr
-                                                key={project.id || project.project_id}
-                                                className={`hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-blue-50/50 dark:hover:from-indigo-900/20 dark:hover:to-blue-900/20 transition-all duration-200 cursor-pointer group border-b border-gray-100 dark:border-gray-700 ${isLast ? 'border-b-0' : ''
-                                                    }`}
-                                                onClick={() => navigate(`/projects/${project.project_id}`)}
-                                            >
-                                                <td className="px-6 py-5">
-                                                    <div className="flex items-center justify-center">
-                                                        <div className="flex items-center">
-                                                            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-                                                                {project.project_name?.charAt(0) || 'P'}
-                                                            </div>
-                                                            <div className="ml-4 text-left">
-                                                                <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                                                    {project.project_name}
-                                                                </div>
-                                                                <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                                    {project.business_id ? `Business ID: ${project.business_id}` : 'No Business ID'}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-5">
-                                                    <div className="flex flex-col items-center space-y-2">
-                                                        <div className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                            <span className="text-xs text-gray-500 dark:text-gray-400 block">Project ID</span>
-                                                            <span className="text-sm font-mono font-medium text-gray-900 dark:text-white">
-                                                                {project.project_id}
-                                                            </span>
-                                                        </div>
-                                                        <div className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                            <span className="text-xs text-gray-500 dark:text-gray-400 block">Internal ID</span>
-                                                            <span className="text-sm font-mono font-medium text-gray-900 dark:text-white">
-                                                                {project.id}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-5">
-                                                    <div className="flex items-center justify-center">
-                                                        {isActive ? (
-                                                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-200 dark:border-green-800">
-                                                                <FiCheckCircle className="text-green-500 dark:text-green-400" size={14} />
-                                                                <span className="text-xs font-semibold text-green-700 dark:text-green-400">Active</span>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-red-200 dark:border-red-800">
-                                                                <FiXCircle className="text-red-500 dark:text-red-400" size={14} />
-                                                                <span className="text-xs font-semibold text-red-700 dark:text-red-400">Inactive</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-5">
-                                                    <div className="flex items-center justify-center">
-                                                        {isConnected ? (
-                                                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-200 dark:border-emerald-800">
-                                                                <FiWifi className="text-emerald-500 dark:text-emerald-400" size={14} />
-                                                                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Connected</span>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-gray-500/10 to-gray-600/10 border border-gray-200 dark:border-gray-700">
-                                                                <FiWifiOff className="text-gray-500 dark:text-gray-400" size={14} />
-                                                                <span className="text-xs font-semibold text-gray-700 dark:text-gray-400">Not Connected</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-5">
-                                                    <div className="flex items-center justify-center">
-                                                        <button
-                                                            type="button"
-                                                            onClick={(e) => handleOpenCharges(project, e)}
-                                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-medium shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-105 transition-all duration-200"
-                                                        >
-                                                            <FiDollarSign size={14} />
-                                                            View Charges
-                                                            <FiChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                ) : (
-                                    <tr>
-                                        <td colSpan="5" className="px-6 py-20 text-center border-b border-gray-100 dark:border-gray-700">
-                                            <div className="flex flex-col items-center justify-center">
-                                                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
-                                                    <FiDatabase className="text-gray-400 dark:text-gray-500" size={32} />
-                                                </div>
-                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No projects found</h3>
-                                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                                                    No projects match your search criteria. Try adjusting your filters.
-                                                </p>
-                                                <button
-                                                    onClick={clearFilters}
-                                                    className="px-4 py-2 bg-indigo-500 text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors"
-                                                >
-                                                    Clear All Filters
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    </tfoot>
                                 )}
-                            </tbody>
-
-                            {/* Table Footer */}
-                            {filteredProjects.length > 0 && (
-                                <tfoot>
-                                    <tr>
-                                        <td colSpan="5" className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-t-2 border-gray-200 dark:border-gray-700 rounded-b-2xl">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-xs text-gray-600 dark:text-gray-400">
-                                                    Showing <span className="font-semibold">{filteredProjects.length}</span> of <span className="font-semibold">{totalProjects}</span> projects
-                                                </span>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                                                        {activeProjects} active, {wabaConnected} WABA connected
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            )}
-                        </table>
+                            </table>
                         </div>
                     </div>
 

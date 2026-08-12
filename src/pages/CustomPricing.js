@@ -136,7 +136,7 @@ const CustomPricing = () => {
         if (showUserSearchModal) {
             fetchUsers(userSearchTerm);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showUserSearchModal, userSearchTerm, tokens]);
 
     const handleCreatePackage = async () => {
@@ -324,19 +324,22 @@ const CustomPricing = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen">
             <div className={`transition-all duration-300 ease-in-out`}>
-                <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8 py-8">
+                <div className="max-w-8xl mx-auto">
 
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Custom Packages</h1>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Manage user-specific custom pricing packages</p>
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20"><FiPackage className="text-white" size={24} /></div>
+                            <div>
+                                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Custom Packages</h1>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage user-specific custom pricing packages</p>
+                            </div>
                         </div>
                         <button
                             onClick={openCreateModal}
-                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all shadow-lg shadow-indigo-600/20"
+                            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:scale-[1.02] transition-all"
                         >
                             <FiPlus size={18} />
                             Create Custom Package
@@ -345,7 +348,7 @@ const CustomPricing = () => {
 
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Total Packages</p>
@@ -356,7 +359,7 @@ const CustomPricing = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Active Users</p>
@@ -367,7 +370,7 @@ const CustomPricing = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Unique Users</p>
@@ -378,7 +381,7 @@ const CustomPricing = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Total Discount</p>
@@ -401,8 +404,8 @@ const CustomPricing = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-lg border mb-6 text-sm ${error
-                                        ? 'bg-rose-50 border-rose-100 text-rose-700 dark:bg-rose-900/10 dark:border-rose-900/20 dark:text-rose-400'
-                                        : 'bg-emerald-50 border-emerald-100 text-emerald-700 dark:bg-emerald-900/10 dark:border-emerald-900/20 dark:text-emerald-400'
+                                    ? 'bg-rose-50 border-rose-100 text-rose-700 dark:bg-rose-900/10 dark:border-rose-900/20 dark:text-rose-400'
+                                    : 'bg-emerald-50 border-emerald-100 text-emerald-700 dark:bg-emerald-900/10 dark:border-emerald-900/20 dark:text-emerald-400'
                                     }`}
                             >
                                 {error ? <FiAlertCircle size={16} /> : <FiCheckCircle size={16} />}
@@ -415,7 +418,7 @@ const CustomPricing = () => {
                     </AnimatePresence>
 
                     {/* Search & Filter Bar */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mb-6">
+                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6">
                         <div className="flex flex-col md:flex-row gap-4">
                             <div className="relative flex-1">
                                 <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -457,8 +460,8 @@ const CustomPricing = () => {
                                                             setShowFilters(false);
                                                         }}
                                                         className={`w-full text-left px-4 py-2 text-sm transition-colors ${filterStatus === filter.value
-                                                                ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
-                                                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                                            ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
+                                                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                                                             }`}
                                                     >
                                                         {filter.label}
@@ -480,7 +483,7 @@ const CustomPricing = () => {
                     </div>
 
                     {/* Table */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
                         {loading ? (
                             <div className="flex items-center justify-center py-20">
                                 <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
@@ -506,116 +509,116 @@ const CustomPricing = () => {
                                 className="mt-6"
                             />
                             <div className="hidden">
-                            <>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left">
-                                        <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
-                                            <tr>
-                                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">User Details</th>
-                                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</th>
-                                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Monthly Package</th>
-                                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Yearly Package</th>
-                                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                            {filteredPackages.map((item) => {
-                                                const monthlyDiscount = calculateDiscount(item.package?.monthly, 'monthly');
-                                                const yearlyDiscount = calculateDiscount(item.package?.yearly, 'yearly');
+                                <>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+                                                <tr>
+                                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">User Details</th>
+                                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</th>
+                                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Monthly Package</th>
+                                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Yearly Package</th>
+                                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                                {filteredPackages.map((item) => {
+                                                    const monthlyDiscount = calculateDiscount(item.package?.monthly, 'monthly');
+                                                    const yearlyDiscount = calculateDiscount(item.package?.yearly, 'yearly');
 
-                                                return (
-                                                    <tr key={item.custom_id} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
-                                                        <td className="px-6 py-4">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                                                                    {item.user?.name?.charAt(0) || 'U'}
-                                                                </div>
-                                                                <div>
-                                                                    <div className="font-medium text-gray-900 dark:text-white">{item.user?.name || 'N/A'}</div>
-                                                                    <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">{item.user?.username || 'N/A'}</div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <div className="text-sm text-gray-600 dark:text-gray-400">{item.user?.email}</div>
-                                                            <div className="text-xs text-gray-500 dark:text-gray-500">
-                                                                {item.user?.country_code} {item.user?.mobile}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <div className="space-y-1">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-sm line-through text-gray-400">₹{BASE_PACKAGE.monthly}</span>
-                                                                    <span className="font-semibold text-gray-900 dark:text-white">₹{item.package?.monthly || 0}</span>
-                                                                </div>
-                                                                {item.package?.monthly && (
-                                                                    <div className="flex items-center gap-1 text-xs">
-                                                                        <span className="text-green-600 dark:text-green-400">
-                                                                            Save ₹{monthlyDiscount.discount}
-                                                                        </span>
-                                                                        <span className="text-gray-400">
-                                                                            ({monthlyDiscount.discountPercent}% off)
-                                                                        </span>
+                                                    return (
+                                                        <tr key={item.custom_id} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                                                            <td className="px-6 py-4">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                                                        {item.user?.name?.charAt(0) || 'U'}
                                                                     </div>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            <div className="space-y-1">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-sm line-through text-gray-400">₹{BASE_PACKAGE.yearly}</span>
-                                                                    <span className="font-semibold text-gray-900 dark:text-white">₹{item.package?.yearly || 0}</span>
-                                                                </div>
-                                                                {item.package?.yearly && (
-                                                                    <div className="flex items-center gap-1 text-xs">
-                                                                        <span className="text-green-600 dark:text-green-400">
-                                                                            Save ₹{yearlyDiscount.discount}
-                                                                        </span>
-                                                                        <span className="text-gray-400">
-                                                                            ({yearlyDiscount.discountPercent}% off)
-                                                                        </span>
+                                                                    <div>
+                                                                        <div className="font-medium text-gray-900 dark:text-white">{item.user?.name || 'N/A'}</div>
+                                                                        <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">{item.user?.username || 'N/A'}</div>
                                                                     </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <div className="text-sm text-gray-600 dark:text-gray-400">{item.user?.email}</div>
+                                                                <div className="text-xs text-gray-500 dark:text-gray-500">
+                                                                    {item.user?.country_code} {item.user?.mobile}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <div className="space-y-1">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-sm line-through text-gray-400">₹{BASE_PACKAGE.monthly}</span>
+                                                                        <span className="font-semibold text-gray-900 dark:text-white">₹{item.package?.monthly || 0}</span>
+                                                                    </div>
+                                                                    {item.package?.monthly && (
+                                                                        <div className="flex items-center gap-1 text-xs">
+                                                                            <span className="text-green-600 dark:text-green-400">
+                                                                                Save ₹{monthlyDiscount.discount}
+                                                                            </span>
+                                                                            <span className="text-gray-400">
+                                                                                ({monthlyDiscount.discountPercent}% off)
+                                                                            </span>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <div className="space-y-1">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-sm line-through text-gray-400">₹{BASE_PACKAGE.yearly}</span>
+                                                                        <span className="font-semibold text-gray-900 dark:text-white">₹{item.package?.yearly || 0}</span>
+                                                                    </div>
+                                                                    {item.package?.yearly && (
+                                                                        <div className="flex items-center gap-1 text-xs">
+                                                                            <span className="text-green-600 dark:text-green-400">
+                                                                                Save ₹{yearlyDiscount.discount}
+                                                                            </span>
+                                                                            <span className="text-gray-400">
+                                                                                ({yearlyDiscount.discountPercent}% off)
+                                                                            </span>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                {item.user?.status ? (
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
+                                                                        Active
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-400">
+                                                                        Inactive
+                                                                    </span>
                                                                 )}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4">
-                                                            {item.user?.status ? (
-                                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                                                                    Active
-                                                                </span>
-                                                            ) : (
-                                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-400">
-                                                                    Inactive
-                                                                </span>
-                                                            )}
-                                                        </td>
-                                                        <td className="px-6 py-4 text-right">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                <button
-                                                                    onClick={() => openEditModal(item)}
-                                                                    className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"
-                                                                    title="Edit Package"
-                                                                >
-                                                                    <FiEdit2 size={16} />
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleDeletePackage(item.custom_id)}
-                                                                    className="p-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
-                                                                    title="Delete Package"
-                                                                >
-                                                                    <FiTrash2 size={16} />
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-right">
+                                                                <div className="flex items-center justify-end gap-2">
+                                                                    <button
+                                                                        onClick={() => openEditModal(item)}
+                                                                        className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"
+                                                                        title="Edit Package"
+                                                                    >
+                                                                        <FiEdit2 size={16} />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleDeletePackage(item.custom_id)}
+                                                                        className="p-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
+                                                                        title="Delete Package"
+                                                                    >
+                                                                        <FiTrash2 size={16} />
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                            </></div></>
+                                </></div></>
                         )}
                     </div>
                 </div>

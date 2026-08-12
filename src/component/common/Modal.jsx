@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import Button from './Button';
 import { X } from 'lucide-react';
 import ModalScrollLock from './ModalScrollLock';
 
@@ -25,16 +24,15 @@ const modalVariants = {
   },
 };
 
-const Modal = ({ isOpen, onClose, title, icon: Icon, children, onConfirm, confirmText = 'Confirm', footer, size = 'md', className = '', contentClassName = 'p-4', closeText = 'Close', hideCloseButton = false }) => {
+const Modal = ({ isOpen, onClose, title, icon: Icon, children, onConfirm, confirmText = 'Confirm', footer, size = '2xl', className = '', contentClassName = 'p-4', closeText = 'Close', hideCloseButton = false }) => {
   const sizeClasses = {
-    sm: 'max-w-md max-h-[50vh]',
-    md: 'max-w-lg max-h-[60vh]',
-    lg: 'max-w-xl max-h-[70vh]',
-    xl: 'max-w-2xl max-h-[75vh]',
-    '2xl': 'max-w-3xl max-h-[80vh]',
-    '3xl': 'max-w-4xl max-h-[85vh]',
-    '4xl': 'max-w-5xl max-h-[90vh]',
-    full: 'max-w-full max-h-[92vh]',
+    sm: 'max-w-lg max-h-[70vh]',
+    md: 'max-w-xl max-h-[75vh]',
+    lg: 'max-w-2xl max-h-[80vh]',
+    xl: 'max-w-3xl max-h-[85vh]',
+    '2xl': 'max-w-4xl max-h-[90vh]',
+    '3xl': 'max-w-5xl max-h-[92vh]',
+    full: 'max-w-full max-h-[95vh]',
   };
 
   return (
@@ -91,9 +89,9 @@ const Modal = ({ isOpen, onClose, title, icon: Icon, children, onConfirm, confir
                 {footer || (
                   <>
                     {onConfirm && (
-                      <Button variant="primary" onClick={onConfirm}>
+                      <button type="button" onClick={onConfirm} className="px-5 py-2.5 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-all">
                         {confirmText}
-                      </Button>
+                      </button>
                     )}
                     {!hideCloseButton && (
                       <button

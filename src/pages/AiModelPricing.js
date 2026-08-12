@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    FiSearch,
     FiDollarSign,
     FiTrendingUp,
     FiTrendingDown,
@@ -10,14 +9,12 @@ import {
     FiTrash2,
     FiX,
     FiTag,
-    FiXCircle,
     FiAlertTriangle,
     FiArrowDownCircle,
     FiArrowUpCircle
 } from 'react-icons/fi';
 import { apiCall } from '../utils/apiCall';
 import toast from 'react-hot-toast';
-import Pagination from '../component/common/PaginationComponent';
 import SelectField from '../component/common/SelectField';
 import ManagementTable from '../component/common/ManagementTable';
 
@@ -25,36 +22,50 @@ import ManagementTable from '../component/common/ManagementTable';
 /*  Constants & helpers                                                       */
 /* -------------------------------------------------------------------------- */
 
-// Must mirror KNOWN_PROVIDERS in adminRoutes.js — these are the only
-// providers the auto-reply engine actually knows how to call.
-const KNOWN_PROVIDERS = ['gemini', 'openai', 'claude', 'groq'];
+// Single source of truth for supported providers — must mirror the
+// providers the auto-reply engine actually knows how to call, and the
+// KNOWN_PROVIDERS list validated against on the backend.
+const providerOptions = [
+    { value: "openai", label: "OpenAI" },
+    { value: "anthropic", label: "Claude" },
+    { value: "gemini", label: "Google Gemini" },
+    { value: "groq", label: "Groq" },
+];
 
-const PROVIDER_LABELS = {
-    gemini: 'Gemini',
-    openai: 'OpenAI',
-    claude: 'Claude',
-    groq: 'Groq',
-};
+// Derived from providerOptions so nothing can drift out of sync.
+const KNOWN_PROVIDERS = providerOptions.map((opt) => opt.value);
+const PROVIDER_LABELS = providerOptions.reduce((acc, opt) => {
+    acc[opt.value] = opt.label;
+    return acc;
+}, {});
 
 const PROVIDER_STYLES = {
     gemini: 'from-blue-500 to-blue-600 shadow-blue-500/20',
     openai: 'from-emerald-500 to-emerald-600 shadow-emerald-500/20',
-    claude: 'from-orange-500 to-orange-600 shadow-orange-500/20',
+    anthropic: 'from-orange-500 to-orange-600 shadow-orange-500/20',
     groq: 'from-fuchsia-500 to-fuchsia-600 shadow-fuchsia-500/20',
 };
 
 const providerBadgeClass = (provider) =>
     `bg-gradient-to-br ${PROVIDER_STYLES[provider] || 'from-gray-400 to-gray-500 shadow-gray-500/20'}`;
 
-const STATUS_OPTIONS = [
-    { value: 'all', label: 'All Providers' },
-    ...KNOWN_PROVIDERS.map((p) => ({ value: p, label: PROVIDER_LABELS[p] })),
-];
-
 const formatRate = (val) => {
     const num = Number(val);
     if (Number.isNaN(num)) return '—';
     return `₹${num.toFixed(4)}`;
+};
+
+const formatDate = (val) => {
+    if (!val) return '—';
+    const d = new Date(val);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
 };
 
 /* -------------------------------------------------------------------------- */
@@ -63,8 +74,7 @@ const formatRate = (val) => {
 
 const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
     const isEdit = !!editingRow;
-    const [provider, setProvider] = useState(KNOWN_PROVIDERS[0]);
-    const [model, setModel] = useState('');
+    const [provider, setProvider] = useState(providerOptions[0].value);
     const [inputPrice, setInputPrice] = useState('');
     const [outputPrice, setOutputPrice] = useState('');
     const [saving, setSaving] = useState(false);
@@ -72,8 +82,7 @@ const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
 
     useEffect(() => {
         if (isOpen) {
-            setProvider(editingRow?.provider || KNOWN_PROVIDERS[0]);
-            setModel(editingRow?.model || '');
+            setProvider(editingRow?.provider || providerOptions[0].value);
             setInputPrice(editingRow ? String(editingRow.input_price_per_1k ?? '') : '');
             setOutputPrice(editingRow ? String(editingRow.output_price_per_1k ?? '') : '');
             setError('');
@@ -86,10 +95,6 @@ const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
         e.preventDefault();
         setError('');
 
-        if (!isEdit && !model.trim()) {
-            toast.error('Model name is required.');
-            return;
-        }
         const inputNum = Number(inputPrice);
         const outputNum = Number(outputPrice);
         if (inputPrice === '' || Number.isNaN(inputNum) || inputNum < 0) {
@@ -111,8 +116,9 @@ const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
 
             let response;
             if (isEdit) {
+                // Backend PUT route is keyed on unique_id, not provider.
                 response = await apiCall(
-                    `/admin/ai-model-pricing/${encodeURIComponent(editingRow.provider)}/${encodeURIComponent(editingRow.model)}`,
+                    `/admin/ai-model-pricing/${encodeURIComponent(editingRow.unique_id)}`,
                     'PUT',
                     { input_price_per_1k: inputNum, output_price_per_1k: outputNum },
                     headers,
@@ -123,7 +129,6 @@ const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
                     'POST',
                     {
                         provider,
-                        model: model.trim(),
                         input_price_per_1k: inputNum,
                         output_price_per_1k: outputNum,
                     },
@@ -161,7 +166,7 @@ const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
                             <FiDollarSign className="text-white" size={18} />
                         </div>
                         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                            {isEdit ? 'Edit Model Pricing' : 'Add Model Pricing'}
+                            {isEdit ? 'Edit Provider Pricing' : 'Add Provider Pricing'}
                         </h2>
                     </div>
                     <button
@@ -185,38 +190,18 @@ const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
                         <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
                             Provider
                         </label>
-                        <select
-                            value={provider}
-                            onChange={(e) => setProvider(e.target.value)}
-                            disabled={isEdit}
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 dark:text-white text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                            {KNOWN_PROVIDERS.map((p) => (
-                                <option key={p} value={p}>{PROVIDER_LABELS[p]}</option>
-                            ))}
-                        </select>
+                        <SelectField
+                            options={providerOptions}
+                            value={providerOptions.find((opt) => opt.value === provider) || null}
+                            onChange={(selected) => setProvider(selected ? selected.value : "")}
+                            isDisabled={isEdit}
+                            isSearchable={false}
+                        />
                         {isEdit && (
                             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5">
-                                Provider can't be changed here — delete and re-add to move a model to a different provider.
+                                Provider can't be changed here — delete and re-add to set a different provider.
                             </p>
                         )}
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
-                            Model
-                        </label>
-                        <input
-                            type="text"
-                            value={model}
-                            onChange={(e) => setModel(e.target.value)}
-                            disabled={isEdit}
-                            placeholder="e.g. claude-3-5-sonnet-latest"
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 dark:text-white text-sm font-mono transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                        />
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5">
-                            Must exactly match the model string used in the AI call (e.g. gpt-4o, gemini-3.6-flash).
-                        </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -291,8 +276,9 @@ const DeleteConfirmModal = ({ isOpen, onClose, tokens, row, onDeleted }) => {
         setDeleting(true);
 
         try {
+            // Backend DELETE route is keyed on unique_id, not provider.
             const response = await apiCall(
-                `/admin/ai-model-pricing/${encodeURIComponent(row.provider)}/${encodeURIComponent(row.model)}`,
+                `/admin/ai-model-pricing/${encodeURIComponent(row.unique_id)}`,
                 'DELETE',
                 null,
                 {
@@ -327,10 +313,10 @@ const DeleteConfirmModal = ({ isOpen, onClose, tokens, row, onDeleted }) => {
                         <FiTrash2 className="text-red-500 dark:text-red-400" size={22} />
                     </div>
                     <h3 className="text-base font-bold text-gray-900 dark:text-white mb-2">
-                        Delete pricing for "{row?.model}"?
+                        Delete pricing for {PROVIDER_LABELS[row?.provider] || row?.provider}?
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Usage logged against {PROVIDER_LABELS[row?.provider] || row?.provider} / {row?.model} after this
+                        Usage logged against {PROVIDER_LABELS[row?.provider] || row?.provider} after this
                         won't be billed until pricing is added again.
                     </p>
                 </div>
@@ -364,9 +350,6 @@ const AiModelPricing = () => {
 
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [providerFilter, setProviderFilter] = useState('all');
-    const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, total_pages: 1 });
     const [tokens, setTokens] = useState(null);
 
     const [formModalOpen, setFormModalOpen] = useState(false);
@@ -388,10 +371,9 @@ const AiModelPricing = () => {
         setLoading(true);
 
         try {
-            const params = new URLSearchParams({ page: String(pagination.page), limit: String(pagination.limit) });
-            if (searchTerm) params.set('search', searchTerm);
-            if (providerFilter !== 'all') params.set('provider', providerFilter);
-            const response = await apiCall(`/admin/ai-model-pricing?${params}`, 'GET', null, {
+            // GET /admin/ai-model-pricing supports ?provider, ?search, ?page & ?limit —
+            // fetching a generous page here since the table isn't paginated in the UI yet.
+            const response = await apiCall('/admin/ai-model-pricing?limit=100', 'GET', null, {
                 'x-token': tokens.token,
                 username: tokens.username,
             });
@@ -399,35 +381,27 @@ const AiModelPricing = () => {
 
             if (response.ok && !responseData?.error) {
                 setRows(responseData.data || []);
-                setPagination((current) => ({ ...current, ...(responseData.pagination || {}) }));
             } else {
-                toast.error(responseData?.message || responseData?.error || 'Failed to fetch model pricing');
+                toast.error(responseData?.message || responseData?.error || 'Failed to fetch pricing');
             }
         } catch (err) {
             toast.error('Authorization failed or server error');
         } finally {
             setLoading(false);
         }
-    }, [pagination.limit, pagination.page, searchTerm, providerFilter, tokens]);
+    }, [tokens]);
 
     useEffect(() => {
         fetchPricing();
     }, [fetchPricing]);
 
     const totalRows = rows.length;
-    const distinctProviders = new Set(rows.map((r) => r.provider)).size;
     const avgInputPrice = totalRows
         ? rows.reduce((sum, r) => sum + Number(r.input_price_per_1k || 0), 0) / totalRows
         : 0;
     const avgOutputPrice = totalRows
         ? rows.reduce((sum, r) => sum + Number(r.output_price_per_1k || 0), 0) / totalRows
         : 0;
-
-    const clearFilters = () => {
-        setPagination((current) => ({ ...current, page: 1 }));
-        setSearchTerm('');
-        setProviderFilter('all');
-    };
 
     const openAddModal = () => {
         setEditingRow(null);
@@ -444,8 +418,10 @@ const AiModelPricing = () => {
         setDeleteModalOpen(true);
     };
 
+    // Match by unique_id — that's the identity key the backend actually
+    // operates on (provider is just a field on the row).
     const handleDeleted = (row) => {
-        setRows((prev) => prev.filter((r) => !(r.provider === row.provider && r.model === row.model)));
+        setRows((prev) => prev.filter((r) => r.unique_id !== row.unique_id));
     };
 
     const pricingColumns = [
@@ -453,7 +429,7 @@ const AiModelPricing = () => {
             key: 'provider',
             label: 'Provider',
             render: (row) => (
-                <div className="flex items-center justify-center gap-3">
+                <div className="flex items-center justify-start gap-3">
                     <div className={`h-9 w-9 rounded-lg text-white flex items-center justify-center font-bold text-sm shadow-lg ${providerBadgeClass(row.provider)}`}>
                         {(PROVIDER_LABELS[row.provider] || row.provider || '?').charAt(0)}
                     </div>
@@ -461,15 +437,6 @@ const AiModelPricing = () => {
                         {PROVIDER_LABELS[row.provider] || row.provider}
                     </span>
                 </div>
-            ),
-        },
-        {
-            key: 'model',
-            label: 'Model',
-            render: (row) => (
-                <code className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-mono text-gray-700 dark:text-gray-300 inline-block">
-                    {row.model}
-                </code>
             ),
         },
         {
@@ -492,6 +459,24 @@ const AiModelPricing = () => {
                 </span>
             ),
         },
+        {
+            key: 'create_date',
+            label: 'Created',
+            render: (row) => (
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {formatDate(row.create_date)}
+                </span>
+            ),
+        },
+        {
+            key: 'update_date',
+            label: 'Updated',
+            render: (row) => (
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {formatDate(row.update_date)}
+                </span>
+            ),
+        },
     ];
 
     const pricingActions = (row) => [
@@ -500,9 +485,9 @@ const AiModelPricing = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="min-h-screen">
             <div className="transition-all duration-300 ease-in-out">
-                <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8 py-8">
+                <div className="max-w-8xl mx-auto">
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div className="flex items-center gap-3">
@@ -511,7 +496,7 @@ const AiModelPricing = () => {
                             </div>
                             <div>
                                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                                    AI Model Pricing
+                                    AI Provider Pricing
                                 </h1>
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                     Set the per-token rate used to bill auto-reply usage, before the platform's markup
@@ -528,13 +513,13 @@ const AiModelPricing = () => {
                     </div>
 
                     {/* Stats Overview */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Priced Models</p>
+                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Providers Priced</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{totalRows}</h3>
-                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">On this page</p>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">of {KNOWN_PROVIDERS.length} supported</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl shadow-lg shadow-teal-500/20">
                                     <FiTag className="text-white" size={24} />
@@ -544,21 +529,9 @@ const AiModelPricing = () => {
                         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Providers Covered</p>
-                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{distinctProviders}</h3>
-                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">of {KNOWN_PROVIDERS.length} supported</p>
-                                </div>
-                                <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/20">
-                                    <FiDollarSign className="text-white" size={24} />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
-                            <div className="flex items-center justify-between">
-                                <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Avg Input ₹/1K</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{formatRate(avgInputPrice)}</h3>
-                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">This page's average</p>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Across priced providers</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl shadow-lg shadow-teal-500/20">
                                     <FiTrendingDown className="text-white" size={24} />
@@ -570,45 +543,11 @@ const AiModelPricing = () => {
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Avg Output ₹/1K</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{formatRate(avgOutputPrice)}</h3>
-                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">This page's average</p>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Across priced providers</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl shadow-lg shadow-cyan-500/20">
                                     <FiTrendingUp className="text-white" size={24} />
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Search and Filters */}
-                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6">
-                        <div className="flex flex-col gap-4">
-                            <div className="relative flex-1">
-                                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                <input
-                                    type="text"
-                                    placeholder="Search by model name..."
-                                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 dark:text-white transition-all"
-                                    value={searchTerm}
-                                    onChange={(e) => { setPagination((p) => ({ ...p, page: 1 })); setSearchTerm(e.target.value); }}
-                                />
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                                <SelectField
-                                    options={STATUS_OPTIONS}
-                                    value={STATUS_OPTIONS.find((option) => option.value === providerFilter)}
-                                    onChange={(option) => { setPagination((p) => ({ ...p, page: 1 })); setProviderFilter(option.value); }}
-                                    isSearchable={false}
-                                />
-
-                                {(providerFilter !== 'all' || searchTerm) && (
-                                    <button
-                                        onClick={clearFilters}
-                                        className="px-4 py-2 text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium transition-colors"
-                                    >
-                                        Clear Filters
-                                    </button>
-                                )}
                             </div>
                         </div>
                     </div>
@@ -618,7 +557,7 @@ const AiModelPricing = () => {
                         <ManagementTable
                             rows={rows}
                             columns={pricingColumns}
-                            rowKey={(row) => `${row.provider}::${row.model}`}
+                            rowKey={(row) => row.unique_id}
                             getActions={pricingActions}
                             onRowClick={openEditModal}
                             accent="teal"
@@ -629,32 +568,21 @@ const AiModelPricing = () => {
                                         <FiDollarSign className="text-gray-400 dark:text-gray-500" size={32} />
                                     </div>
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                                        No model pricing found
+                                        No provider pricing found
                                     </h3>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                                        {rows.length === 0 && !searchTerm && providerFilter === 'all'
-                                            ? "Add a rate for each model your projects use — until it's here, that usage won't be billed."
-                                            : 'No pricing rows match your search criteria.'}
+                                        Add a rate for each provider your projects use — until it's here, that usage won't be billed.
                                     </p>
                                     <button
-                                        onClick={rows.length === 0 && !searchTerm && providerFilter === 'all' ? openAddModal : clearFilters}
+                                        onClick={openAddModal}
                                         className="px-4 py-2 bg-teal-500 text-white rounded-lg text-sm font-medium hover:bg-teal-600 transition-colors"
                                     >
-                                        {rows.length === 0 && !searchTerm && providerFilter === 'all' ? 'Add Pricing' : 'Clear All Filters'}
+                                        Add Pricing
                                     </button>
                                 </div>
                             }
                         />
                     </div>
-
-                    <Pagination
-                        currentPage={pagination.page}
-                        totalItems={pagination.total || rows.length}
-                        itemsPerPage={pagination.limit}
-                        onPageChange={(page) => setPagination((p) => ({ ...p, page }))}
-                        onLimitChange={(limit) => setPagination((p) => ({ ...p, limit, page: 1 }))}
-                        className="mt-4"
-                    />
 
                     <PricingFormModal
                         isOpen={formModalOpen}

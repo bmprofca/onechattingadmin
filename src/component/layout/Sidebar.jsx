@@ -38,14 +38,14 @@ const Sidebar = ({
       path: "/projects",
     },
     {
-      icon: Package,
-      label: "All Subscriptions",
-      path: "/subscriptions",
-    },
-    {
       icon: Gift,
       label: "Subscription Packs",
       path: "/subscription-packs",
+    },
+    {
+      icon: Package,
+      label: "All Subscriptions",
+      path: "/subscriptions",
     },
     {
       icon: Package,
@@ -58,8 +58,8 @@ const Sidebar = ({
       path: "/ai-providers",
     },
     {
-      icon:Coins,
-      label:"AI Pricing",
+      icon: Coins,
+      label: "AI Pricing",
       path: "/ai-pricing",
     }
   ];
