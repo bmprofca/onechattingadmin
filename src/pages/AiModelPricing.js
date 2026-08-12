@@ -649,7 +649,7 @@ const AiModelPricing = () => {
 
                     <Pagination
                         currentPage={pagination.page}
-                        totalItems={pagination.total}
+                        totalItems={pagination.total || rows.length}
                         itemsPerPage={pagination.limit}
                         onPageChange={(page) => setPagination((p) => ({ ...p, page }))}
                         onLimitChange={(limit) => setPagination((p) => ({ ...p, limit, page: 1 }))}

@@ -11,6 +11,7 @@ import { Encrypt } from '../pages/encryption/payload-encryption';
 import toast from 'react-hot-toast';
 import ManagementTable from '../component/common/ManagementTable';
 import ActionCard from '../component/common/ActionCard';
+import Pagination from '../component/common/PaginationComponent';
 
 const BASE_URL = (process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540') + '/admin';
 const BASE_PACKAGE = {
@@ -55,9 +56,9 @@ const CustomPricing = () => {
     // Pagination states
     const [pagination, setPagination] = useState({
         page: 1,
-        limit: 50,
+        limit: 20,
         total: 0,
-        total_pages: 0
+        total_pages: 1
     });
 
     useEffect(() => {
@@ -69,7 +70,7 @@ const CustomPricing = () => {
         }
     }, [navigate]);
 
-    const fetchCustomPackages = useCallback(async (page = 1) => {
+    const fetchCustomPackages = useCallback(async () => {
         if (!tokens?.token) return;
         setLoading(true);
         try {
@@ -77,7 +78,7 @@ const CustomPricing = () => {
             const { data, key } = Encrypt(payload);
 
             const response = await axios.post(
-                `${BASE_URL}/custom-packages?page=${page}&limit=${pagination.limit}`,
+                `${BASE_URL}/custom-packages?page=${pagination.page}&limit=${pagination.limit}`,
                 { data, key },
                 {
                     headers: {
@@ -91,9 +92,9 @@ const CustomPricing = () => {
                 setCustomPackages(response.data.data || []);
                 setPagination(response.data.pagination || {
                     page: 1,
-                    limit: 50,
+                    limit: 20,
                     total: 0,
-                    total_pages: 0
+                    total_pages: 1
                 });
             }
         } catch (err) {
@@ -102,7 +103,7 @@ const CustomPricing = () => {
         } finally {
             setLoading(false);
         }
-    }, [tokens, searchTerm, pagination.limit]);
+    }, [tokens, searchTerm, pagination.limit, pagination.page]);
 
     const fetchUsers = async (search = '') => {
         if (!tokens?.token) return;
@@ -127,7 +128,7 @@ const CustomPricing = () => {
 
     useEffect(() => {
         if (tokens?.token) {
-            fetchCustomPackages(1);
+            fetchCustomPackages();
         }
     }, [fetchCustomPackages, tokens]);
 
@@ -177,7 +178,7 @@ const CustomPricing = () => {
                 toast.success('Custom package created successfully');
                 setShowCreateModal(false);
                 resetForm();
-                fetchCustomPackages(1);
+                setPagination(prev => ({ ...prev, page: 1 }));
             }
         } catch (err) {
             toast.error(err?.response?.data?.error || 'Failed to create custom package');
@@ -214,7 +215,7 @@ const CustomPricing = () => {
                 setShowEditModal(false);
                 setSelectedPackage(null);
                 resetForm();
-                fetchCustomPackages(pagination.page);
+                fetchCustomPackages();
             }
         } catch (err) {
             toast.error(err?.response?.data?.error || 'Failed to update custom package');
@@ -244,7 +245,7 @@ const CustomPricing = () => {
                 toast.error(response.data.error || 'Failed to delete custom package');
             } else {
                 toast.success('Custom package deleted successfully');
-                fetchCustomPackages(pagination.page);
+                fetchCustomPackages();
             }
         } catch (err) {
             toast.error(err?.response?.data?.error || 'Failed to delete custom package');
@@ -303,12 +304,6 @@ const CustomPricing = () => {
         { key: 'status', label: 'Status', render: item => <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${item.user?.status ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>{item.user?.status ? 'Active' : 'Inactive'}</span> },
     ];
     const packageActions = item => [{ label: 'Edit custom package', icon: <FiEdit2 />, onClick: () => openEditModal(item) }, { label: 'Delete custom package', icon: <FiTrash2 />, className: 'text-rose-600 dark:text-rose-400', onClick: () => handleDeletePackage(item.custom_id) }];
-
-    const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= pagination.total_pages) {
-            fetchCustomPackages(newPage);
-        }
-    };
 
     const filteredPackages = customPackages.filter(item => {
         if (filterStatus === 'all') return true;
@@ -474,7 +469,7 @@ const CustomPricing = () => {
                                     )}
                                 </div>
                                 <button
-                                    onClick={() => fetchCustomPackages(1)}
+                                    onClick={fetchCustomPackages}
                                     className="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
                                     title="Refresh"
                                 >
@@ -485,7 +480,6 @@ const CustomPricing = () => {
                     </div>
 
                     {/* Table */}
-                    <ActionCard icon={<FiPlus className="text-white text-2xl" />} title="Custom pricing" description="Assign user-specific monthly and yearly pricing." buttonText="Create pricing" onClick={openCreateModal} gradient="purple" delay={0.1} />
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                         {loading ? (
                             <div className="flex items-center justify-center py-20">
@@ -503,6 +497,14 @@ const CustomPricing = () => {
                                 </button>
                             </div>
                         ) : (<><ManagementTable rows={filteredPackages} columns={packageColumns} rowKey="custom_id" getActions={packageActions} onRowClick={openEditModal} accent="indigo" />
+                            <Pagination
+                                currentPage={pagination.page}
+                                totalItems={pagination.total}
+                                itemsPerPage={pagination.limit}
+                                onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
+                                onLimitChange={(limit) => setPagination((prev) => ({ ...prev, limit, page: 1 }))}
+                                className="mt-6"
+                            />
                             <div className="hidden">
                             <>
                                 <div className="overflow-x-auto">
@@ -613,33 +615,6 @@ const CustomPricing = () => {
                                     </table>
                                 </div>
 
-                                {/* Pagination */}
-                                {pagination.total_pages > 1 && (
-                                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-gray-700">
-                                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                                            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => handlePageChange(pagination.page - 1)}
-                                                disabled={pagination.page === 1}
-                                                className="px-3 py-1 border border-gray-200 dark:border-gray-700 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-                                            >
-                                                Previous
-                                            </button>
-                                            <span className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg text-sm font-medium">
-                                                Page {pagination.page} of {pagination.total_pages}
-                                            </span>
-                                            <button
-                                                onClick={() => handlePageChange(pagination.page + 1)}
-                                                disabled={pagination.page === pagination.total_pages}
-                                                className="px-3 py-1 border border-gray-200 dark:border-gray-700 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-                                            >
-                                                Next
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
                             </></div></>
                         )}
                     </div>

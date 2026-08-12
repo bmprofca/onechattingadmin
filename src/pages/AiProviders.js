@@ -725,7 +725,7 @@ const AiProviders = () => {
                         </div>
                     </div>
 
-                    <Pagination currentPage={pagination.page} totalItems={pagination.total} itemsPerPage={pagination.limit} onPageChange={page => setPagination(p => ({ ...p, page }))} onLimitChange={limit => setPagination(p => ({ ...p, limit, page: 1 }))} className="mt-4" />
+                    <Pagination currentPage={pagination.page} totalItems={pagination.total || providers.length} itemsPerPage={pagination.limit} onPageChange={page => setPagination(p => ({ ...p, page }))} onLimitChange={limit => setPagination(p => ({ ...p, limit, page: 1 }))} className="mt-4" />
 
                     <ProviderFormModal
                         isOpen={formModalOpen}
