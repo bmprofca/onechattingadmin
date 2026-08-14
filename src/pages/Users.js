@@ -224,7 +224,7 @@ const Users = () => {
             key: 'joined',
             label: 'Joined',
             render: (user) => (
-                <div className="flex items-center justify-start text-xs text-gray-600">
+                <div className="flex items-center justify-start text-xs text-gray-600 dark:text-gray-300">
                     <FiCalendar className="mr-1.5 flex-shrink-0" size={11} />
                     <span className="truncate">{formatDate(user.create_date)}</span>
                 </div>
