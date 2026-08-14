@@ -29,9 +29,13 @@ import ActionMenu from '../component/common/ActionMenu';
 import Pagination from '../component/common/PaginationComponent';
 import SelectField from '../component/common/SelectField';
 import { API_BASE } from '../utils/config';
+import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
+import { checkUserActiveSession } from '../utils/impersonationService';
 
 const Users = () => {
     const navigate = useNavigate();
+    const { startImpersonatingUser } = useAuth();
 
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -99,15 +103,49 @@ const Users = () => {
 
     const filteredUsers = users;
 
-    const handleLoginAsUser = (user) => {
-        if (!user?.email) return;
-        const baseUrl = `${API_BASE}/login`;
-        const params = new URLSearchParams({
-            username: user.email,
-            password: user.password || ''
-        });
-        const url = `${baseUrl}?${params.toString()}`;
-        window.open(url, '_blank', 'noopener,noreferrer');
+    const handleLoginAsUser = async (user) => {
+        if (!user?.username && !user?.email) return;
+        const targetUsername = user.username || user.email;
+        const toastId = toast.loading(`Checking active session for ${user.name || targetUsername}...`);
+
+        try {
+            const stored = localStorage.getItem('user_data');
+            const adminToken = stored ? JSON.parse(stored)?.token : null;
+
+            const sessionCheck = await checkUserActiveSession(targetUsername, adminToken);
+            if (!sessionCheck.hasActiveSession || !sessionCheck.activeToken) {
+                toast.error(
+                    sessionCheck.message ||
+                    `No active login session found for ${targetUsername}. The user must have logged in or have an active session token.`,
+                    { id: toastId, duration: 5000 }
+                );
+                return;
+            }
+
+            const res = await startImpersonatingUser(
+                {
+                    id: user.id || user._id,
+                    name: user.name || targetUsername,
+                    username: user.username || targetUsername,
+                    email: user.email,
+                    mobile: user.mobile,
+                    country_code: user.country_code,
+                    role: user.role || 'user',
+                    balance: user.balance
+                },
+                sessionCheck.activeToken,
+                true
+            );
+
+            if (res.success) {
+                toast.success(`Logged in as ${user.name || targetUsername}! Admin session backed up securely.`, { id: toastId, duration: 4500 });
+            } else {
+                toast.error(res.error || 'Failed to switch to user session.', { id: toastId });
+            }
+        } catch (err) {
+            console.error('Failed to log in as user:', err);
+            toast.error('Failed to log in as user.', { id: toastId });
+        }
     };
 
     const formatDate = (dateString) => {

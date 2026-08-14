@@ -38,12 +38,16 @@ import {
   FiEdit2,
   FiTrash2,
   FiSave,
-  FiAlertTriangle
+  FiAlertTriangle,
+  FiLogIn,
+  FiShield
 } from 'react-icons/fi';
 import axios from 'axios';
 import { Encrypt } from './encryption/payload-encryption';
 import { AnimatePresence, motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
+import { checkUserActiveSession } from '../utils/impersonationService';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:6540';
 const API_BASE = `${API_BASE_URL}/admin/users`;
@@ -93,6 +97,13 @@ const UserDetails = () => {
   // Delete Confirmation Modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingCustomPackage, setDeletingCustomPackage] = useState(false);
+
+  // Impersonation ("Login as User") state
+  const { impersonation, startImpersonatingUser } = useAuth();
+  const [impersonateLoading, setImpersonateLoading] = useState(false);
+  const [showImpersonateModal, setShowImpersonateModal] = useState(false);
+  const [targetSessionToken, setTargetSessionToken] = useState(null);
+  const [openPortalAfterLogin, setOpenPortalAfterLogin] = useState(true);
 
   // Tab-specific data with pagination
   const [projectsData, setProjectsData] = useState({ data: [], pagination: { page: 1, limit: 10, total: 0, total_pages: 1 }, loading: false });
@@ -628,6 +639,76 @@ const UserDetails = () => {
       });
 
       setShowCustomPackageModal(true);
+    }
+  };
+
+  // Trigger impersonation check
+  const handleInitiateLoginAsUser = async (explicitToken = null) => {
+    if (!username && !details?.user?.username) return;
+    const targetUsername = details?.user?.username || username;
+    setImpersonateLoading(true);
+
+    try {
+      if (explicitToken) {
+        setTargetSessionToken(explicitToken);
+        setShowImpersonateModal(true);
+        setImpersonateLoading(false);
+        return;
+      }
+
+      // Check active session from backend
+      const sessionCheck = await checkUserActiveSession(targetUsername, adminTokens?.token);
+      if (!sessionCheck.hasActiveSession || !sessionCheck.activeToken) {
+        toast.error(
+          sessionCheck.message ||
+          'No active login session found for this user. The user must have logged in or have an active session key.',
+          { duration: 5000 }
+        );
+        setImpersonateLoading(false);
+        return;
+      }
+
+      setTargetSessionToken(sessionCheck.activeToken);
+      setShowImpersonateModal(true);
+    } catch (err) {
+      console.error('Failed to verify session for impersonation:', err);
+      toast.error('Failed to check user session status.');
+    } finally {
+      setImpersonateLoading(false);
+    }
+  };
+
+  // Confirm impersonation and log in as user
+  const handleConfirmLoginAsUser = async () => {
+    if (!targetSessionToken) {
+      toast.error('No session token available to log in.');
+      return;
+    }
+    setImpersonateLoading(true);
+    try {
+      const targetUserObj = {
+        id: details?.user?.id,
+        name: details?.user?.name || details?.user?.username || username,
+        username: details?.user?.username || username,
+        email: details?.user?.email,
+        mobile: details?.user?.mobile,
+        country_code: details?.user?.country_code,
+        role: details?.user?.role || 'user',
+        balance: details?.user?.balance
+      };
+
+      const res = await startImpersonatingUser(targetUserObj, targetSessionToken, openPortalAfterLogin);
+      if (res.success) {
+        toast.success(`Logged in as ${targetUserObj.name || targetUserObj.username}! Admin session backed up securely.`, { duration: 4500 });
+        setShowImpersonateModal(false);
+      } else {
+        toast.error(res.error || 'Failed to switch to user session.');
+      }
+    } catch (err) {
+      console.error('Error switching session:', err);
+      toast.error('Failed to log in as user.');
+    } finally {
+      setImpersonateLoading(false);
     }
   };
 
@@ -1321,6 +1402,17 @@ const UserDetails = () => {
                     <div className="inline-flex items-center rounded-full bg-gray-50 dark:bg-gray-800 px-2.5 py-1 text-xs text-gray-500 dark:text-gray-300 border border-gray-100 dark:border-gray-700">
                       ID: <span className="ml-1 font-mono text-[11px]">{user.id}</span>
                     </div>
+                    {/* Login as User Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleInitiateLoginAsUser()}
+                      disabled={impersonateLoading}
+                      title="Log in as this user with their active session key"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 active:from-amber-700 active:to-rose-700 text-white shadow-md shadow-amber-500/20 hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      <FiLogIn className={impersonateLoading ? 'animate-spin' : ''} size={12} />
+                      <span>{impersonateLoading ? 'Checking Session...' : 'Login as User'}</span>
+                    </button>
                   </div>
                 </div>
 
@@ -1465,7 +1557,22 @@ const UserDetails = () => {
                   pagination: loginData.pagination,
                   onPageChange: setLoginPage,
                   pageJumpValue: loginPageJump,
-                  onPageJumpChange: setLoginPageJump
+                  onPageJumpChange: setLoginPageJump,
+                  actionsColumn: (row) => {
+                    const rowToken = row.token || row.jwt_token || row.session_key || row.session_token;
+                    return (
+                      <button
+                        type="button"
+                        onClick={() => handleInitiateLoginAsUser(rowToken)}
+                        disabled={!rowToken || impersonateLoading}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md bg-amber-50 text-amber-800 hover:bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300 dark:hover:bg-amber-900/60 border border-amber-200/50 dark:border-amber-800/50 transition-colors disabled:opacity-50"
+                        title="Login with this session token"
+                      >
+                        <FiLogIn size={11} />
+                        Login with Session
+                      </button>
+                    );
+                  }
                 })}
 
                 {/* Transactions tab content */}
@@ -2185,6 +2292,124 @@ const UserDetails = () => {
                       <>
                         <FiTrash2 size={16} />
                         Delete
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Impersonate User Confirmation Modal */}
+      <AnimatePresence>
+        {showImpersonateModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+            onClick={() => setShowImpersonateModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-transparent">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
+                    <FiShield size={18} />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900 dark:text-white">Login as User (Impersonate)</h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Active session token swap</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowImpersonateModal(false)}
+                  className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all"
+                >
+                  <FiX size={18} />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 p-3.5 border border-gray-100 dark:border-gray-700/60 space-y-2">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-gray-400">Target User:</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">
+                      {details?.user?.name || details?.user?.username || username}
+                    </span>
+                  </div>
+                  {details?.user?.email && (
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gray-500 dark:text-gray-400">Email:</span>
+                      <span className="font-mono text-gray-700 dark:text-gray-300">{details.user.email}</span>
+                    </div>
+                  )}
+                  {details?.user?.username && (
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gray-500 dark:text-gray-400">Username:</span>
+                      <span className="font-mono text-gray-700 dark:text-gray-300">@{details.user.username}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-gray-400">Session Key:</span>
+                    <span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                      Active Verified (***{targetSessionToken?.slice(-6)})
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/50 rounded-xl space-y-1.5 text-xs text-amber-800 dark:text-amber-300">
+                  <p className="font-semibold flex items-center gap-1.5">
+                    <FiAlertTriangle size={14} className="text-amber-600" />
+                    How this works:
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-[11px] text-amber-700 dark:text-amber-400">
+                    <li>Your admin session token is backed up safely in local storage.</li>
+                    <li>The user's active session token is loaded for browsing as this user.</li>
+                    <li>A persistent warning banner at the top allows you to return to Admin at any time with 1-click.</li>
+                  </ul>
+                </div>
+
+                <label className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer pt-1">
+                  <input
+                    type="checkbox"
+                    checked={openPortalAfterLogin}
+                    onChange={(e) => setOpenPortalAfterLogin(e.target.checked)}
+                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <span>Open Client Portal site in a new tab with user's session</span>
+                </label>
+
+                <div className="flex items-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowImpersonateModal(false)}
+                    className="flex-1 px-4 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConfirmLoginAsUser}
+                    disabled={impersonateLoading}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500 via-rose-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-rose-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {impersonateLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></div>
+                        <span>Logging in...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiLogIn size={14} />
+                        <span>Confirm & Login</span>
                       </>
                     )}
                   </button>

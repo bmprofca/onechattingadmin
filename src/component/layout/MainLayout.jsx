@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+import ImpersonationBanner from '../common/ImpersonationBanner';
 import { ThemeProvider } from '../../context/ThemeContext';
 
 const MainLayout = ({ children }) => {
@@ -73,52 +74,53 @@ const MainLayout = ({ children }) => {
 
   return (
     <ThemeProvider>
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-950 dark:to-gray-900 transition-colors duration-300 overflow-hidden">
-      <Navbar
-        toggleSidebar={toggleSidebar}
-        isMobile={isMobile}
-        sidebarOpen={sidebarOpen}
-        isDesktopSidebarExpanded={!desktopSidebarCollapsed}
-      />
+      <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-950 dark:to-gray-900 transition-colors duration-300 overflow-hidden">
+        <ImpersonationBanner />
+        <Navbar
+          toggleSidebar={toggleSidebar}
+          isMobile={isMobile}
+          sidebarOpen={sidebarOpen}
+          isDesktopSidebarExpanded={!desktopSidebarCollapsed}
+        />
 
-      <div className="flex flex-1 relative overflow-hidden">
-        <div ref={sidebarRef} className="z-30">
-          <Sidebar
-            isMobile={isMobile}
-            sidebarOpen={sidebarOpen}
-            toggleSidebar={toggleSidebar}
-            onHover={handleSidebarHover}
-            isExpanded={isSidebarExpanded()}
-          />
-        </div>
-
-        {isMobile && sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-20 transition-opacity duration-300"
-            onClick={handleOverlayClick}
-            style={{ top: '64px' }}
-          />
-        )}
-
-        <main
-          ref={mainRef}
-          className={`
-            flex-1 transition-all duration-300 ease-out
-            ${getContentMargin()}
-            overflow-y-auto overflow-x-hidden
-          `}
-          style={{
-            padding: isMobile ? '0px' : '1rem',
-            transition: 'margin-left 0.3s ease-out',
-            maxWidth: isMobile ? '100%' : `calc(100vw - ${desktopSidebarCollapsed ? '64px' : '256px'})`,
-          }}
-        >
-          <div className="w-full max-w-8xl lg:p-2 sm:p-0">
-            {children || <Outlet />}
+        <div className="flex flex-1 relative overflow-hidden">
+          <div ref={sidebarRef} className="z-30">
+            <Sidebar
+              isMobile={isMobile}
+              sidebarOpen={sidebarOpen}
+              toggleSidebar={toggleSidebar}
+              onHover={handleSidebarHover}
+              isExpanded={isSidebarExpanded()}
+            />
           </div>
-        </main>
+
+          {isMobile && sidebarOpen && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-20 transition-opacity duration-300"
+              onClick={handleOverlayClick}
+              style={{ top: '64px' }}
+            />
+          )}
+
+          <main
+            ref={mainRef}
+            className={`
+              flex-1 transition-all duration-300 ease-out
+              ${getContentMargin()}
+              overflow-y-auto overflow-x-hidden
+            `}
+            style={{
+              padding: isMobile ? '0px' : '1rem',
+              transition: 'margin-left 0.3s ease-out',
+              maxWidth: isMobile ? '100%' : `calc(100vw - ${desktopSidebarCollapsed ? '64px' : '256px'})`,
+            }}
+          >
+            <div className="w-full max-w-8xl lg:p-2 sm:p-0">
+              {children || <Outlet />}
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
     </ThemeProvider>
   );
 };
