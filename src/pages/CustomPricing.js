@@ -297,7 +297,7 @@ const CustomPricing = () => {
     };
 
     const packageColumns = [
-        { key: 'user', label: 'User', render: item => <div><p className="font-semibold text-gray-900 dark:text-white">{item.user?.name || 'N/A'}</p><p className="font-mono text-xs text-gray-500">{item.user?.username || 'N/A'}</p></div> },
+        { key: 'user', label: 'User', render: item => <div><p className="font-semibold text-gray-900 dark:text-white">{item.user?.name || 'N/A'}</p></div> },
         { key: 'contact', label: 'Contact', render: item => <div className="text-xs"><p>{item.user?.email || '—'}</p><p className="text-gray-500">{item.user?.country_code} {item.user?.mobile}</p></div> },
         { key: 'monthly', label: 'Monthly', render: item => `₹${item.package?.monthly || 0}` },
         { key: 'yearly', label: 'Yearly', render: item => `₹${item.package?.yearly || 0}` },
