@@ -5,25 +5,33 @@ import {
     FiAlertTriangle, FiPhone, FiMail, FiGlobe,
     FiMapPin, FiLink, FiInfo, FiActivity, FiShield, FiSettings,
     FiDollarSign, FiStar, FiCpu, FiHash, FiCalendar,
-    FiThumbsUp, FiTrendingUp, FiAward, FiLock, FiUnlock
+    FiThumbsUp, FiTrendingUp, FiAward, FiLock, FiUnlock,
+    FiPlus, FiCopy, FiCheck, FiRefreshCw,
+    FiToggleLeft, FiToggleRight, FiEye
 } from 'react-icons/fi';
 import { apiCall } from '../utils/apiCall';
 import toast from 'react-hot-toast';
+import QRCodeModal from '../component/QRCodeModal';
+import QrCodeIcon from '../component/QrCodeIcon';
+import { QRCodeCanvas } from 'qrcode.react';
 
 const ProjectDetails = () => {
-
     const { project_id } = useParams();
     const navigate = useNavigate();
-
-    const [isMinimized, setIsMinimized] = useState(() => {
-        const saved = localStorage.getItem('sidebarMinimized');
-        return saved ? JSON.parse(saved) : false;
-    });
 
     const [tokens, setTokens] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [metaDetails, setMetaDetails] = useState(null);
+
+    // QR Codes State
+    const [qrCodes, setQrCodes] = useState([]);
+    const [loadingQr, setLoadingQr] = useState(false);
+    const [selectedQrModal, setSelectedQrModal] = useState(null);
+    const [showGenerateModal, setShowGenerateModal] = useState(false);
+    const [newQrLabel, setNewQrLabel] = useState('');
+    const [generatingQr, setGeneratingQr] = useState(false);
+    const [copiedId, setCopiedId] = useState(null);
 
     useEffect(() => {
         const data = localStorage.getItem('user_data') || localStorage.getItem('userData') || sessionStorage.getItem('userData');
@@ -34,33 +42,119 @@ const ProjectDetails = () => {
         }
     }, [navigate]);
 
-    useEffect(() => {
-        const fetchMetaDetails = async () => {
-            if (!tokens?.token || !project_id) return;
-            setLoading(true);
+    const fetchMetaDetails = async () => {
+        if (!tokens?.token || !project_id) return;
+        setLoading(true);
 
-            try {
-                const response = await apiCall(`/admin/projects/${project_id}/meta-details`);
-                const data = await response.json();
+        try {
+            const response = await apiCall(`/admin/projects/${project_id}/meta-details`);
+            const data = await response.json();
 
-                if (response.ok && !data?.error) {
-                    setMetaDetails(data.data);
-                } else {
-                    toast.error(data?.message || data?.error || 'Failed to fetch project details');
-                }
-            } catch (err) {
-                toast.error('Authorization failed or server error');
-            } finally {
-                setLoading(false);
+            if (response.ok && !data?.error) {
+                setMetaDetails(data.data);
+            } else {
+                toast.error(data?.message || data?.error || 'Failed to fetch project details');
             }
-        };
-        fetchMetaDetails();
+        } catch (err) {
+            toast.error('Authorization failed or server error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchQRCodes = async () => {
+        if (!tokens?.token || !project_id) return;
+        setLoadingQr(true);
+        try {
+            const response = await apiCall(`/qrcode/admin/list/${project_id}`);
+            const data = await response.json();
+            if (response.ok && !data?.error) {
+                setQrCodes(data.qr_codes || []);
+            }
+        } catch (err) {
+            console.error('Failed to fetch QR codes:', err);
+        } finally {
+            setLoadingQr(false);
+        }
+    };
+
+    useEffect(() => {
+        if (tokens?.token && project_id) {
+            fetchMetaDetails();
+            fetchQRCodes();
+        }
     }, [tokens, project_id]);
+
+    const handleGenerateQR = async (e) => {
+        e?.preventDefault();
+        if (!project_id) return;
+        setGeneratingQr(true);
+
+        try {
+            const response = await apiCall('/qrcode/admin/generate', 'POST', {
+                project_id,
+                label: newQrLabel.trim() || undefined
+            });
+            const data = await response.json();
+
+            if (response.ok && !data?.error) {
+                toast.success('QR Code created successfully!');
+                setNewQrLabel('');
+                setShowGenerateModal(false);
+                fetchQRCodes();
+                if (data.qr_code) {
+                    setSelectedQrModal(data.qr_code);
+                }
+            } else {
+                toast.error(data?.error || data?.message || 'Failed to generate QR code');
+            }
+        } catch (err) {
+            toast.error('Server error while generating QR code');
+        } finally {
+            setGeneratingQr(false);
+        }
+    };
+
+    const handleToggleQrStatus = async (qr_id, currentStatus) => {
+        const nextStatus = currentStatus === '1' ? '0' : '1';
+        try {
+            const response = await apiCall('/qrcode/admin/toggle-status', 'POST', {
+                qr_id,
+                status: nextStatus
+            });
+            const data = await response.json();
+
+            if (response.ok && !data?.error) {
+                toast.success(`QR code ${nextStatus === '1' ? 'activated' : 'deactivated'}`);
+                setQrCodes((prev) =>
+                    prev.map((item) => (item.qr_id === qr_id ? { ...item, status: nextStatus } : item))
+                );
+            } else {
+                toast.error(data?.error || 'Failed to update status');
+            }
+        } catch (err) {
+            toast.error('Network error updating QR status');
+        }
+    };
+
+    const handleCopyUrl = async (qr_id) => {
+        const portalUrl = (process.env.REACT_APP_PORTAL_URL || 'http://localhost:3000').replace(/\/$/, '');
+        const scanUrl = `${portalUrl}/qr/${qr_id}`;
+        try {
+            await navigator.clipboard.writeText(scanUrl);
+            setCopiedId(qr_id);
+            toast.success('QR Link copied to clipboard!');
+            setTimeout(() => setCopiedId(null), 2000);
+        } catch (err) {
+            toast.error('Failed to copy link');
+        }
+    };
 
     const project = metaDetails?.project || {};
     const profile = metaDetails?.profile || {};
     const isActive = project.status === '1' || project.status === 1 || project.status === 'active';
     const isWabaConnected = metaDetails?.is_waba_connected === true;
+    const portalUrl = (process.env.REACT_APP_PORTAL_URL || 'http://localhost:3000').replace(/\/$/, '');
 
     // Helper component for detail rows
     const DetailRow = ({ label, value, icon: Icon, badge = false }) => (
@@ -83,7 +177,7 @@ const ProjectDetails = () => {
 
     return (
         <div className="min-h-screen">
-            <main className={`transition-all duration-300 `}>
+            <main className="transition-all duration-300">
                 <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
                     {/* Error Message */}
@@ -99,7 +193,7 @@ const ProjectDetails = () => {
                     {/* Breadcrumb & Navigation */}
                     <button
                         onClick={() => navigate('/projects')}
-                        className="group mb-6 flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-all duration-200"
+                        className="group mb-6 flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:indigo-400 transition-all duration-200"
                     >
                         <div className="p-1.5 rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 mr-3 group-hover:border-indigo-200 dark:group-hover:border-indigo-800 group-hover:-translate-x-1 transition-all">
                             <FiArrowLeft className="text-indigo-500 dark:text-indigo-400" size={14} />
@@ -109,7 +203,7 @@ const ProjectDetails = () => {
 
                     {loading ? (
                         <div className="space-y-6">
-                            {/* Loading Skeleton - Hero */}
+                            {/* Loading Skeleton */}
                             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-8">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                     <div className="flex items-center gap-5">
@@ -125,42 +219,18 @@ const ProjectDetails = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Loading Skeleton - Grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                                <div className="lg:col-span-8">
-                                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-6 h-96 animate-pulse">
-                                        <div className="h-8 w-40 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {[...Array(6)].map((_, i) => (
-                                                <div key={i} className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="lg:col-span-4">
-                                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-6 h-96 animate-pulse">
-                                        <div className="flex flex-col items-center">
-                                            <div className="h-24 w-24 rounded-full bg-gray-200 dark:bg-gray-700 mb-4"></div>
-                                            <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2"></div>
-                                            <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            {/* Hero Header Card - Premium Design */}
+                            {/* Hero Header Card */}
                             <div className="relative overflow-hidden bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-8">
-                                {/* Decorative Gradient Background */}
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
                                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 rounded-full blur-3xl translate-y-16 -translate-x-16"></div>
 
                                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                     <div className="flex items-center gap-6">
                                         <div className="relative">
-                                            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur-xl opacity-20"></div>
                                             <div className="relative h-20 w-20 rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-indigo-500/20">
                                                 {project.project_name?.charAt(0) || project.name?.charAt(0) || 'P'}
                                             </div>
@@ -198,7 +268,14 @@ const ProjectDetails = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-wrap gap-3">
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <button
+                                            onClick={() => setShowGenerateModal(true)}
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                        >
+                                            <QrCodeIcon size={15} />
+                                            Generate QR Code
+                                        </button>
                                         <StatusBadge
                                             condition={isActive}
                                             trueLabel="Active"
@@ -223,6 +300,172 @@ const ProjectDetails = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* QR Codes Section */}
+                            <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+                                <div className="px-6 py-5 bg-gradient-to-r from-indigo-50/50 via-purple-50/50 to-pink-50/30 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg shadow-indigo-500/20 text-white">
+                                            <QrCodeIcon size={18} />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                                Project QR Codes
+                                                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
+                                                    {qrCodes.length}
+                                                </span>
+                                            </h2>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                Scan with any camera app to auto-register and map users directly to this project's chatroom.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={fetchQRCodes}
+                                            disabled={loadingQr}
+                                            className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+                                            title="Refresh QR Codes"
+                                        >
+                                            <FiRefreshCw size={14} className={loadingQr ? 'animate-spin' : ''} />
+                                        </button>
+                                        <button
+                                            onClick={() => setShowGenerateModal(true)}
+                                            className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-sm active:scale-95"
+                                        >
+                                            <FiPlus size={14} />
+                                            New QR Code
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="p-6">
+                                    {loadingQr && qrCodes.length === 0 ? (
+                                        <div className="py-12 text-center text-sm text-gray-500 dark:text-gray-400">
+                                            <FiRefreshCw className="animate-spin inline-block mr-2" /> Loading QR codes...
+                                        </div>
+                                    ) : qrCodes.length === 0 ? (
+                                        <div className="py-12 text-center">
+                                            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl inline-block mb-3 text-indigo-500">
+                                                <QrCodeIcon size={32} />
+                                            </div>
+                                            <h3 className="text-base font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                                No QR Codes Generated Yet
+                                            </h3>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-5">
+                                                Generate a QR code for your reception, campaign posters, flyers, or website to onboard users instantly into this project.
+                                            </p>
+                                            <button
+                                                onClick={() => setShowGenerateModal(true)}
+                                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-md active:scale-95"
+                                            >
+                                                <FiPlus size={15} />
+                                                Create First QR Code
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                            {qrCodes.map((item) => {
+                                                const scanUrl = `${portalUrl}/qr/${item.qr_id}`;
+                                                const isItemActive = item.status === '1';
+
+                                                return (
+                                                    <div
+                                                        key={item.qr_id}
+                                                        className="group bg-gray-50/70 dark:bg-gray-700/30 rounded-2xl border border-gray-200/80 dark:border-gray-700 p-5 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all hover:shadow-lg hover:shadow-indigo-500/5 flex flex-col justify-between"
+                                                    >
+                                                        <div>
+                                                            <div className="flex items-start justify-between gap-3 mb-4">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div
+                                                                        onClick={() => setSelectedQrModal(item)}
+                                                                        className="cursor-pointer p-2 bg-white rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 hover:scale-105 transition-transform"
+                                                                        title="Click to expand QR Code"
+                                                                    >
+                                                                        <QRCodeCanvas
+                                                                            value={scanUrl}
+                                                                            size={64}
+                                                                            level="M"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4 className="font-bold text-gray-900 dark:text-white text-sm">
+                                                                            {item.label || 'Project QR Code'}
+                                                                        </h4>
+                                                                        <span className="text-[11px] font-mono text-gray-400 dark:text-gray-500 truncate block max-w-[140px]">
+                                                                            {item.qr_id}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <span
+                                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+                                                                        isItemActive
+                                                                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
+                                                                            : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+                                                                    }`}
+                                                                >
+                                                                    {isItemActive ? 'Active' : 'Disabled'}
+                                                                </span>
+                                                            </div>
+
+                                                            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400 bg-white/60 dark:bg-gray-800/60 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700 mb-4">
+                                                                <div>
+                                                                    <span className="text-[10px] uppercase text-gray-400 block font-medium">Scans</span>
+                                                                    <span className="font-bold text-gray-800 dark:text-gray-200">
+                                                                        {item.scan_count || 0}
+                                                                    </span>
+                                                                </div>
+                                                                <div>
+                                                                    <span className="text-[10px] uppercase text-gray-400 block font-medium">Created</span>
+                                                                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                                                                        {item.create_date ? new Date(item.create_date).toLocaleDateString() : '-'}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center justify-between gap-2 pt-3 border-t border-gray-200/60 dark:border-gray-700/60">
+                                                            <button
+                                                                onClick={() => setSelectedQrModal(item)}
+                                                                className="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-lg text-xs font-semibold transition-colors"
+                                                            >
+                                                                <FiEye size={13} />
+                                                                View / Print
+                                                            </button>
+
+                                                            <div className="flex items-center gap-1">
+                                                                <button
+                                                                    onClick={() => handleCopyUrl(item.qr_id)}
+                                                                    className="p-1.5 rounded-lg text-gray-500 hover:text-indigo-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                                    title="Copy QR URL"
+                                                                >
+                                                                    {copiedId === item.qr_id ? (
+                                                                        <FiCheck size={14} className="text-emerald-500" />
+                                                                    ) : (
+                                                                        <FiCopy size={14} />
+                                                                    )}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleToggleQrStatus(item.qr_id, item.status)}
+                                                                    className="p-1.5 rounded-lg text-gray-500 hover:text-indigo-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                                    title={isItemActive ? 'Disable QR Code' : 'Enable QR Code'}
+                                                                >
+                                                                    {isItemActive ? (
+                                                                        <FiToggleRight size={18} className="text-emerald-500" />
+                                                                    ) : (
+                                                                        <FiToggleLeft size={18} className="text-gray-400" />
+                                                                    )}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
 
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                                 {/* Left Column: Configuration & Details */}
@@ -388,7 +631,7 @@ const ProjectDetails = () => {
                                                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 text-left">Websites</p>
                                                     <div className="flex flex-wrap gap-2">
                                                         {profile.websites.map((site, i) => (
-                                                            <a
+                                                             <a
                                                                 key={i}
                                                                 href={site}
                                                                 target="_blank"
@@ -420,6 +663,63 @@ const ProjectDetails = () => {
                     )}
                 </div>
             </main>
+
+            {/* QR Code Details & Print Modal */}
+            {selectedQrModal && (
+                <QRCodeModal
+                    isOpen={!!selectedQrModal}
+                    onClose={() => setSelectedQrModal(null)}
+                    qrData={selectedQrModal}
+                    projectName={project.project_name || project.name}
+                />
+            )}
+
+            {/* Generate QR Code Form Modal */}
+            {showGenerateModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-6">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                            Generate New QR Code
+                        </h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                            Create a scan point for this project. When scanned, it automatically registers/logs in and connects the user to this chatroom.
+                        </p>
+
+                        <form onSubmit={handleGenerateQR} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                    QR Code Label (Optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Reception Desk, Flyer Campaign, Website Banner"
+                                    value={newQrLabel}
+                                    onChange={(e) => setNewQrLabel(e.target.value)}
+                                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowGenerateModal(false)}
+                                    className="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={generatingQr}
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-md disabled:opacity-50"
+                                >
+                                    {generatingQr ? <FiRefreshCw className="animate-spin" size={13} /> : <FiPlus size={14} />}
+                                    {generatingQr ? 'Generating...' : 'Generate QR Code'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

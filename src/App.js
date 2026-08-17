@@ -14,6 +14,7 @@ import AiProviders from './pages/AiProviders';
 import MainLayout from './component/layout/MainLayout';
 import ProtectedRoute from './component/ProtectedRoute';
 import AiModelPricing from './pages/AiModelPricing';
+import QrCodes from './pages/QrCodes';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/users/:username/transactions" element={<UserTransactionHistory />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:project_id" element={<ProjectDetails />} />
+          <Route path="/qr-codes" element={<QrCodes />} />
           <Route path="/subscriptions" element={<AllSubscriptions />} />
           <Route path="/subscription-packs" element={<SubscriptionPacks />} />
           <Route path="/custom-pricing" element={<CustomPricing />} />
