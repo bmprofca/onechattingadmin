@@ -7,7 +7,8 @@ import {
   Gift,
   Bot,
   Coins,
-  QrCode
+  QrCode,
+  Server
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 
@@ -42,6 +43,11 @@ const Sidebar = ({
       icon: QrCode,
       label: "QR Codes",
       path: "/qr-codes",
+    },
+    {
+      icon: Server,
+      label: "Tech Provider",
+      path: "/tech-provider",
     },
     {
       icon: Gift,
