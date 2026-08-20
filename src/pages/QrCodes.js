@@ -227,11 +227,11 @@ const QrCodes = () => {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg text-white shadow-lg shadow-indigo-500/20">
+                        <div className="p-4 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg text-white shadow-lg shadow-indigo-500/20">
                             <QrCode size={26} />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent flex items-center gap-2.5">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent flex items-center gap-2.5">
                                 Project QR Code Management
                                 <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
                                     Admin Only

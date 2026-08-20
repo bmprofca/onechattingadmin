@@ -213,7 +213,7 @@ function Login() {
           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#FF6A4D] to-[#6C4CE0] flex items-center justify-center font-[Sora] font-extrabold text-sm text-white">
             1
           </div>
-          <span className="font-[Sora] font-bold text-3xl tracking-tight">1chatting</span>
+          <span className="font-[Sora] font-bold text-2xl tracking-tight">1chatting</span>
           <span className="ml-auto text-[10px] uppercase tracking-[0.15em] text-[#8E86A6] border border-[#E6E2F3] rounded-full px-2.5 py-1">
             Admin
           </span>

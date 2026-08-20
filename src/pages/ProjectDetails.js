@@ -178,7 +178,7 @@ const ProjectDetails = () => {
     return (
         <div className="min-h-screen">
             <main className="transition-all duration-300">
-                <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="mx-auto">
 
                     {/* Error Message */}
                     {error && (
@@ -223,7 +223,7 @@ const ProjectDetails = () => {
                     ) : (
                         <div className="space-y-6">
                             {/* Hero Header Card */}
-                            <div className="relative overflow-hidden bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-8">
+                            <div className="relative overflow-hidden bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-4">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
                                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 rounded-full blur-3xl translate-y-16 -translate-x-16"></div>
 
@@ -231,12 +231,12 @@ const ProjectDetails = () => {
                                     <div className="flex items-center gap-6">
                                         <div className="relative">
                                             <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg blur-xl opacity-20"></div>
-                                            <div className="relative h-20 w-20 rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-indigo-500/20">
+                                            <div className="relative h-10 w-10 rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-indigo-500/20">
                                                 {project.project_name?.charAt(0) || project.name?.charAt(0) || 'P'}
                                             </div>
                                         </div>
                                         <div>
-                                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                                            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                                                 {project.project_name || project.name}
                                             </h1>
                                             <div className="flex flex-wrap items-center gap-3 mt-2">
@@ -269,6 +269,7 @@ const ProjectDetails = () => {
                                     </div>
 
                                     <div className="flex flex-wrap items-center gap-3">
+                                        
                                         <button
                                             onClick={() => setShowGenerateModal(true)}
                                             className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg text-xs font-bold shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
@@ -321,13 +322,9 @@ const ProjectDetails = () => {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={fetchQRCodes}
-                                            disabled={loadingQr}
-                                            className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
-                                            title="Refresh QR Codes"
-                                        >
-                                            <FiRefreshCw size={14} className={loadingQr ? 'animate-spin' : ''} />
+                                        <button type="button" onClick={() => { fetchQRCodes(); }} disabled={loadingQr} title="Refresh project details" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 shadow-md shadow-gray-300/30 transition-all hover:bg-gray-50 hover:shadow-lg active:translate-y-px disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:shadow-black/20 dark:hover:bg-gray-700">
+                                            <FiRefreshCw size={16} className={loadingQr ? 'animate-spin' : ''} />
+                                            <span>{loadingQr ? 'Refreshing...' : 'Refresh'}</span>
                                         </button>
                                         <button
                                             onClick={() => setShowGenerateModal(true)}
@@ -473,7 +470,7 @@ const ProjectDetails = () => {
                                     <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
                                         <div className="px-6 py-5 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                                             <div className="flex items-center gap-2.5">
-                                                <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
+                                                <div className="p-4 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
                                                     <FiSettings className="text-white" size={16} />
                                                 </div>
                                                 <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">

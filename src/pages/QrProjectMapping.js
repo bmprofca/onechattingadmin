@@ -75,7 +75,7 @@ const QrProjectMapping = () => {
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-3"><Briefcase className="text-indigo-600" /><div><h1 className="text-xl font-bold dark:text-white">QR Project Mapping</h1><p className="text-xs text-gray-500">Map generated QR numbers to projects that do not have a QR yet.</p></div></div>
-          <button type="button" onClick={load} disabled={loading} className="rounded-lg border p-2 text-gray-600 dark:border-gray-600 dark:text-gray-300"><RefreshCw size={16} className={loading ? 'animate-spin' : ''} /></button>
+          <button type="button" onClick={load} disabled={loading} title="Refresh QR mappings" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 shadow-md shadow-gray-300/30 transition-all hover:bg-gray-50 hover:shadow-lg active:translate-y-px disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:shadow-black/20 dark:hover:bg-gray-700"><RefreshCw size={16} className={loading ? 'animate-spin' : ''} /><span>{loading ? 'Refreshing...' : 'Refresh'}</span></button>
         </div>
         {loading ? <div className="py-20 text-center text-gray-500">Loading unmapped QR codes...</div> : (
           <ManagementTable

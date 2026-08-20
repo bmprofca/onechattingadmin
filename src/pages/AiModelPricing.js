@@ -5,6 +5,7 @@ import {
     FiTrendingUp,
     FiTrendingDown,
     FiPlus,
+    FiRefreshCw,
     FiEdit2,
     FiTrash2,
     FiX,
@@ -495,7 +496,7 @@ const AiModelPricing = () => {
                                 <FiDollarSign className="text-white" size={24} />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                                     AI Provider Pricing
                                 </h1>
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -503,13 +504,15 @@ const AiModelPricing = () => {
                                 </p>
                             </div>
                         </div>
-                        <button
-                            onClick={openAddModal}
-                            className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-sm font-medium shadow-lg shadow-teal-500/20 hover:shadow-xl hover:shadow-teal-500/30 hover:scale-[1.02] transition-all duration-200"
-                        >
-                            <FiPlus size={16} />
-                            Add Pricing
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button type="button" onClick={fetchPricing} disabled={loading} title="Refresh pricing" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 shadow-md shadow-gray-300/30 transition-all hover:bg-gray-50 hover:shadow-lg active:translate-y-px disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:shadow-black/20 dark:hover:bg-gray-700">
+                                <FiRefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                                <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
+                            </button>
+                            <button onClick={openAddModal} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-600 px-4 text-sm font-medium text-white shadow-lg shadow-teal-500/25 transition-all hover:shadow-xl active:translate-y-px">
+                                <FiPlus size={16} /> Add Pricing
+                            </button>
+                        </div>
                     </div>
 
                     {/* Stats Overview */}
@@ -518,7 +521,7 @@ const AiModelPricing = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Providers Priced</p>
-                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{totalRows}</h3>
+                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{totalRows}</h3>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">of {KNOWN_PROVIDERS.length} supported</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg shadow-lg shadow-teal-500/20">
@@ -530,7 +533,7 @@ const AiModelPricing = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Avg Input ₹/1K</p>
-                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{formatRate(avgInputPrice)}</h3>
+                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{formatRate(avgInputPrice)}</h3>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Across priced providers</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg shadow-lg shadow-teal-500/20">
@@ -542,7 +545,7 @@ const AiModelPricing = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Avg Output ₹/1K</p>
-                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{formatRate(avgOutputPrice)}</h3>
+                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{formatRate(avgOutputPrice)}</h3>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Across priced providers</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-lg shadow-cyan-500/20">

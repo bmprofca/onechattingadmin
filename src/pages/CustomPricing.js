@@ -331,19 +331,21 @@ const CustomPricing = () => {
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20"><FiPackage className="text-white" size={24} /></div>
+                            <div className="p-4 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20"><FiPackage className="text-white" size={24} /></div>
                             <div>
-                                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Custom Packages</h1>
+                                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Custom Packages</h1>
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage user-specific custom pricing packages</p>
                             </div>
                         </div>
-                        <button
-                            onClick={openCreateModal}
-                            className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:scale-[1.02] transition-all"
-                        >
-                            <FiPlus size={18} />
-                            Create Custom Package
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button type="button" onClick={fetchCustomPackages} disabled={loading} title="Refresh packages" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 shadow-md shadow-gray-300/30 transition-all hover:bg-gray-50 hover:shadow-lg active:translate-y-px disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:shadow-black/20 dark:hover:bg-gray-700">
+                                <FiRefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                                <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
+                            </button>
+                            <button onClick={openCreateModal} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 text-sm font-medium text-white shadow-lg shadow-indigo-500/25 transition-all hover:shadow-xl active:translate-y-px">
+                                <FiPlus size={18} /> Create Custom Package
+                            </button>
+                        </div>
                     </div>
 
                     {/* Stats Cards */}

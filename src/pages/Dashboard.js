@@ -153,13 +153,13 @@ function AdminDashboard() {
     };
 
     return (
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mx-auto">
             {/* Header Section with Greeting */}
             <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <FiAward className="text-3xl text-indigo-600 dark:text-indigo-400" />
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                        <FiAward className="text-2xl text-indigo-600 dark:text-indigo-400" />
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                             Admin Dashboard
                         </h1>
                     </div>

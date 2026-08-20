@@ -12,7 +12,8 @@ import {
     FiXCircle,
     FiWifi,
     FiWifiOff,
-    FiFilter
+    FiFilter,
+    FiRefreshCw
 } from 'react-icons/fi';
 import { apiCall } from '../utils/apiCall';
 import ProjectChargesModal from '../component/Modals/ProjectChargesModal';
@@ -131,11 +132,11 @@ const Projects = () => {
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div>
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
+                                <div className="p-4 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
                                     <FiDatabase className="text-white" size={24} />
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                                    <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                                         Projects
                                     </h1>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -145,6 +146,10 @@ const Projects = () => {
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
+                            <button type="button" onClick={fetchProjects} disabled={loading} title="Refresh projects" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 shadow-md shadow-gray-300/30 transition-all hover:bg-gray-50 hover:shadow-lg active:translate-y-px disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:shadow-black/20 dark:hover:bg-gray-700">
+                                <FiRefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                                <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
+                            </button>
                             <div className="px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                                 <span className="text-sm text-gray-600 dark:text-gray-300">
                                     Last updated: {new Date().toLocaleDateString()}
@@ -159,7 +164,7 @@ const Projects = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Projects</p>
-                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{totalProjects}</h3>
+                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{totalProjects}</h3>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">All time</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
@@ -171,7 +176,7 @@ const Projects = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Projects</p>
-                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{activeProjects}</h3>
+                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{activeProjects}</h3>
                                     <p className="text-xs text-green-500 dark:text-green-400 mt-1">{((activeProjects / totalProjects) * 100 || 0).toFixed(1)}% of total</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg shadow-green-500/20">
@@ -183,7 +188,7 @@ const Projects = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">WABA Connected</p>
-                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{wabaConnected}</h3>
+                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{wabaConnected}</h3>
                                     <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">{((wabaConnected / totalProjects) * 100 || 0).toFixed(1)}% connected</p>
                                 </div>
                                 <div className="p-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-lg shadow-emerald-500/20">

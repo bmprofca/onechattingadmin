@@ -1384,6 +1384,15 @@ const UserDetails = () => {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2 justify-start md:justify-end">
+                    <button
+                      type="button"
+                      onClick={() => window.location.reload()}
+                      title="Refresh user details"
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 shadow-md shadow-gray-300/30 transition-all hover:bg-gray-50 hover:shadow-lg active:translate-y-px dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:shadow-black/20 dark:hover:bg-gray-700"
+                    >
+                      <FiRefreshCw size={16} />
+                      <span>Refresh</span>
+                    </button>
                     <span
                       className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${user.status === '1'
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'

@@ -280,9 +280,9 @@ const Users = () => {
             <div className="max-w-8xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20"><FiUsers className="text-white" size={24} /></div>
+                        <div className="p-4 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20"><FiUsers className="text-white" size={24} /></div>
                         <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">User Management</h1>
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">User Management</h1>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage, monitor and verify system users across all projects.</p>
                         </div>
                     </div>
@@ -301,7 +301,7 @@ const Users = () => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Users</p>
-                                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{pagination.total}</h3>
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{pagination.total}</h3>
                             </div>
                             <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20"><FiUsers className="text-white" size={24} /></div>
                         </div>
@@ -310,7 +310,7 @@ const Users = () => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Now</p>
-                                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{users.filter(u => u.status === '1').length}</h3>
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{users.filter(u => u.status === '1').length}</h3>
                             </div>
                             <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg shadow-green-500/20"><FiActivity className="text-white" size={24} /></div>
                         </div>
@@ -319,7 +319,7 @@ const Users = () => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Inactive Users</p>
-                                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{users.filter(u => u.status !== '1').length}</h3>
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{users.filter(u => u.status !== '1').length}</h3>
                             </div>
                             <div className="p-4 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg shadow-lg shadow-red-500/20"><FiUserX className="text-white" size={24} /></div>
                         </div>
