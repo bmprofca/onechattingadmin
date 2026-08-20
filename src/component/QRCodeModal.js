@@ -66,11 +66,11 @@ const QRCodeModal = ({ isOpen, onClose, qrData, projectName }) => {
         ctx.textAlign = 'center';
         ctx.fillText(projectName || 'Project Chat', exportCanvas.width / 2, 60);
 
-        // Subtitle - Label or Scan instruction
+        // Subtitle - Scan instruction
         ctx.fillStyle = '#64748b';
         ctx.font = '18px sans-serif';
         ctx.fillText(
-            qrData.label ? `${qrData.label} • Scan to connect` : 'Scan with your mobile camera to join chat',
+            'Scan with your mobile camera to join chat',
             exportCanvas.width / 2,
             95
         );
@@ -179,7 +179,6 @@ const QRCodeModal = ({ isOpen, onClose, qrData, projectName }) => {
             <body>
                 <div class="card">
                     <h1>${projectName || 'Project Chat'}</h1>
-                    ${qrData.label ? `<p class="label">${qrData.label}</p>` : ''}
                     <div class="qr-container">
                         <img src="${dataUrl}" width="260" height="260" alt="QR Code" />
                     </div>
@@ -207,12 +206,12 @@ const QRCodeModal = ({ isOpen, onClose, qrData, projectName }) => {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
                     transition={{ duration: 0.2 }}
-                    className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden"
+                    className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden"
                 >
                     {/* Header */}
                     <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                            <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
                                 <QrCodeIcon size={20} />
                             </div>
                             <div>
@@ -234,13 +233,7 @@ const QRCodeModal = ({ isOpen, onClose, qrData, projectName }) => {
 
                     {/* QR Code Container */}
                     <div className="p-6 flex flex-col items-center text-center">
-                        {qrData.label && (
-                            <span className="mb-3 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-semibold">
-                                {qrData.label}
-                            </span>
-                        )}
-
-                        <div className="p-4 bg-white rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 inline-block mb-4">
+                        <div className="p-4 bg-white rounded-lg shadow-md border border-gray-100 dark:border-gray-700 inline-block mb-4">
                             <QRCodeCanvas
                                 id={`qr-canvas-${qrData.qr_id}`}
                                 value={scanUrl}
@@ -255,7 +248,7 @@ const QRCodeModal = ({ isOpen, onClose, qrData, projectName }) => {
                         </p>
 
                         {/* URL Copy Bar */}
-                        <div className="w-full flex items-center bg-gray-50 dark:bg-gray-700/50 rounded-xl p-2 border border-gray-200 dark:border-gray-600 mb-5">
+                        <div className="w-full flex items-center bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2 border border-gray-200 dark:border-gray-600 mb-5">
                             <input
                                 type="text"
                                 readOnly
@@ -275,14 +268,14 @@ const QRCodeModal = ({ isOpen, onClose, qrData, projectName }) => {
                         <div className="grid grid-cols-2 gap-3 w-full">
                             <button
                                 onClick={handleDownloadPng}
-                                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-md hover:shadow-indigo-500/20 active:scale-[0.98]"
+                                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition-all shadow-md hover:shadow-indigo-500/20 active:scale-[0.98]"
                             >
                                 <FiDownload size={15} />
                                 Download PNG
                             </button>
                             <button
                                 onClick={handlePrint}
-                                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-xl text-xs font-semibold transition-all active:scale-[0.98]"
+                                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg text-xs font-semibold transition-all active:scale-[0.98]"
                             >
                                 <FiPrinter size={15} />
                                 Print Card

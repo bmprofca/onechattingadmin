@@ -19,8 +19,8 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
       setMarketingCharge(project.marketing_charge ?? '');
       setUtilityCharge(project.utility_charge ?? '');
       setAuthenticationCharge(project.authentication_charge ?? '');
-      
-      
+
+
     }
   }, [isOpen, project]);
 
@@ -35,13 +35,13 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
       authenticationCharge === ''
     ) {
       toast.error('Please set at least one charge before saving.');
-      
+
       return;
     }
 
     setSubmitting(true);
-    
-    
+
+
 
     try {
       const body = {
@@ -76,8 +76,8 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
 
   const handleClose = () => {
     if (submitting) return;
-    
-    
+
+
     onClose();
   };
 
@@ -96,7 +96,7 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: 'spring', duration: 0.25 }}
-            className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 shadow-2xl border border-gray-200/80 dark:border-gray-700 overflow-hidden"
+            className="w-full max-w-md rounded-lg bg-white dark:bg-gray-900 shadow-2xl border border-gray-200/80 dark:border-gray-700 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -127,11 +127,10 @@ const ProjectChargesModal = ({ isOpen, onClose, project, tokens, onUpdated }) =>
             <form onSubmit={handleSubmit} className="px-5 pt-4 pb-5 space-y-4">
               {(error || success) && (
                 <div
-                  className={`flex items-start gap-2 text-xs rounded-lg px-3 py-2 border ${
-                    error
+                  className={`flex items-start gap-2 text-xs rounded-lg px-3 py-2 border ${error
                       ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
                       : 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
-                  }`}
+                    }`}
                 >
                   {error ? (
                     <FiAlertCircle className="mt-0.5" size={14} />

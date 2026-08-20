@@ -114,11 +114,10 @@ const NavItem = ({
                       navigate(submenu.path);
                       if (isMobile) setMobileMenuOpen(false);
                     }}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                      subActive
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${subActive
                         ? 'text-indigo-700 bg-indigo-50 font-medium'
                         : 'text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/50'
-                    }`}
+                      }`}
                   >
                     {submenu.title}
                   </button>
@@ -264,7 +263,7 @@ export const Header = ({ mobileMenuOpen, setMobileMenuOpen, isMinimized, setIsMi
                 className="fixed inset-0 z-40"
                 onClick={() => setProfileDropdownOpen(false)}
               />
-              <div className="absolute right-0 mt-3 w-56 origin-top-right rounded-xl border border-slate-100 bg-white p-1 shadow-xl z-50">
+              <div className="absolute right-0 mt-3 w-56 origin-top-right rounded-lg border border-slate-100 bg-white p-1 shadow-xl z-50">
                 <div className="px-3 py-2 border-b border-slate-100 mb-1">
                   <p className="text-sm font-semibold text-slate-900">
                     {userProfile.name || 'Admin'}

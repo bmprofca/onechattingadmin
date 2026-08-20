@@ -280,60 +280,60 @@ const Users = () => {
             <div className="max-w-8xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20"><FiUsers className="text-white" size={24} /></div>
+                        <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20"><FiUsers className="text-white" size={24} /></div>
                         <div>
                             <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">User Management</h1>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage, monitor and verify system users across all projects.</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button onClick={() => fetchUsers(pagination.page)} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/90 dark:bg-gray-800/90 border border-gray-200/50 dark:border-gray-700/50 text-sm font-medium hover:bg-white dark:hover:bg-gray-700 shadow-lg transition-all">
+                        <button onClick={() => fetchUsers(pagination.page)} className="inline-flex items-center h-10 gap-2 px-4 rounded-lg bg-white/90 dark:bg-gray-800/90 border border-gray-200/50 dark:border-gray-700/50 text-sm font-medium hover:bg-white dark:hover:bg-gray-700 shadow-lg transition-all">
                             <FiRefreshCw className="mr-2" /> Refresh
                         </button>
-                        <button onClick={exportAllToCSV} disabled={exportLoading} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl transition-all disabled:opacity-50">
+                        <button onClick={exportAllToCSV} disabled={exportLoading} className="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl transition-all disabled:opacity-50">
                             {exportLoading ? <><FiRefreshCw className="mr-2 animate-spin" /> Exporting...</> : <><FiDownload className="mr-2" /> Export All</>}
                         </button>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Users</p>
                                 <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{pagination.total}</h3>
                             </div>
-                            <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/20"><FiUsers className="text-white" size={24} /></div>
+                            <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20"><FiUsers className="text-white" size={24} /></div>
                         </div>
                     </div>
-                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Now</p>
                                 <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{users.filter(u => u.status === '1').length}</h3>
                             </div>
-                            <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg shadow-green-500/20"><FiActivity className="text-white" size={24} /></div>
+                            <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg shadow-green-500/20"><FiActivity className="text-white" size={24} /></div>
                         </div>
                     </div>
-                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Inactive Users</p>
                                 <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{users.filter(u => u.status !== '1').length}</h3>
                             </div>
-                            <div className="p-4 bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl shadow-lg shadow-red-500/20"><FiUserX className="text-white" size={24} /></div>
+                            <div className="p-4 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg shadow-lg shadow-red-500/20"><FiUserX className="text-white" size={24} /></div>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl lg:flex justify-between gap-3 shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg lg:flex justify-between gap-3 shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-2 mb-2">
                     <div className="flex w-full max-w-[600px] flex-col md:flex-row gap-4 md:mb-2 lg:mb-0 mb-2">
                         <div className="relative flex-1">
                             <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search by name, email, username or mobile..."
-                                className="w-full pl-11 pr-10 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
+                                className="w-full pl-11 pr-10 h-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
                                 value={searchTerm}
                                 onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setSearchTerm(e.target.value); }}
                             />
@@ -352,7 +352,7 @@ const Users = () => {
 
                 </div>
 
-                <div className="w-full overflow-x-auto rounded-2xl">
+                <div className="w-full overflow-x-auto rounded-lg">
                     <ManagementTable
                         columns={columns}
                         rows={filteredUsers}

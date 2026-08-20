@@ -172,7 +172,7 @@ function AdminDashboard() {
                 {/* Refresh Button */}
                 <button
                     onClick={() => window.location.reload()}
-                    className="mt-4 md:mt-0 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-black/20 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md transition-all duration-300 flex items-center gap-2 group"
+                    className="mt-4 md:mt-0 px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-black/20 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md transition-all duration-300 flex items-center gap-2 group"
                 >
                     <FiRefreshCw className="group-hover:rotate-180 transition-transform duration-500" />
                     Refresh Data
@@ -184,23 +184,23 @@ function AdminDashboard() {
                     {/* Skeleton Loader */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
                         {[1, 2, 3, 4, 5].map(i => (
-                            <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-black/20 p-6 animate-pulse">
-                                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4"></div>
+                            <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-black/20 p-6 animate-pulse">
+                                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
                                 <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2"></div>
                                 <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-24"></div>
                             </div>
                         ))}
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-black/20 p-6 animate-pulse">
+                        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-black/20 p-6 animate-pulse">
                             <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-4"></div>
                             <div className="grid grid-cols-3 gap-4">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="h-24 bg-gray-100 dark:bg-gray-700 rounded-xl"></div>
+                                    <div key={i} className="h-24 bg-gray-100 dark:bg-gray-700 rounded-lg"></div>
                                 ))}
                             </div>
                         </div>
-                        <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl p-6 animate-pulse">
+                        <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-lg p-6 animate-pulse">
                             <div className="h-6 bg-white/20 rounded w-32 mb-4"></div>
                             <div className="space-y-3">
                                 {[1, 2].map(i => (
@@ -211,7 +211,7 @@ function AdminDashboard() {
                     </div>
                 </div>
             ) : error ? (
-                <div className="bg-red-50 dark:bg-red-950/30 border-l-4 border-red-500 dark:border-red-400 text-red-700 dark:text-red-300 p-6 rounded-2xl shadow-lg dark:shadow-black/20">
+                <div className="bg-red-50 dark:bg-red-950/30 border-l-4 border-red-500 dark:border-red-400 text-red-700 dark:text-red-300 p-6 rounded-lg shadow-lg dark:shadow-black/20">
                     <div className="flex items-center">
                         <FiShield className="text-2xl mr-3" />
                         <div>
@@ -227,10 +227,10 @@ function AdminDashboard() {
                         {mainStats.map((stat, idx) => (
                             <div
                                 key={idx}
-                                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-black/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 overflow-hidden"
+                                className="group bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-black/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 overflow-hidden"
                             >
                                 <div className="p-6">
-                                    <div className={`w-12 h-12 ${stat.bgColor} ${stat.color} rounded-xl flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform duration-300`}>
+                                    <div className={`w-12 h-12 ${stat.bgColor} ${stat.color} rounded-lg flex items-center justify-center mb-4 text-2xl group-hover:scale-110 transition-transform duration-300`}>
                                         {stat.icon}
                                     </div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{stat.title}</p>
@@ -255,7 +255,7 @@ function AdminDashboard() {
                     {/* Financial Summary with Enhanced Design */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                         {/* Transaction Summary Card */}
-                        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-xl dark:shadow-black/20 border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-black/20 border border-gray-100 dark:border-gray-700 overflow-hidden">
                             <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-semibold flex items-center text-gray-800 dark:text-gray-100">
@@ -269,8 +269,8 @@ function AdminDashboard() {
                             <div className="p-6">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div className="relative overflow-hidden group">
-                                        <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl"></div>
-                                        <div className="p-5 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 rounded-xl border border-green-100 dark:border-green-900">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-lg"></div>
+                                        <div className="p-5 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 rounded-lg border border-green-100 dark:border-green-900">
                                             <div className="flex items-center text-green-700 dark:text-green-300 mb-2">
                                                 <div className="p-2 bg-green-200 dark:bg-green-900/60 rounded-lg mr-2">
                                                     <FiArrowUpRight className="text-green-700 dark:text-green-300" />
@@ -283,8 +283,8 @@ function AdminDashboard() {
                                     </div>
 
                                     <div className="relative overflow-hidden group">
-                                        <div className="absolute inset-0 bg-gradient-to-br from-red-400 to-red-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl"></div>
-                                        <div className="p-5 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/50 dark:to-rose-950/50 rounded-xl border border-red-100 dark:border-red-900">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-red-400 to-red-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-lg"></div>
+                                        <div className="p-5 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/50 dark:to-rose-950/50 rounded-lg border border-red-100 dark:border-red-900">
                                             <div className="flex items-center text-red-700 dark:text-red-300 mb-2">
                                                 <div className="p-2 bg-red-200 dark:bg-red-900/60 rounded-lg mr-2">
                                                     <FiArrowDownLeft className="text-red-700 dark:text-red-300" />
@@ -297,8 +297,8 @@ function AdminDashboard() {
                                     </div>
 
                                     <div className="relative overflow-hidden group">
-                                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-400 to-purple-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl"></div>
-                                        <div className="p-5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 rounded-xl border border-indigo-100 dark:border-indigo-900">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-400 to-purple-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-lg"></div>
+                                        <div className="p-5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 rounded-lg border border-indigo-100 dark:border-indigo-900">
                                             <div className="flex items-center text-indigo-700 dark:text-indigo-300 mb-2">
                                                 <div className="p-2 bg-indigo-200 dark:bg-indigo-900/60 rounded-lg mr-2">
                                                     <FiBarChart2 className="text-indigo-700 dark:text-indigo-300" />
@@ -340,7 +340,7 @@ function AdminDashboard() {
                         </div>
 
                         {/* System Health Card with Enhanced Design */}
-                        <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-800 dark:from-indigo-800 dark:via-indigo-900 dark:to-blue-950 rounded-2xl p-6 text-white shadow-2xl shadow-indigo-200 dark:shadow-black/40 relative overflow-hidden">
+                        <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-800 dark:from-indigo-800 dark:via-indigo-900 dark:to-blue-950 rounded-lg p-6 text-white shadow-2xl shadow-indigo-200 dark:shadow-black/40 relative overflow-hidden">
                             {/* Decorative Elements */}
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-8 -mt-8"></div>
                             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-8 -mb-8"></div>
@@ -393,7 +393,7 @@ function AdminDashboard() {
 
                                         <button
                                             onClick={() => navigate('/users')}
-                                            className="w-full mt-4 bg-white text-indigo-700 py-3 rounded-xl font-semibold hover:bg-indigo-50 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center group"
+                                            className="w-full mt-4 bg-white text-indigo-700 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center group"
                                         >
                                             Manage Users
                                             <FiChevronRight className="ml-2 group-hover:translate-x-1 transition-transform" />

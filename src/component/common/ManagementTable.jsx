@@ -97,7 +97,7 @@ export default function ManagementTable({
       ref={containerRef}
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      className={joinClasses('overflow-hidden rounded-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg border w-full', cardClass, containerClassName, className)}
+      className={joinClasses('overflow-hidden rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg border w-full', cardClass, containerClassName, className)}
     >
       <div className={joinClasses('w-full', tableClassName)}>
         <table className="w-full table-fixed text-left text-sm text-gray-700 dark:text-gray-300">

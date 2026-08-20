@@ -184,6 +184,26 @@ const Pagination = ({
                                 isSearchable={false}
                                 menuPlacement="top"
                                 classNamePrefix="react-select"
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        minHeight: '32px',
+                                        height: '32px',
+                                    }),
+                                    valueContainer: (provided) => ({
+                                        ...provided,
+                                        height: '32px',
+                                        padding: '0 8px',
+                                    }),
+                                    indicatorsContainer: (provided) => ({
+                                        ...provided,
+                                        height: '32px',
+                                    }),
+                                    dropdownIndicator: (provided) => ({
+                                        ...provided,
+                                        padding: '3px 6px',
+                                    }),
+                                }}
                             />
                         </div>
                     )}

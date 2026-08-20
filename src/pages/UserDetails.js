@@ -1055,7 +1055,7 @@ const UserDetails = () => {
 
     if (!Array.isArray(items)) {
       return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-5">
           <div className="flex items-center gap-2 mb-2">
             {icon}
             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
@@ -1139,7 +1139,7 @@ const UserDetails = () => {
     };
 
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="p-5 pb-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <div className="flex items-center gap-2">
@@ -1344,18 +1344,18 @@ const UserDetails = () => {
           {/* Loading skeleton */}
           {loading ? (
             <div className="space-y-6 animate-pulse">
-              <div className="h-24 rounded-xl bg-white dark:bg-gray-800" />
+              <div className="h-24 rounded-lg bg-white dark:bg-gray-800" />
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="h-64 rounded-xl bg-white dark:bg-gray-800 lg:col-span-2" />
-                <div className="h-64 rounded-xl bg-white dark:bg-gray-800" />
+                <div className="h-64 rounded-lg bg-white dark:bg-gray-800 lg:col-span-2" />
+                <div className="h-64 rounded-lg bg-white dark:bg-gray-800" />
               </div>
-              <div className="h-48 rounded-xl bg-white dark:bg-gray-800" />
+              <div className="h-48 rounded-lg bg-white dark:bg-gray-800" />
             </div>
           ) : (
             details && (
               <>
                 {/* Header card */}
-                <div className="mb-6 rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="mb-6 rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-12 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">
                       {(user.name || user.username || 'U').toString().charAt(0).toUpperCase()}
@@ -1476,7 +1476,7 @@ const UserDetails = () => {
                 {activeTab === 'profile' && (
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                     <div className="lg:col-span-2 space-y-4">
-                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+                      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-5">
                         <div className="flex items-center gap-2 mb-3">
                           <FiUser className="text-indigo-500" />
                           <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -1488,7 +1488,7 @@ const UserDetails = () => {
                     </div>
 
                     <div className="space-y-4">
-                      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+                      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-5">
                         <div className="flex items-center gap-2 mb-3">
                           <FiCreditCard className="text-emerald-500" />
                           <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -1580,7 +1580,7 @@ const UserDetails = () => {
                   <div className="space-y-6">
                     {/* Balance Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Total Credit</p>
@@ -1593,7 +1593,7 @@ const UserDetails = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Total Debit</p>
@@ -1606,7 +1606,7 @@ const UserDetails = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Current Balance</p>
@@ -1648,7 +1648,7 @@ const UserDetails = () => {
                     </div>
 
                     {/* Transactions Table Card */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                       {/* Filters */}
                       <div className="p-4 border-b border-gray-100 dark:border-gray-700">
                         <div className="flex flex-col md:flex-row gap-4">
@@ -1925,7 +1925,7 @@ const UserDetails = () => {
                 {activeTab === 'subscriptions' && (
                   <div className="space-y-6">
                     {/* Custom Package Section */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                           <FiPackage className="text-indigo-500" size={20} />
@@ -2047,7 +2047,7 @@ const UserDetails = () => {
       {/* Wallet Credit/Debit Modal */}
       {showWalletModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {walletAction === 'credit' ? 'Credit Wallet' : 'Debit Wallet'}
@@ -2143,7 +2143,7 @@ const UserDetails = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden"
+              className="w-full max-w-md bg-white dark:bg-gray-900 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
@@ -2250,7 +2250,7 @@ const UserDetails = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden"
+              className="w-full max-w-md bg-white dark:bg-gray-900 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
@@ -2316,7 +2316,7 @@ const UserDetails = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden"
+              className="w-full max-w-md bg-white dark:bg-gray-900 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-transparent">
@@ -2338,7 +2338,7 @@ const UserDetails = () => {
               </div>
 
               <div className="p-6 space-y-4">
-                <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 p-3.5 border border-gray-100 dark:border-gray-700/60 space-y-2">
+                <div className="rounded-lg bg-gray-50 dark:bg-gray-800/60 p-3.5 border border-gray-100 dark:border-gray-700/60 space-y-2">
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-gray-500 dark:text-gray-400">Target User:</span>
                     <span className="font-semibold text-gray-900 dark:text-white">
@@ -2365,7 +2365,7 @@ const UserDetails = () => {
                   </div>
                 </div>
 
-                <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/50 rounded-xl space-y-1.5 text-xs text-amber-800 dark:text-amber-300">
+                <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/50 rounded-lg space-y-1.5 text-xs text-amber-800 dark:text-amber-300">
                   <p className="font-semibold flex items-center gap-1.5">
                     <FiAlertTriangle size={14} className="text-amber-600" />
                     How this works:
@@ -2391,7 +2391,7 @@ const UserDetails = () => {
                   <button
                     type="button"
                     onClick={() => setShowImpersonateModal(false)}
-                    className="flex-1 px-4 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 transition-all"
+                    className="flex-1 px-4 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 transition-all"
                   >
                     Cancel
                   </button>
@@ -2399,7 +2399,7 @@ const UserDetails = () => {
                     type="button"
                     onClick={handleConfirmLoginAsUser}
                     disabled={impersonateLoading}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500 via-rose-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-rose-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500 via-rose-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 text-white rounded-lg text-xs font-bold shadow-lg shadow-rose-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {impersonateLoading ? (
                       <>

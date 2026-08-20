@@ -131,7 +131,7 @@ const Projects = () => {
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div>
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20">
+                                <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
                                     <FiDatabase className="text-white" size={24} />
                                 </div>
                                 <div>
@@ -155,38 +155,38 @@ const Projects = () => {
 
                     {/* Stats Overview */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Projects</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{totalProjects}</h3>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">All time</p>
                                 </div>
-                                <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/20">
+                                <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
                                     <FiBriefcase className="text-white" size={24} />
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Projects</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{activeProjects}</h3>
                                     <p className="text-xs text-green-500 dark:text-green-400 mt-1">{((activeProjects / totalProjects) * 100 || 0).toFixed(1)}% of total</p>
                                 </div>
-                                <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg shadow-green-500/20">
+                                <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg shadow-green-500/20">
                                     <FiActivity className="text-white" size={24} />
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">WABA Connected</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{wabaConnected}</h3>
                                     <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">{((wabaConnected / totalProjects) * 100 || 0).toFixed(1)}% connected</p>
                                 </div>
-                                <div className="p-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg shadow-emerald-500/20">
+                                <div className="p-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-lg shadow-emerald-500/20">
                                     <FiToggleRight className="text-white" size={24} />
                                 </div>
                             </div>
@@ -194,7 +194,7 @@ const Projects = () => {
                     </div>
 
                     {/* Search and Filters */}
-                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm lg:flex justify-between gap-2 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6">
+                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm lg:flex justify-between gap-2 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-2 mb-2">
                         <div className="flex w-full max-w-[600px] flex-col md:flex-row gap-4 md:mb-2 lg:mb-0 mb-2">
                             {/* Search Bar */}
                             <div className="relative flex-1">
@@ -202,7 +202,7 @@ const Projects = () => {
                                 <input
                                     type="text"
                                     placeholder="Search by project name, project ID or business ID..."
-                                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
+                                    className="w-full pl-11 pr-4 h-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
                                     value={searchTerm}
                                     onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setSearchTerm(e.target.value); }}
                                 />
@@ -255,7 +255,7 @@ const Projects = () => {
 
                     {/* Error Message */}
                     {error && (
-                        <div className="mb-6 px-6 py-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                        <div className="mb-6 px-6 py-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
                             <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-300">
                                 <FiXCircle className="flex-shrink-0" size={16} />
                                 <span>{error}</span>
@@ -293,7 +293,7 @@ const Projects = () => {
                                             <tr key={i} className="animate-pulse hover:bg-gray-50/50 dark:hover:bg-gray-700/30 border-b border-gray-100 dark:border-gray-700">
                                                 <td className="px-6 py-5" colSpan="5">
                                                     <div className="flex items-center justify-center space-x-4">
-                                                        <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+                                                        <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
                                                         <div className="flex-1 space-y-3">
                                                             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto"></div>
                                                             <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto"></div>
@@ -325,7 +325,7 @@ const Projects = () => {
                                                     <td className="px-6 py-5">
                                                         <div className="flex items-center justify-center">
                                                             <div className="flex items-center">
-                                                                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                                                                <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
                                                                     {project.project_name?.charAt(0) || 'P'}
                                                                 </div>
                                                                 <div className="ml-4 text-left">

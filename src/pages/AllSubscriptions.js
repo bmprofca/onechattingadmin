@@ -10,7 +10,7 @@ import Modal from '../component/common/Modal';
 
 const emptyForm = { username: '', userName: '', package_id: '', packageName: '', project_id: '', projectName: '', type: 'project', amount: '', start_date: '', end_date: '' };
 const initialFilters = { search: '', username: '', userName: '', project_id: '', projectName: '', package_id: '', packageName: '' };
-const inputClass = 'w-full px-3.5 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/80 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all';
+const inputClass = 'w-full px-3.5 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/80 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all';
 
 const UserAvatar = ({ image, name, size = 'w-9 h-9' }) => {
     const [hasError, setHasError] = useState(false);
@@ -41,13 +41,13 @@ const ProjectLogo = ({ image, name, size = 'w-9 h-9' }) => {
             <img
                 src={image}
                 alt={name || 'Project'}
-                className={`${size} rounded-xl object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0 shadow-sm`}
+                className={`${size} rounded-lg object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0 shadow-sm`}
                 onError={() => setHasError(true)}
             />
         );
     }
     return (
-        <div className={`${size} rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm`}>
+        <div className={`${size} rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm`}>
             <FiBriefcase size={16} />
         </div>
     );
@@ -405,7 +405,7 @@ const AllSubscriptions = () => {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20">
+                        <div className="p-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
                             <FiBriefcase className="text-white" size={24} />
                         </div>
                         <div>
@@ -419,14 +419,14 @@ const AllSubscriptions = () => {
                     </div>
                     <button
                         onClick={() => openModal()}
-                        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:scale-[1.02] transition-all"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:scale-[1.02] transition-all"
                     >
                         <FiPlus size={16} /> Create User Package
                     </button>
                 </div>
 
                 {/* Filter Bar */}
-                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 sm:p-5 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 mb-6">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-2 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 mb-2">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         {/* 1. Search */}
                         <div className="relative">
@@ -528,31 +528,6 @@ const AllSubscriptions = () => {
                                 </button>
                             )}
                         </div>
-                    </div>
-
-                    {/* Filter footer: Active filter tags & actions */}
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50 text-xs text-gray-500">
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <span>Showing {subscriptions.length} of {pagination.total} subscriptions</span>
-                            {hasActiveFilters && (
-                                <button
-                                    type="button"
-                                    onClick={clearAllFilters}
-                                    className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium ml-2"
-                                >
-                                    Clear all filters
-                                </button>
-                            )}
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => fetchSubscriptions()}
-                            className="p-2 border border-gray-200 dark:border-gray-700 rounded-lg dark:text-gray-300 hover:text-indigo-600 flex items-center gap-1.5 transition-colors text-xs font-medium"
-                            title="Refresh"
-                        >
-                            <FiRefreshCw className={loading ? 'animate-spin' : ''} size={13} />
-                            <span>Refresh</span>
-                        </button>
                     </div>
                 </div>
 
@@ -658,7 +633,7 @@ const AllSubscriptions = () => {
                                 <PickerLoading />
                             ) : users.length ? (
                                 users.map(user => (
-                                    <button type="button" key={user.username} onClick={() => selectUser(user)} className="w-full rounded-xl p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-3 transition-colors">
+                                    <button type="button" key={user.username} onClick={() => selectUser(user)} className="w-full rounded-lg p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-3 transition-colors">
                                         <UserAvatar image={user.profile_picture || user.image} name={user.name || user.full_name || user.username} />
                                         <div className="min-w-0 flex-1">
                                             <div className="font-semibold text-gray-900 dark:text-white truncate">{user.name || user.full_name || user.username}</div>
@@ -686,7 +661,7 @@ const AllSubscriptions = () => {
                             {packages
                                 .filter(pack => `${pack.package_id} ${pack.name}`.toLowerCase().includes(packageSearchTerm.toLowerCase()))
                                 .map(pack => (
-                                    <button type="button" key={pack.package_id} onClick={() => selectPackage(pack)} className="w-full rounded-xl p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                    <button type="button" key={pack.package_id} onClick={() => selectPackage(pack)} className="w-full rounded-lg p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                                         <div className="font-semibold text-gray-900 dark:text-white">{pack.name || pack.package_id}</div>
                                         <div className="font-mono text-xs text-gray-500 dark:text-gray-400 mt-0.5">{pack.package_id} · ₹{pack.amount} · {pack.validity}</div>
                                     </button>
@@ -710,7 +685,7 @@ const AllSubscriptions = () => {
                             {projects
                                 .filter(project => `${project.project_id} ${project.name || project.project_name || ''}`.toLowerCase().includes(projectSearchTerm.toLowerCase()))
                                 .map(project => (
-                                    <button type="button" key={project.project_id} onClick={() => selectProject(project)} className="w-full rounded-xl p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-3 transition-colors">
+                                    <button type="button" key={project.project_id} onClick={() => selectProject(project)} className="w-full rounded-lg p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-3 transition-colors">
                                         <ProjectLogo image={project.image || project.profile_picture} name={project.name || project.project_name} />
                                         <div className="min-w-0 flex-1">
                                             <div className="font-semibold text-gray-900 dark:text-white truncate">{project.name || project.project_name || project.project_id}</div>

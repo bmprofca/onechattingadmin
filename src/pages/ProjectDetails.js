@@ -182,7 +182,7 @@ const ProjectDetails = () => {
 
                     {/* Error Message */}
                     {error && (
-                        <div className="mb-6 px-6 py-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-900/20 rounded-2xl border border-red-200 dark:border-red-800">
+                        <div className="mb-6 px-6 py-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
                             <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-300">
                                 <FiAlertTriangle className="flex-shrink-0" size={16} />
                                 <span>{error}</span>
@@ -204,10 +204,10 @@ const ProjectDetails = () => {
                     {loading ? (
                         <div className="space-y-6">
                             {/* Loading Skeleton */}
-                            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-8">
+                            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-8">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                     <div className="flex items-center gap-5">
-                                        <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-indigo-900/50 dark:to-purple-900/50 animate-pulse"></div>
+                                        <div className="h-20 w-20 rounded-lg bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-indigo-900/50 dark:to-purple-900/50 animate-pulse"></div>
                                         <div className="space-y-3">
                                             <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
                                             <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
@@ -223,15 +223,15 @@ const ProjectDetails = () => {
                     ) : (
                         <div className="space-y-6">
                             {/* Hero Header Card */}
-                            <div className="relative overflow-hidden bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-8">
+                            <div className="relative overflow-hidden bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl p-8">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
                                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-emerald-500/5 to-teal-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 rounded-full blur-3xl translate-y-16 -translate-x-16"></div>
 
                                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                     <div className="flex items-center gap-6">
                                         <div className="relative">
-                                            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur-xl opacity-20"></div>
-                                            <div className="relative h-20 w-20 rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-indigo-500/20">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg blur-xl opacity-20"></div>
+                                            <div className="relative h-20 w-20 rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-indigo-500/20">
                                                 {project.project_name?.charAt(0) || project.name?.charAt(0) || 'P'}
                                             </div>
                                         </div>
@@ -271,7 +271,7 @@ const ProjectDetails = () => {
                                     <div className="flex flex-wrap items-center gap-3">
                                         <button
                                             onClick={() => setShowGenerateModal(true)}
-                                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg text-xs font-bold shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
                                         >
                                             <QrCodeIcon size={15} />
                                             Generate QR Code
@@ -302,7 +302,7 @@ const ProjectDetails = () => {
                             </div>
 
                             {/* QR Codes Section */}
-                            <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+                            <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
                                 <div className="px-6 py-5 bg-gradient-to-r from-indigo-50/50 via-purple-50/50 to-pink-50/30 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg shadow-indigo-500/20 text-white">
@@ -324,14 +324,14 @@ const ProjectDetails = () => {
                                         <button
                                             onClick={fetchQRCodes}
                                             disabled={loadingQr}
-                                            className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+                                            className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
                                             title="Refresh QR Codes"
                                         >
                                             <FiRefreshCw size={14} className={loadingQr ? 'animate-spin' : ''} />
                                         </button>
                                         <button
                                             onClick={() => setShowGenerateModal(true)}
-                                            className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-sm active:scale-95"
+                                            className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition-all shadow-sm active:scale-95"
                                         >
                                             <FiPlus size={14} />
                                             New QR Code
@@ -346,7 +346,7 @@ const ProjectDetails = () => {
                                         </div>
                                     ) : qrCodes.length === 0 ? (
                                         <div className="py-12 text-center">
-                                            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl inline-block mb-3 text-indigo-500">
+                                            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg inline-block mb-3 text-indigo-500">
                                                 <QrCodeIcon size={32} />
                                             </div>
                                             <h3 className="text-base font-bold text-gray-800 dark:text-gray-200 mb-1">
@@ -357,7 +357,7 @@ const ProjectDetails = () => {
                                             </p>
                                             <button
                                                 onClick={() => setShowGenerateModal(true)}
-                                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-md active:scale-95"
+                                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition-all shadow-md active:scale-95"
                                             >
                                                 <FiPlus size={15} />
                                                 Create First QR Code
@@ -372,14 +372,14 @@ const ProjectDetails = () => {
                                                 return (
                                                     <div
                                                         key={item.qr_id}
-                                                        className="group bg-gray-50/70 dark:bg-gray-700/30 rounded-2xl border border-gray-200/80 dark:border-gray-700 p-5 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all hover:shadow-lg hover:shadow-indigo-500/5 flex flex-col justify-between"
+                                                        className="group bg-gray-50/70 dark:bg-gray-700/30 rounded-lg border border-gray-200/80 dark:border-gray-700 p-5 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all hover:shadow-lg hover:shadow-indigo-500/5 flex flex-col justify-between"
                                                     >
                                                         <div>
                                                             <div className="flex items-start justify-between gap-3 mb-4">
                                                                 <div className="flex items-center gap-3">
                                                                     <div
                                                                         onClick={() => setSelectedQrModal(item)}
-                                                                        className="cursor-pointer p-2 bg-white rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 hover:scale-105 transition-transform"
+                                                                        className="cursor-pointer p-2 bg-white rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 hover:scale-105 transition-transform"
                                                                         title="Click to expand QR Code"
                                                                     >
                                                                         <QRCodeCanvas
@@ -399,17 +399,16 @@ const ProjectDetails = () => {
                                                                 </div>
 
                                                                 <span
-                                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
-                                                                        isItemActive
-                                                                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
-                                                                            : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
-                                                                    }`}
+                                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${isItemActive
+                                                                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
+                                                                        : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+                                                                        }`}
                                                                 >
                                                                     {isItemActive ? 'Active' : 'Disabled'}
                                                                 </span>
                                                             </div>
 
-                                                            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400 bg-white/60 dark:bg-gray-800/60 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700 mb-4">
+                                                            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400 bg-white/60 dark:bg-gray-800/60 p-2.5 rounded-lg border border-gray-100 dark:border-gray-700 mb-4">
                                                                 <div>
                                                                     <span className="text-[10px] uppercase text-gray-400 block font-medium">Scans</span>
                                                                     <span className="font-bold text-gray-800 dark:text-gray-200">
@@ -471,7 +470,7 @@ const ProjectDetails = () => {
                                 {/* Left Column: Configuration & Details */}
                                 <div className="lg:col-span-8 space-y-6">
                                     {/* Configuration Details Card */}
-                                    <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+                                    <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
                                         <div className="px-6 py-5 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                                             <div className="flex items-center gap-2.5">
                                                 <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
@@ -539,7 +538,7 @@ const ProjectDetails = () => {
                                     </section>
 
                                     {/* Additional Information Card */}
-                                    <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+                                    <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
                                         <div className="px-6 py-5 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2.5">
                                             <div className="p-2 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg shadow-purple-500/20">
                                                 <FiInfo className="text-white" size={16} />
@@ -550,7 +549,7 @@ const ProjectDetails = () => {
                                         </div>
                                         <div className="p-6">
                                             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <div className="flex flex-col p-4 bg-gray-50 dark:bg-gray-700/30 rounded-xl border border-gray-100 dark:border-gray-700">
+                                                <div className="flex flex-col p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-gray-700">
                                                     <dt className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1.5">
                                                         <FiThumbsUp size={12} className="text-indigo-500" />
                                                         WhatsApp Verified
@@ -559,7 +558,7 @@ const ProjectDetails = () => {
                                                         {project.is_whatsapp_verified ? 'Yes' : 'No'}
                                                     </dd>
                                                 </div>
-                                                <div className="flex flex-col p-4 bg-gray-50 dark:bg-gray-700/30 rounded-xl border border-gray-100 dark:border-gray-700">
+                                                <div className="flex flex-col p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-gray-700">
                                                     <dt className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1.5">
                                                         <FiBriefcase size={12} className="text-indigo-500" />
                                                         Business ID
@@ -575,7 +574,7 @@ const ProjectDetails = () => {
 
                                 {/* Right Column: Business Profile */}
                                 <div className="lg:col-span-4 space-y-6">
-                                    <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden sticky top-24">
+                                    <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden sticky top-24">
                                         <div className="px-6 py-5 bg-gradient-to-r from-emerald-500 to-teal-600">
                                             <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                                                 <FiGlobe size={16} />
@@ -631,7 +630,7 @@ const ProjectDetails = () => {
                                                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 text-left">Websites</p>
                                                     <div className="flex flex-wrap gap-2">
                                                         {profile.websites.map((site, i) => (
-                                                             <a
+                                                            <a
                                                                 key={i}
                                                                 href={site}
                                                                 target="_blank"
@@ -677,7 +676,7 @@ const ProjectDetails = () => {
             {/* Generate QR Code Form Modal */}
             {showGenerateModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-6">
+                    <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-100 dark:border-gray-700 p-6">
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
                             Generate New QR Code
                         </h3>
@@ -695,7 +694,7 @@ const ProjectDetails = () => {
                                     placeholder="e.g. Reception Desk, Flyer Campaign, Website Banner"
                                     value={newQrLabel}
                                     onChange={(e) => setNewQrLabel(e.target.value)}
-                                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
                             </div>
 
@@ -703,14 +702,14 @@ const ProjectDetails = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShowGenerateModal(false)}
-                                    className="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+                                    className="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={generatingQr}
-                                    className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-md disabled:opacity-50"
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition-all shadow-md disabled:opacity-50"
                                 >
                                     {generatingQr ? <FiRefreshCw className="animate-spin" size={13} /> : <FiPlus size={14} />}
                                     {generatingQr ? 'Generating...' : 'Generate QR Code'}
@@ -746,7 +745,7 @@ const StatusBadge = ({ condition, trueLabel, falseLabel, icon: Icon, color = "gr
     };
 
     return (
-        <span className={`inline-flex items-center px-4 py-2 rounded-xl border text-xs font-semibold ${getColorClasses()}`}>
+        <span className={`inline-flex items-center px-4 py-2 rounded-lg border text-xs font-semibold ${getColorClasses()}`}>
             <Icon className="mr-1.5" size={14} />
             {condition ? trueLabel : falseLabel}
         </span>
@@ -756,7 +755,7 @@ const StatusBadge = ({ condition, trueLabel, falseLabel, icon: Icon, color = "gr
 const ContactItem = ({ icon: Icon, text }) => {
     if (!text) return null;
     return (
-        <div className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors group">
+        <div className="flex items-center gap-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors group">
             <div className="p-2 rounded-lg bg-white dark:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-600 group-hover:border-indigo-200 dark:group-hover:border-indigo-700 transition-colors">
                 <Icon size={14} className="text-indigo-500 dark:text-indigo-400" />
             </div>

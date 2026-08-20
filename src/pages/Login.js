@@ -168,7 +168,7 @@ function Login() {
 
         <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full">
           <div className="flex items-center gap-3">
-            <div className="logo-pulse relative w-11 h-11 rounded-xl bg-gradient-to-br from-[#FF6A4D] to-[#6C4CE0] flex items-center justify-center font-[Sora] font-extrabold text-lg text-white">
+            <div className="logo-pulse relative w-11 h-11 rounded-lg bg-gradient-to-br from-[#FF6A4D] to-[#6C4CE0] flex items-center justify-center font-[Sora] font-extrabold text-lg text-white">
               1
             </div>
             <span className="font-[Sora] font-bold text-xl tracking-tight">1chatting</span>
@@ -192,9 +192,9 @@ function Login() {
 
             {/* bounded bubble cluster: fixed box, bubbles positioned only within it */}
             <div className="relative w-full h-40 xl:w-40 xl:h-48 shrink-0">
-              <div className="bubble absolute top-0 right-6 xl:right-2 w-14 h-14 rounded-2xl rounded-bl-sm bg-[#FF6A4D] shadow-[0_16px_34px_-12px_rgba(255,106,77,0.55)]" />
-              <div className="bubble-slow absolute top-10 right-24 xl:right-0 xl:top-16 w-9 h-9 rounded-xl rounded-br-sm bg-[#6C4CE0] shadow-[0_16px_34px_-12px_rgba(108,76,224,0.5)]" style={{ animationDelay: '0.4s' }} />
-              <div className="bubble absolute bottom-2 right-2 xl:right-10 xl:bottom-0 w-11 h-11 rounded-xl rounded-bl-sm bg-[#23C9A7] shadow-[0_16px_34px_-12px_rgba(35,201,167,0.45)]" style={{ animationDelay: '1s' }} />
+              <div className="bubble absolute top-0 right-6 xl:right-2 w-14 h-14 rounded-lg rounded-bl-sm bg-[#FF6A4D] shadow-[0_16px_34px_-12px_rgba(255,106,77,0.55)]" />
+              <div className="bubble-slow absolute top-10 right-24 xl:right-0 xl:top-16 w-9 h-9 rounded-lg rounded-br-sm bg-[#6C4CE0] shadow-[0_16px_34px_-12px_rgba(108,76,224,0.5)]" style={{ animationDelay: '0.4s' }} />
+              <div className="bubble absolute bottom-2 right-2 xl:right-10 xl:bottom-0 w-11 h-11 rounded-lg rounded-bl-sm bg-[#23C9A7] shadow-[0_16px_34px_-12px_rgba(35,201,167,0.45)]" style={{ animationDelay: '1s' }} />
             </div>
           </div>
 
@@ -249,7 +249,7 @@ function Login() {
                     inputMode="numeric"
                     placeholder="98765 43210"
                     autoFocus
-                    className="w-full pl-14 pr-4 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder:text-gray-500 outline-none transition-all duration-200  focus:ring-2 focus:ring-[#FF6A4D]/12 shadow-[0_1px_2px_rgba(34,28,53,0.04)]"
+                    className="w-full pl-14 pr-4 py-3.5 rounded-lg bg-white border border-gray-200 text-gray-900 placeholder:text-gray-500 outline-none transition-all duration-200  focus:ring-2 focus:ring-[#FF6A4D]/12 shadow-[0_1px_2px_rgba(34,28,53,0.04)]"
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value)}
                     required
@@ -260,7 +260,7 @@ function Login() {
               <button
                 type="submit"
                 disabled={loading || !mobile}
-                className="group relative w-full py-3.5 px-4 rounded-xl bg-blue-500 text-white font-[Sora] font-bold text-sm tracking-wide overflow-hidden transition-all duration-200 hover:from-[#F04B32] hover:to-[#D6361F] hover:shadow-[0_10px_28px_-8px_rgba(198,48,28,0.55)] active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
+                className="group relative w-full py-3.5 px-4 rounded-lg bg-blue-500 text-white font-[Sora] font-bold text-sm tracking-wide overflow-hidden transition-all duration-200 hover:from-[#F04B32] hover:to-[#D6361F] hover:shadow-[0_10px_28px_-8px_rgba(198,48,28,0.55)] active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   {loading && (
@@ -286,7 +286,7 @@ function Login() {
                       maxLength={1}
                       value={d}
                       style={{ animationDelay: `${i * 60}ms` }}
-                      className="digit-in w-11 sm:w-12 h-13 sm:h-14 py-3 rounded-xl bg-white border border-[#E4E0F2] text-center text-lg font-[JetBrainsMono] font-semibold text-[#221C35] outline-none transition-all duration-200 focus:border-[#6C4CE0] focus:ring-4 focus:ring-[#6C4CE0]/15 shadow-[0_1px_2px_rgba(34,28,53,0.04)]"
+                      className="digit-in w-11 sm:w-12 h-13 sm:h-14 py-3 rounded-lg bg-white border border-[#E4E0F2] text-center text-lg font-[JetBrainsMono] font-semibold text-[#221C35] outline-none transition-all duration-200 focus:border-[#6C4CE0] focus:ring-4 focus:ring-[#6C4CE0]/15 shadow-[0_1px_2px_rgba(34,28,53,0.04)]"
                       onChange={(e) => handleDigitChange(i, e.target.value)}
                       onKeyDown={(e) => handleDigitKeyDown(i, e)}
                       required
@@ -299,7 +299,7 @@ function Login() {
               <button
                 type="submit"
                 disabled={loading || otp.length !== 6}
-                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#6C4CE0] to-[#5A3DD1] text-white font-[Sora] font-bold text-sm tracking-wide transition-all duration-200 hover:shadow-[0_10px_28px_-8px_rgba(90,61,209,0.5)] active:scale-[0.98] disabled:opacity-45 disabled:pointer-events-none"
+                className="w-full py-3.5 px-4 rounded-lg bg-gradient-to-r from-[#6C4CE0] to-[#5A3DD1] text-white font-[Sora] font-bold text-sm tracking-wide transition-all duration-200 hover:shadow-[0_10px_28px_-8px_rgba(90,61,209,0.5)] active:scale-[0.98] disabled:opacity-45 disabled:pointer-events-none"
               >
                 <span className="flex items-center justify-center gap-2">
                   {loading && (

@@ -131,7 +131,7 @@ const ProviderFormModal = ({ isOpen, onClose, tokens, editingProvider, onSaved }
                 className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
                 onClick={saving ? undefined : onClose}
             />
-            <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+            <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-indigo-500/5 to-indigo-600/5">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
@@ -181,7 +181,7 @@ const ProviderFormModal = ({ isOpen, onClose, tokens, editingProvider, onSaved }
                                 value={apiKey}
                                 onChange={(e) => setApiKey(e.target.value)}
                                 placeholder="Paste the provider API key"
-                                className="w-full pl-4 pr-11 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white text-sm font-mono transition-all"
+                                className="w-full pl-4 pr-11 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white text-sm font-mono transition-all"
                             />
                             <button
                                 type="button"
@@ -196,7 +196,7 @@ const ProviderFormModal = ({ isOpen, onClose, tokens, editingProvider, onSaved }
                         </p>
                     </div>
 
-                    <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
                         <div>
                             <p className="text-sm font-medium text-gray-900 dark:text-white">Active</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">Enable this provider for use immediately</p>
@@ -219,14 +219,14 @@ const ProviderFormModal = ({ isOpen, onClose, tokens, editingProvider, onSaved }
                             type="button"
                             onClick={onClose}
                             disabled={saving}
-                            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                            className="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={saving}
-                            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 transition-all disabled:opacity-50"
+                            className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 transition-all disabled:opacity-50"
                         >
                             {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Add Provider'}
                         </button>
@@ -280,7 +280,7 @@ const DeleteConfirmModal = ({ isOpen, onClose, tokens, provider, onDeleted }) =>
                 className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
                 onClick={deleting ? undefined : onClose}
             />
-            <div className="relative w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+            <div className="relative w-full max-w-sm bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
                 <div className="px-6 py-6 text-center">
                     <div className="mx-auto mb-4 p-3 w-fit bg-red-50 dark:bg-red-900/30 rounded-full">
                         <FiTrash2 className="text-red-500 dark:text-red-400" size={22} />
@@ -297,14 +297,14 @@ const DeleteConfirmModal = ({ isOpen, onClose, tokens, provider, onDeleted }) =>
                     <button
                         onClick={onClose}
                         disabled={deleting}
-                        className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                        className="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleDelete}
                         disabled={deleting}
-                        className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm font-medium shadow-lg shadow-red-500/20 hover:shadow-xl transition-all disabled:opacity-50"
+                        className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm font-medium shadow-lg shadow-red-500/20 hover:shadow-xl transition-all disabled:opacity-50"
                     >
                         {deleting ? 'Deleting...' : 'Delete'}
                     </button>
@@ -442,7 +442,7 @@ const AiProviders = () => {
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20">
+                            <div className="p-2 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
                                 <FiCpu className="text-white" size={24} />
                             </div>
                             <div>
@@ -456,7 +456,7 @@ const AiProviders = () => {
                         </div>
                         <button
                             onClick={openAddModal}
-                            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-[1.02] transition-all duration-200"
+                            className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 text-white text-sm font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-[1.02] transition-all duration-200"
                         >
                             <FiPlus size={16} />
                             Add Provider
@@ -465,38 +465,38 @@ const AiProviders = () => {
 
                     {/* Stats Overview */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Keys</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{totalProviders}</h3>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">All time</p>
                                 </div>
-                                <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/20">
+                                <div className="p-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20">
                                     <FiDatabase className="text-white" size={24} />
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Keys</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{activeProviders}</h3>
                                     <p className="text-xs text-green-500 dark:text-green-400 mt-1">{((activeProviders / totalProviders) * 100 || 0).toFixed(1)}% of total</p>
                                 </div>
-                                <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg shadow-green-500/20">
+                                <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg shadow-green-500/20">
                                     <FiActivity className="text-white" size={24} />
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Distinct Providers</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{distinctProviders}</h3>
                                     <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">Unique provider names</p>
                                 </div>
-                                <div className="p-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg shadow-emerald-500/20">
+                                <div className="p-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-lg shadow-emerald-500/20">
                                     <FiToggleRight className="text-white" size={24} />
                                 </div>
                             </div>
@@ -504,14 +504,14 @@ const AiProviders = () => {
                     </div>
 
                     {/* Search and Filters */}
-                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-5 mb-6">
-                        <div className="flex flex-col gap-4">
-                            <div className="relative flex-1">
+                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-2 mb-2">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div className="relative max-w-[600px] flex-1 w-full">
                                 <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                 <input
                                     type="text"
                                     placeholder="Search by provider name or ID..."
-                                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
+                                    className="w-full pl-11 pr-4 h-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition-all"
                                     value={searchTerm}
                                     onChange={(e) => { setPagination(p => ({ ...p, page: 1 })); setSearchTerm(e.target.value); }}
                                 />
@@ -534,7 +534,7 @@ const AiProviders = () => {
 
                     {/* Error Message */}
                     {error && (
-                        <div className="mb-6 px-6 py-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                        <div className="mb-6 px-6 py-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
                             <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-300">
                                 <FiXCircle className="flex-shrink-0" size={16} />
                                 <span>{error}</span>
@@ -575,7 +575,7 @@ const AiProviders = () => {
                                             <tr key={i} className="animate-pulse border-b border-gray-100 dark:border-gray-700">
                                                 <td className="px-6 py-5" colSpan="6">
                                                     <div className="flex items-center justify-center space-x-4">
-                                                        <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+                                                        <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
                                                         <div className="flex-1 space-y-3">
                                                             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto"></div>
                                                             <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto"></div>
@@ -599,7 +599,7 @@ const AiProviders = () => {
                                                     <td className="px-6 py-5">
                                                         <div className="flex items-center justify-center">
                                                             <div className="flex items-center">
-                                                                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-500/20">
+                                                                <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-500/20">
                                                                     {p.provider?.charAt(0)?.toUpperCase() || 'A'}
                                                                 </div>
                                                                 <div className="ml-4 text-left">

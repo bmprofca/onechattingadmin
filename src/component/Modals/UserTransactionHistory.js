@@ -34,10 +34,10 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:654
 const UserTransactionHistoryPage = ({ user: propUser, tokens: propTokens }) => {
 
     const navigate = useNavigate();
-   const { username: urlUsername } = useParams();
-const location = useLocation();
-const state = location.state || {};
-const username = state.username || urlUsername;
+    const { username: urlUsername } = useParams();
+    const location = useLocation();
+    const state = location.state || {};
+    const username = state.username || urlUsername;
 
     // Sidebar state
     const [isMinimized, setIsMinimized] = useState(() => {
@@ -55,19 +55,19 @@ const username = state.username || urlUsername;
     const [loadingUser, setLoadingUser] = useState(!propUser && !state.user && username);
     const [error, setError] = useState('');
     const [copiedId, setCopiedId] = useState(null);
-    const [pagination, setPagination] = useState({ 
-        page: 1, 
-        limit: 15, 
-        total_records: 0, 
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 15,
+        total_records: 0,
         total_pages: 0,
-        has_more: false 
+        has_more: false
     });
-    const [summary, setSummary] = useState({ 
-        total_debit: '0.00', 
-        total_credit: '0.00', 
-        current_balance: '0.00' 
+    const [summary, setSummary] = useState({
+        total_debit: '0.00',
+        total_credit: '0.00',
+        current_balance: '0.00'
     });
-    
+
     // Filters
     const [filters, setFilters] = useState({
         from_date: '',
@@ -125,15 +125,15 @@ const username = state.username || urlUsername;
         if (tokens?.token) {
             return tokens.token;
         }
-        
-        const storedToken = localStorage.getItem('adminToken') || 
-                           localStorage.getItem('token') || 
-                           localStorage.getItem('x-auth-token');
-        
+
+        const storedToken = localStorage.getItem('adminToken') ||
+            localStorage.getItem('token') ||
+            localStorage.getItem('x-auth-token');
+
         if (storedToken) {
             return storedToken;
         }
-        
+
         return null;
     };
 
@@ -157,7 +157,7 @@ const username = state.username || urlUsername;
             setLoadingUser(true);
             try {
                 const response = await axios.get(`${API_BASE_URL}/admin/user/${username}`, {
-                    headers: { 
+                    headers: {
                         'x-auth-token': token,
                         'x-token': token,
                         'Authorization': `Bearer ${token}`,
@@ -177,7 +177,7 @@ const username = state.username || urlUsername;
         };
 
         fetchUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [username, user]);
 
     // Initialize dates on mount
@@ -198,120 +198,120 @@ const username = state.username || urlUsername;
                 fetchTransactions(1);
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, filters.from_date, filters.to_date, filters.transaction_type, filters.type]);
 
     // Handle wallet credit/debit
-   // Handle wallet credit/debit
-const handleWalletAction = async () => {
-    if (!user?.username) {
-        toast.error('User not found');
-        return;
-    }
-
-    if (!walletAmount || parseFloat(walletAmount) <= 0) {
-        toast.error('Please enter a valid amount');
-        return;
-    }
-
-    const token = getAuthToken();
-    if (!token) {
-        toast.error('Authentication token missing');
-        return;
-    }
-
-    setWalletLoading(true);
-    
-    setWalletSuccess('');
-
-    try {
-        // Get admin username from token or localStorage
-        let adminUsername = '';
-        
-        // Try to get from propTokens
-        if (propTokens?.username) {
-            adminUsername = propTokens.username;
-        } else if (tokens?.username) {
-            adminUsername = tokens.username;
-        } else {
-            // Try to get from localStorage
-            adminUsername = localStorage.getItem('adminUsername') || 
-                           localStorage.getItem('username') || 
-                           'SYSTEM';
+    // Handle wallet credit/debit
+    const handleWalletAction = async () => {
+        if (!user?.username) {
+            toast.error('User not found');
+            return;
         }
 
-        // Prepare data for encryption with admin username included
-        const payload = {
-            amount: parseFloat(walletAmount),
-            remark: walletRemark || `${walletAction} by admin`,
-            admin: adminUsername // Include admin username in payload
-        };
-
-        // Encrypt the data using the Encrypt function
-        const encrypted = Encrypt(payload);
-
-        const payloadData = {
-            data: encrypted.data,
-            key: encrypted.key
-        };
-
-        // Determine which endpoint to use
-        const endpoint = walletAction === 'credit' 
-            ? `${API_BASE_URL}/admin/credit-wallet/${user.username}`
-            : `${API_BASE_URL}/admin/debit-wallet/${user.username}`;
-
-        const response = await axios.post(endpoint, payloadData, {
-            headers: { 
-                'x-auth-token': token,
-                'x-token': token,
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.data && response.data.error === false) {
-            setWalletSuccess(`Wallet ${walletAction}ed successfully!`);
-            
-            // Reset form
-            setWalletAmount('');
-            setWalletRemark('');
-            
-            // Refresh transactions and summary
-            fetchTransactions(1);
-            
-            // Close modal after 2 seconds
-            setTimeout(() => {
-                setShowWalletModal(false);
-                setWalletSuccess('');
-            }, 2000);
-        } else {
-            toast.error(response.data?.error || `Failed to ${walletAction} wallet`);
+        if (!walletAmount || parseFloat(walletAmount) <= 0) {
+            toast.error('Please enter a valid amount');
+            return;
         }
-    } catch (error) {
-        console.error(`Failed to ${walletAction} wallet:`, error);
-        
-        if (error.code === 'ERR_NETWORK') {
-            toast.error('Cannot connect to server. Please check if the API server is running.');
-        } else if (error.response) {
-            if (error.response.status === 401) {
-                toast.error('Unauthorized: Your session has expired. Please login again.');
-            } else if (error.response.status === 404) {
-                toast.error('User not found');
-            } else if (error.response.status === 500) {
-                toast.error('Server error. Please try again later.');
-                console.error('Server error details:', error.response.data);
+
+        const token = getAuthToken();
+        if (!token) {
+            toast.error('Authentication token missing');
+            return;
+        }
+
+        setWalletLoading(true);
+
+        setWalletSuccess('');
+
+        try {
+            // Get admin username from token or localStorage
+            let adminUsername = '';
+
+            // Try to get from propTokens
+            if (propTokens?.username) {
+                adminUsername = propTokens.username;
+            } else if (tokens?.username) {
+                adminUsername = tokens.username;
             } else {
-                toast.error(error.response.data?.error || `Server error: ${error.response.status}`);
+                // Try to get from localStorage
+                adminUsername = localStorage.getItem('adminUsername') ||
+                    localStorage.getItem('username') ||
+                    'SYSTEM';
             }
-        } else if (error.request) {
-            toast.error('No response from server. Please check your network connection.');
-        } else {
-            toast.error(`Request failed: ${error.message}`);
+
+            // Prepare data for encryption with admin username included
+            const payload = {
+                amount: parseFloat(walletAmount),
+                remark: walletRemark || `${walletAction} by admin`,
+                admin: adminUsername // Include admin username in payload
+            };
+
+            // Encrypt the data using the Encrypt function
+            const encrypted = Encrypt(payload);
+
+            const payloadData = {
+                data: encrypted.data,
+                key: encrypted.key
+            };
+
+            // Determine which endpoint to use
+            const endpoint = walletAction === 'credit'
+                ? `${API_BASE_URL}/admin/credit-wallet/${user.username}`
+                : `${API_BASE_URL}/admin/debit-wallet/${user.username}`;
+
+            const response = await axios.post(endpoint, payloadData, {
+                headers: {
+                    'x-auth-token': token,
+                    'x-token': token,
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.data && response.data.error === false) {
+                setWalletSuccess(`Wallet ${walletAction}ed successfully!`);
+
+                // Reset form
+                setWalletAmount('');
+                setWalletRemark('');
+
+                // Refresh transactions and summary
+                fetchTransactions(1);
+
+                // Close modal after 2 seconds
+                setTimeout(() => {
+                    setShowWalletModal(false);
+                    setWalletSuccess('');
+                }, 2000);
+            } else {
+                toast.error(response.data?.error || `Failed to ${walletAction} wallet`);
+            }
+        } catch (error) {
+            console.error(`Failed to ${walletAction} wallet:`, error);
+
+            if (error.code === 'ERR_NETWORK') {
+                toast.error('Cannot connect to server. Please check if the API server is running.');
+            } else if (error.response) {
+                if (error.response.status === 401) {
+                    toast.error('Unauthorized: Your session has expired. Please login again.');
+                } else if (error.response.status === 404) {
+                    toast.error('User not found');
+                } else if (error.response.status === 500) {
+                    toast.error('Server error. Please try again later.');
+                    console.error('Server error details:', error.response.data);
+                } else {
+                    toast.error(error.response.data?.error || `Server error: ${error.response.status}`);
+                }
+            } else if (error.request) {
+                toast.error('No response from server. Please check your network connection.');
+            } else {
+                toast.error(`Request failed: ${error.message}`);
+            }
+        } finally {
+            setWalletLoading(false);
         }
-    } finally {
-        setWalletLoading(false);
-    }
-};
+    };
 
     // Copy to clipboard function
     const copyToClipboard = (text, id) => {
@@ -326,17 +326,17 @@ const handleWalletAction = async () => {
             toast.error('Username is required');
             return;
         }
-        
+
         const token = getAuthToken();
-        
+
         if (!token) {
             toast.error('Authentication token is missing. Please login again.');
             return;
         }
 
         setLoading(true);
-        
-        
+
+
         try {
             const params = new URLSearchParams({
                 page: page,
@@ -348,15 +348,15 @@ const handleWalletAction = async () => {
             if (filters.transaction_type) {
                 params.append('transaction_type', filters.transaction_type);
             }
-            
+
             if (filters.type !== '') {
                 params.append('type', filters.type);
             }
 
             const url = `${API_BASE_URL}/admin/user/transaction-history/${encodeURIComponent(user.username)}?${params.toString()}`;
-            
+
             const response = await axios.get(url, {
-                headers: { 
+                headers: {
                     'x-auth-token': token,
                     'x-token': token,
                     'Authorization': `Bearer ${token}`,
@@ -366,7 +366,7 @@ const handleWalletAction = async () => {
 
             if (response.data && response.data.error === false) {
                 setTransactions(response.data.data || []);
-                
+
                 if (response.data.summary) {
                     setSummary({
                         total_debit: response.data.summary.total_debit || '0.00',
@@ -374,7 +374,7 @@ const handleWalletAction = async () => {
                         current_balance: response.data.summary.current_balance || '0.00'
                     });
                 }
-                
+
                 if (response.data.pagination) {
                     setPagination({
                         page: response.data.pagination.page || page,
@@ -389,7 +389,7 @@ const handleWalletAction = async () => {
             }
         } catch (error) {
             console.error('Failed to fetch transaction history:', error);
-            
+
             if (error.code === 'ERR_NETWORK') {
                 toast.error('Cannot connect to server. Please check if the API server is running.');
             } else if (error.response) {
@@ -453,13 +453,13 @@ const handleWalletAction = async () => {
     // FIXED: Amount formatting for your API (type is boolean from API)
     const formatAmount = (amount, type) => {
         if (!amount && amount !== 0) return { formatted: '₹0.00', class: '', icon: null, prefix: '' };
-        
+
         const num = parseFloat(amount);
-        
+
         // Your API returns type as boolean (true = credit, false = debit)
         // This is the CORRECT way to handle it
         const isCredit = type === true;
-        
+
         const absNum = Math.abs(num);
         const formattedNum = new Intl.NumberFormat('en-IN', {
             style: 'currency',
@@ -467,12 +467,12 @@ const handleWalletAction = async () => {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         }).format(absNum);
-        
+
         return {
             formatted: formattedNum,
             class: isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400',
-            icon: isCredit ? 
-                <FiArrowDownLeft className="inline mr-1" size={14} /> : 
+            icon: isCredit ?
+                <FiArrowDownLeft className="inline mr-1" size={14} /> :
                 <FiArrowUpRight className="inline mr-1" size={14} />,
             prefix: isCredit ? '+' : '-'
         };
@@ -480,7 +480,7 @@ const handleWalletAction = async () => {
 
     const getTransactionBadge = (transactionType) => {
         const type = transactionType?.toLowerCase() || '';
-        
+
         if (type.includes('wallet topup')) {
             return {
                 bg: 'bg-emerald-100 dark:bg-emerald-900/30',
@@ -557,9 +557,9 @@ const handleWalletAction = async () => {
 
         const csvContent = [
             headers.join(','),
-            ...rows.map(row => row.map(cell => 
-                typeof cell === 'string' && (cell.includes(',') || cell.includes('"')) 
-                    ? `"${cell.replace(/"/g, '""')}"` 
+            ...rows.map(row => row.map(cell =>
+                typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))
+                    ? `"${cell.replace(/"/g, '""')}"`
                     : cell
             ).join(','))
         ].join('\n');
@@ -580,8 +580,8 @@ const handleWalletAction = async () => {
     };
 
     // Filter transactions by search term
-    const filteredTransactions = transactions.filter(t => 
-        searchTerm === '' || 
+    const filteredTransactions = transactions.filter(t =>
+        searchTerm === '' ||
         t.transaction_id?.toString().includes(searchTerm) ||
         t.transaction_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.remark?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -633,7 +633,7 @@ const handleWalletAction = async () => {
             {/* Wallet Action Modal */}
             {showWalletModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -642,7 +642,7 @@ const handleWalletAction = async () => {
                                 <button
                                     onClick={() => {
                                         setShowWalletModal(false);
-                                        
+
                                         setWalletSuccess('');
                                         setWalletAmount('');
                                         setWalletRemark('');
@@ -715,11 +715,10 @@ const handleWalletAction = async () => {
                                     <button
                                         onClick={handleWalletAction}
                                         disabled={walletLoading || !walletAmount || parseFloat(walletAmount) <= 0 || walletSuccess}
-                                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition-all ${
-                                            walletAction === 'credit'
+                                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition-all ${walletAction === 'credit'
                                                 ? 'bg-emerald-600 hover:bg-emerald-700'
                                                 : 'bg-rose-600 hover:bg-rose-700'
-                                        } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
+                                            } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
                                     >
                                         {walletLoading ? (
                                             <>
@@ -736,7 +735,7 @@ const handleWalletAction = async () => {
                                     <button
                                         onClick={() => {
                                             setShowWalletModal(false);
-                                            
+
                                             setWalletSuccess('');
                                             setWalletAmount('');
                                             setWalletRemark('');
@@ -813,7 +812,7 @@ const handleWalletAction = async () => {
 
                     {/* Balance Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Total Credit</p>
@@ -826,7 +825,7 @@ const handleWalletAction = async () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Total Debit</p>
@@ -839,7 +838,7 @@ const handleWalletAction = async () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Current Balance</p>
@@ -855,7 +854,7 @@ const handleWalletAction = async () => {
                     </div>
 
                     {/* Main content card */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                         {/* Error Message */}
                         {error && (
                             <div className="px-6 py-3 bg-red-50 dark:bg-red-900/20 border-b border-red-100 dark:border-red-800">
@@ -890,11 +889,10 @@ const handleWalletAction = async () => {
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => setShowFilters(!showFilters)}
-                                        className={`px-4 py-2.5 border rounded-lg text-sm font-medium flex items-center transition-all ${
-                                            Object.values(filters).some(v => v && v !== get30DaysAgo() && v !== getTodayDate() && v !== '')
+                                        className={`px-4 py-2.5 border rounded-lg text-sm font-medium flex items-center transition-all ${Object.values(filters).some(v => v && v !== get30DaysAgo() && v !== getTodayDate() && v !== '')
                                                 ? 'border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
                                                 : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                        }`}
+                                            }`}
                                     >
                                         <FiFilter className="mr-2" size={14} />
                                         Filters
@@ -1081,7 +1079,7 @@ const handleWalletAction = async () => {
                                                     <FiFileText size={48} className="text-gray-300 dark:text-gray-600 mb-3" />
                                                     <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">No transactions found</p>
                                                     <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm">
-                                                        {searchTerm || Object.values(filters).some(v => v && v !== get30DaysAgo() && v !== getTodayDate() && v !== '') 
+                                                        {searchTerm || Object.values(filters).some(v => v && v !== get30DaysAgo() && v !== getTodayDate() && v !== '')
                                                             ? 'No transactions match your current filters.'
                                                             : 'This user has no transaction history yet.'}
                                                     </p>

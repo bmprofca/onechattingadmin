@@ -159,7 +159,7 @@ const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
                 className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
                 onClick={saving ? undefined : onClose}
             />
-            <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+            <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-teal-500/5 to-cyan-600/5">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-lg shadow-lg shadow-teal-500/20">
@@ -217,7 +217,7 @@ const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
                                 value={inputPrice}
                                 onChange={(e) => setInputPrice(e.target.value)}
                                 placeholder="0.2500"
-                                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 dark:text-white text-sm font-mono transition-all"
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 dark:text-white text-sm font-mono transition-all"
                             />
                         </div>
                         <div>
@@ -232,7 +232,7 @@ const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
                                 value={outputPrice}
                                 onChange={(e) => setOutputPrice(e.target.value)}
                                 placeholder="1.2500"
-                                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 dark:text-white text-sm font-mono transition-all"
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 dark:text-white text-sm font-mono transition-all"
                             />
                         </div>
                     </div>
@@ -245,14 +245,14 @@ const PricingFormModal = ({ isOpen, onClose, tokens, editingRow, onSaved }) => {
                             type="button"
                             onClick={onClose}
                             disabled={saving}
-                            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                            className="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={saving}
-                            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-sm font-medium shadow-lg shadow-teal-500/20 hover:shadow-xl hover:shadow-teal-500/30 transition-all disabled:opacity-50"
+                            className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-sm font-medium shadow-lg shadow-teal-500/20 hover:shadow-xl hover:shadow-teal-500/30 transition-all disabled:opacity-50"
                         >
                             {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Add Pricing'}
                         </button>
@@ -307,7 +307,7 @@ const DeleteConfirmModal = ({ isOpen, onClose, tokens, row, onDeleted }) => {
                 className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
                 onClick={deleting ? undefined : onClose}
             />
-            <div className="relative w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+            <div className="relative w-full max-w-sm bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
                 <div className="px-6 py-6 text-center">
                     <div className="mx-auto mb-4 p-3 w-fit bg-red-50 dark:bg-red-900/30 rounded-full">
                         <FiTrash2 className="text-red-500 dark:text-red-400" size={22} />
@@ -324,14 +324,14 @@ const DeleteConfirmModal = ({ isOpen, onClose, tokens, row, onDeleted }) => {
                     <button
                         onClick={onClose}
                         disabled={deleting}
-                        className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                        className="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleDelete}
                         disabled={deleting}
-                        className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm font-medium shadow-lg shadow-red-500/20 hover:shadow-xl transition-all disabled:opacity-50"
+                        className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm font-medium shadow-lg shadow-red-500/20 hover:shadow-xl transition-all disabled:opacity-50"
                     >
                         {deleting ? 'Deleting...' : 'Delete'}
                     </button>
@@ -491,7 +491,7 @@ const AiModelPricing = () => {
                     {/* Page Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl shadow-lg shadow-teal-500/20">
+                            <div className="p-2 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-lg shadow-lg shadow-teal-500/20">
                                 <FiDollarSign className="text-white" size={24} />
                             </div>
                             <div>
@@ -505,7 +505,7 @@ const AiModelPricing = () => {
                         </div>
                         <button
                             onClick={openAddModal}
-                            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-sm font-medium shadow-lg shadow-teal-500/20 hover:shadow-xl hover:shadow-teal-500/30 hover:scale-[1.02] transition-all duration-200"
+                            className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-sm font-medium shadow-lg shadow-teal-500/20 hover:shadow-xl hover:shadow-teal-500/30 hover:scale-[1.02] transition-all duration-200"
                         >
                             <FiPlus size={16} />
                             Add Pricing
@@ -514,38 +514,38 @@ const AiModelPricing = () => {
 
                     {/* Stats Overview */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Providers Priced</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{totalRows}</h3>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">of {KNOWN_PROVIDERS.length} supported</p>
                                 </div>
-                                <div className="p-4 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl shadow-lg shadow-teal-500/20">
+                                <div className="p-4 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg shadow-lg shadow-teal-500/20">
                                     <FiTag className="text-white" size={24} />
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Avg Input ₹/1K</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{formatRate(avgInputPrice)}</h3>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Across priced providers</p>
                                 </div>
-                                <div className="p-4 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl shadow-lg shadow-teal-500/20">
+                                <div className="p-4 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg shadow-lg shadow-teal-500/20">
                                     <FiTrendingDown className="text-white" size={24} />
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+                        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Avg Output ₹/1K</p>
                                     <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{formatRate(avgOutputPrice)}</h3>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Across priced providers</p>
                                 </div>
-                                <div className="p-4 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl shadow-lg shadow-cyan-500/20">
+                                <div className="p-4 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-lg shadow-cyan-500/20">
                                     <FiTrendingUp className="text-white" size={24} />
                                 </div>
                             </div>
