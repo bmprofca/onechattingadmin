@@ -214,8 +214,8 @@ const Users = () => {
                 <div className="space-y-1 min-w-0 text-left">
                     <div className="flex items-center justify-start text-xs text-gray-600 dark:text-gray-300">
                         <FiUser className="mr-1.5 flex-shrink-0" size={11} />
-                        <span className="truncate">{user.name}</span>
-                    </div>
+                            <span className="truncate">{user.name}</span>
+                        </div>
                     <div className="flex items-center justify-start text-xs text-gray-600 dark:text-gray-300">
                         <FiMail className="mr-1.5 flex-shrink-0" size={11} />
                         <span className="truncate">{user.email}</span>
