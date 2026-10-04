@@ -8,7 +8,9 @@ import {
   Bot,
   Coins,
   QrCode,
-  Server
+  Server,
+  Globe,
+  SlidersHorizontal
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 
@@ -73,6 +75,16 @@ const Sidebar = ({
       icon: Coins,
       label: "AI Pricing",
       path: "/ai-pricing",
+    },
+    {
+      icon: Globe,
+      label: "Website Content",
+      path: "/website-content",
+    },
+    {
+      icon: SlidersHorizontal,
+      label: "Settings",
+      path: "/settings",
     }
   ];
 

@@ -16,6 +16,8 @@ import ProtectedRoute from './component/ProtectedRoute';
 import AiModelPricing from './pages/AiModelPricing';
 import QrCodes from './pages/QrCodes';
 import TechProvider from './pages/TechProvider';
+import WebsiteContent from './pages/WebsiteContent';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -37,6 +39,8 @@ function App() {
           <Route path='/custom-pricing' element={<CustomPricing />} />
           <Route path='/ai-providers' element={<AiProviders />} />
           <Route path='/ai-pricing' element={<AiModelPricing />} />
+          <Route path='/website-content' element={<WebsiteContent />} />
+          <Route path='/settings' element={<Settings />} />
           <Route path='*' element={<Dashboard />} />
         </Route>
       </Route>

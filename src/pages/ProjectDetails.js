@@ -534,6 +534,34 @@ const ProjectDetails = () => {
                                         </div>
                                     </section>
 
+                                    <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
+                                        <div className="px-6 py-5 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
+                                            <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                                Marketing profile
+                                            </h2>
+                                        </div>
+                                        <div className="p-6">
+                                            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                {[
+                                                    ['PAN', project.pan],
+                                                    ['GST', project.gst],
+                                                    ['Firm type', project.firm_type],
+                                                    ['Industry', project.industry],
+                                                    ['Team volume', project.team_volume],
+                                                    ['Client volume', project.client_volume],
+                                                    ['Annual revenue', project.annual_revenue],
+                                                    ['City', project.city],
+                                                    ['Website', project.website],
+                                                ].map(([label, value]) => (
+                                                    <div key={label} className="flex flex-col p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-gray-700">
+                                                        <dt className="text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</dt>
+                                                        <dd className="text-sm font-semibold text-gray-900 dark:text-white break-all">{value || '—'}</dd>
+                                                    </div>
+                                                ))}
+                                            </dl>
+                                        </div>
+                                    </section>
+
                                     {/* Additional Information Card */}
                                     <section className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-xl overflow-hidden">
                                         <div className="px-6 py-5 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2.5">

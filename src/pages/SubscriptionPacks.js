@@ -52,7 +52,7 @@ const SubscriptionPacks = () => {
     useEffect(() => { fetchPacks(); }, [fetchPacks]);
 
     const openModal = (pack = null) => {
-        setEditingPack(pack);
+            setEditingPack(pack);
         setFormData(pack ? { package_id: pack.package_id, name: pack.name || '', amount: pack.amount ?? '', validity: pack.validity || '1m' } : initialForm);
         setShowModal(true);
     };
@@ -97,7 +97,7 @@ const SubscriptionPacks = () => {
 
     return <div className="min-h-screen">
         <div className="max-w-8xl mx-auto">
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                 <div className="flex items-center gap-3"><div className="p-4 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow-lg shadow-indigo-500/20"><FiPackage className="text-white" size={24} /></div><div><h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Subscription Packages</h1><p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage subscription plans and pricing</p></div></div>
                 <div className="flex items-center gap-3">
                     <button type="button" onClick={fetchPacks} disabled={loading} title="Refresh packages" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 shadow-md shadow-gray-300/30 transition-all hover:bg-gray-50 hover:shadow-lg active:translate-y-px disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:shadow-black/20 dark:hover:bg-gray-700"><FiRefreshCw size={16} className={loading ? 'animate-spin' : ''} />{loading ? 'Refreshing...' : 'Refresh'}</button>
@@ -108,17 +108,17 @@ const SubscriptionPacks = () => {
                 <Stat label="Total Packages" value={packs.length} icon={<FiPackage size={24} />} color="indigo" />
                 <Stat label="Starting Price" value={packs.length ? formatCurrency(Math.min(...packs.map(p => Number(p.amount) || 0))) : '—'} icon={<FiDollarSign size={24} />} color="green" />
                 <Stat label="Max Price" value={packs.length ? formatCurrency(Math.max(...packs.map(p => Number(p.amount) || 0))) : '—'} icon={<FiDollarSign size={24} />} color="green" />
-            </div>
+                            </div>
             <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-2 mb-2 flex gap-4">
                 <div className="relative flex-1 max-w-[600px]"><FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" /><input value={searchTerm} onChange={e => { setPagination(p => ({ ...p, page: 1 })); setSearchTerm(e.target.value); }} placeholder="Search by name, package ID or validity..." className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg dark:text-white" /></div>
-            </div>
+                                    </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
                 <input value={filters.package_id} onChange={e => updateFilter('package_id', e.target.value)} placeholder="Exact package ID" className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white" />
                 <input value={filters.name} onChange={e => updateFilter('name', e.target.value)} placeholder="Exact package name" className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white" />
                 <input value={filters.validity} onChange={e => updateFilter('validity', e.target.value)} placeholder="Exact validity" className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white" />
                 <input type="number" value={filters.min_amount} onChange={e => updateFilter('min_amount', e.target.value)} placeholder="Minimum amount" className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white" />
                 <input type="number" value={filters.max_amount} onChange={e => updateFilter('max_amount', e.target.value)} placeholder="Maximum amount" className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white" />
-            </div>
+                                    </div>
             {loading ? <div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" /></div>
                 : !packs.length ? <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-lg border border-dashed border-gray-200"><FiPackage className="mx-auto text-gray-300 mb-3" size={48} /><p className="text-gray-500">No subscription packages found</p></div>
                     : <><ManagementTable rows={packs} columns={packageColumns} rowKey="package_id" getActions={packageActions} onRowClick={openModal} accent="indigo" /><div className="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{packs.map(pack => <div key={pack.package_id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
