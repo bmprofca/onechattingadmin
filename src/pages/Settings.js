@@ -91,7 +91,7 @@ export default function Settings() {
                 <div>
                     <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Settings</h1>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Each value is stored as its own row. Use a group such as website, billing, or general to organise configs.
+                        Integrations, email, payments, storage, and communications are stored here and used by the server. Secret values stay hidden in the list.
                     </p>
                 </div>
                 <button
@@ -152,7 +152,9 @@ export default function Settings() {
                                                 <div className="font-medium text-gray-900 dark:text-white">{item.label}</div>
                                                 <div className="text-xs text-gray-400">{item.setting_key}</div>
                                             </td>
-                                            <td className="px-4 py-3 max-w-[280px] truncate text-gray-600 dark:text-gray-300">{item.setting_value}</td>
+                                            <td className="px-4 py-3 max-w-[280px] truncate text-gray-600 dark:text-gray-300">
+                                                {item.value_type === 'secret' && item.setting_value ? '••••••••' : item.setting_value}
+                                            </td>
                                             <td className="px-4 py-3 text-gray-500">{item.is_public ? 'Yes' : 'No'}</td>
                                         </tr>
                                     ))}
@@ -174,20 +176,22 @@ export default function Settings() {
                             <span className="text-gray-600 dark:text-gray-300">Group</span>
                             <input
                                 required
+                                disabled={!!draft.system}
                                 value={draft.setting_group}
                                 onChange={(event) => setDraft((prev) => ({ ...prev, setting_group: event.target.value }))}
                                 placeholder="general"
-                                className="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
+                                className="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm disabled:opacity-60"
                             />
                         </label>
                         <label className="block text-sm">
                             <span className="text-gray-600 dark:text-gray-300">Key</span>
                             <input
                                 required
+                                disabled={!!draft.system}
                                 value={draft.setting_key}
                                 onChange={(event) => setDraft((prev) => ({ ...prev, setting_key: event.target.value }))}
                                 placeholder="support_email"
-                                className="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
+                                className="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm disabled:opacity-60"
                             />
                         </label>
                         <label className="block text-sm">
@@ -209,6 +213,7 @@ export default function Settings() {
                                 <option value="textarea">Long text</option>
                                 <option value="number">Number</option>
                                 <option value="boolean">Yes / No</option>
+                                <option value="secret">Secret</option>
                             </select>
                         </label>
                         <label className="block text-sm">
@@ -232,6 +237,7 @@ export default function Settings() {
                             ) : (
                                 <input
                                     type={draft.value_type === 'number' ? 'number' : 'text'}
+                                    autoComplete="off"
                                     value={draft.setting_value || ''}
                                     onChange={(event) => setDraft((prev) => ({ ...prev, setting_value: event.target.value }))}
                                     className="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
@@ -264,7 +270,7 @@ export default function Settings() {
                                 <FiSave className="w-4 h-4" />
                                 {saving ? 'Saving...' : 'Save setting'}
                             </button>
-                            {draft.id ? (
+                            {draft.id && !draft.system ? (
                                 <button
                                     type="button"
                                     onClick={remove}
