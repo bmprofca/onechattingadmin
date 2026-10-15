@@ -64,7 +64,7 @@ function Login() {
     setLoading(true);
     try {
       const res = await verifyOtp(mobile, otp);
-      if (!res.error && res.token) {
+      if (res?.token) {
         const userData = {
           token: res.token,
           username: res.username,
@@ -74,7 +74,7 @@ function Login() {
         toast.success('Logged in successfully');
         navigate('/');
       } else {
-        toast.error(res.message || 'Invalid OTP');
+        toast.error('Invalid OTP');
       }
     } catch (err) {
       toast.error(err.message || 'Login failed. Please try again.');

@@ -19,6 +19,8 @@ export default function Settings() {
     const [draft, setDraft] = useState(emptySetting);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [surcharge, setSurcharge] = useState({ percent: '0', flat: '0' });
+    const [savingSurcharge, setSavingSurcharge] = useState(false);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -26,7 +28,14 @@ export default function Settings() {
             const response = await apiCall('/admin/settings', 'GET');
             const data = await response.json();
             if (!response.ok || data.error) throw new Error(data.error || 'Failed to load settings');
-            setSettings(data.settings || []);
+            const next = data.settings || [];
+            setSettings(next);
+            const percent = next.find((item) => item.setting_key === 'wallet_surcharge_percent');
+            const flat = next.find((item) => item.setting_key === 'wallet_surcharge_flat');
+            setSurcharge({
+                percent: percent?.setting_value ?? '0',
+                flat: flat?.setting_value ?? '0',
+            });
         } catch (error) {
             toast.error(error.message || 'Failed to load settings');
         } finally {
@@ -47,6 +56,63 @@ export default function Settings() {
         : settings.filter((item) => item.setting_group === groupFilter);
 
     const startNew = () => setDraft({ ...emptySetting, setting_group: groupFilter === 'all' ? 'general' : groupFilter });
+
+    const saveSetting = async (payload) => {
+        const existing = settings.find((item) => item.setting_group === payload.setting_group && item.setting_key === payload.setting_key);
+        const response = await apiCall(
+            existing ? `/admin/settings/${existing.id}` : '/admin/settings',
+            existing ? 'PUT' : 'POST',
+            { ...(existing || {}), ...payload }
+        );
+        const data = await response.json();
+        if (!response.ok || data.error) throw new Error(data.error || 'Failed to save setting');
+    };
+
+    const saveSurcharge = async (event) => {
+        event.preventDefault();
+        const percent = Number(surcharge.percent);
+        const flat = Number(surcharge.flat);
+        if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
+            toast.error('Surcharge percent must be between 0 and 100');
+            return;
+        }
+        if (!Number.isFinite(flat) || flat < 0) {
+            toast.error('Flat surcharge cannot be negative');
+            return;
+        }
+        setSavingSurcharge(true);
+        try {
+            await saveSetting({
+                setting_group: 'payments',
+                setting_key: 'wallet_surcharge_percent',
+                label: 'Wallet recharge surcharge (%)',
+                setting_value: String(percent),
+                value_type: 'number',
+                is_public: false,
+                sort_order: 40,
+            });
+            await saveSetting({
+                setting_group: 'payments',
+                setting_key: 'wallet_surcharge_flat',
+                label: 'Wallet recharge surcharge (₹)',
+                setting_value: String(flat),
+                value_type: 'number',
+                is_public: false,
+                sort_order: 50,
+            });
+            toast.success('Wallet surcharge saved');
+            await load();
+        } catch (error) {
+            toast.error(error.message || 'Failed to save surcharge');
+        } finally {
+            setSavingSurcharge(false);
+        }
+    };
+
+    const sampleCredit = 1000;
+    const samplePercentFee = Math.round((sampleCredit * (Number(surcharge.percent) || 0)) ) / 100;
+    const sampleSurcharge = Math.round((samplePercentFee + (Number(surcharge.flat) || 0)) * 100) / 100;
+    const samplePayable = sampleCredit + sampleSurcharge;
 
     const save = async (event) => {
         event.preventDefault();
@@ -103,6 +169,51 @@ export default function Settings() {
                     Refresh
                 </button>
             </div>
+
+            <form onSubmit={saveSurcharge} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 space-y-4">
+                <div>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Wallet recharge surcharge</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Added on top of the amount credited to the wallet. Razorpay charges the total. The wallet receives only the recharge amount.
+                    </p>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4 max-w-xl">
+                    <label className="block text-sm">
+                        <span className="text-gray-600 dark:text-gray-300">Percent (%)</span>
+                        <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            value={surcharge.percent}
+                            onChange={(event) => setSurcharge((prev) => ({ ...prev, percent: event.target.value }))}
+                            className="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
+                        />
+                    </label>
+                    <label className="block text-sm">
+                        <span className="text-gray-600 dark:text-gray-300">Flat fee (₹)</span>
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={surcharge.flat}
+                            onChange={(event) => setSurcharge((prev) => ({ ...prev, flat: event.target.value }))}
+                            className="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
+                        />
+                    </label>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                    A ₹{sampleCredit.toLocaleString('en-IN')} recharge pays ₹{samplePayable.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (fee ₹{sampleSurcharge.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).
+                </p>
+                <button
+                    type="submit"
+                    disabled={savingSurcharge || loading}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium disabled:opacity-60"
+                >
+                    <FiSave className="w-4 h-4" />
+                    {savingSurcharge ? 'Saving...' : 'Save surcharge'}
+                </button>
+            </form>
 
             {loading ? (
                 <div className="py-16 text-center text-sm text-gray-500">Loading settings...</div>

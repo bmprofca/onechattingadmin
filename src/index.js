@@ -1,4 +1,5 @@
 import React from 'react';
+import { installDefaultTransport } from './api/http/transport';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
@@ -10,6 +11,9 @@ import { AuthProvider } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
 const GOOGLE_CLIENT_ID = "124604231994-dtnflivbu049428d1cg9ngfuhgq38efs.apps.googleusercontent.com";
+
+// API transport for axios requests to the OneChatting API
+installDefaultTransport();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

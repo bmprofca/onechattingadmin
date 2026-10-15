@@ -1,19 +1,13 @@
-import { apiCall } from '../utils/apiCall';
+import { apiRequest } from '../utils/apiCall';
 
+/** Send a login OTP to an admin mobile number. Throws ApiError on failure. */
 export const sendOtp = async (mobile) => {
-  const response = await apiCall('/admin/send-otp', 'POST', { mobile });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || 'Failed to send OTP');
-  }
-  return data;
+  const { message } = await apiRequest('/admin/send-otp', 'POST', { mobile });
+  return { message };
 };
 
+/** Verify the OTP. Resolves with { token, username, profile }. Throws ApiError on failure. */
 export const verifyOtp = async (mobile, otp) => {
-  const response = await apiCall('/admin/verify-otp', 'POST', { mobile, otp });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || 'Failed to verify OTP');
-  }
+  const { data } = await apiRequest('/admin/verify-otp', 'POST', { mobile, otp });
   return data;
 };

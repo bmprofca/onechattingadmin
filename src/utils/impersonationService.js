@@ -24,8 +24,6 @@ export const checkUserActiveSession = async (username, adminToken) => {
 
   if (adminToken) {
     headers['Authorization'] = `Bearer ${adminToken}`;
-    headers['x-token'] = adminToken;
-    headers['x-auth-token'] = adminToken;
   }
 
   try {
