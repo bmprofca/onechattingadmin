@@ -10,6 +10,7 @@
 /build
 
 # env overrides (committed .env.development / .env.production are OK)
+.env
 .env.local
 .env.development.local
 .env.test.local
